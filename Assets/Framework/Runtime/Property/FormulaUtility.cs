@@ -50,7 +50,7 @@ namespace GBG.Framework.Property
             return result;
         }
 
-        public static double CalculateProperties(double baseValue, IEnumerable<IProperty> properties)
+        public static double CalculateProperties(IEnumerable<IProperty> properties)
         {
             if (_propertySpecs == null)
             {
@@ -101,7 +101,7 @@ namespace GBG.Framework.Property
                 }
             }
 
-            var result = (baseValue + baseAddends) * (1.0 + mulAddends) + rawAddends;
+            var result = baseAddends * (1.0 + mulAddends) + rawAddends;
             return result;
         }
     }

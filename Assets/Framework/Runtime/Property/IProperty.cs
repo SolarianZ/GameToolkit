@@ -11,4 +11,15 @@ namespace GBG.Framework.Property
             return $"#{SpecId} {Value:F5}";
         }
     }
+
+    public class Property : IProperty
+    {
+        public int SpecId { get; internal set; }
+        public double Value { get; internal set; }
+
+        public override string ToString()
+        {
+            return ((IProperty)this).ToString();
+        }
+    }
 }

@@ -1,13 +1,14 @@
-﻿using System;
+﻿using GBG.Framework.ConfigData;
+using System;
 
 namespace GBG.Framework.Property
 {
     public enum PropertyPosition
     {
-        // (base+p0)*(1+p1)+p2
-        BaseAddend = 0, // p0
-        MulAddend = 100, // p1
-        RawAddend = 200, // p2
+        // (ΣBaseAddend)*(1+ΣMulAddend)+ΣRawAddend
+        BaseAddend = 0,
+        MulAddend = 100,
+        RawAddend = 200,
     }
 
     public enum PropertyConvertion
@@ -15,7 +16,7 @@ namespace GBG.Framework.Property
         Raw = 0, Floor = 100, Ceiling = 200, Round = 300,
     }
 
-    public interface IPropertySpec
+    public interface IPropertySpec : IConfig
     {
         int Id { get; }
         double MinValue { get; }
@@ -49,5 +50,14 @@ namespace GBG.Framework.Property
         {
             return Clamp(Convert(value));
         }
+    }
+
+    public class PropertySpec : IPropertySpec
+    {
+        public int Id { get; internal set; }
+        public double MinValue { get; internal set; }
+        public double MaxValue { get; internal set; }
+        public PropertyPosition Position { get; internal set; }
+        public PropertyConvertion Convertion { get; internal set; }
     }
 }
