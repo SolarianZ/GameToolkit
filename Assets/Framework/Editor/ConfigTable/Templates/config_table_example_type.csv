@@ -1,0 +1,10 @@
+#This row serves as a type comment.,
+#class _EXAMPLE_CLASS_NAME,
+#Primary Key.,#This row serves as a field comment.
+Id,#This row serves as a field name.
+#int32,#This row serves as a field type.
+null,#This row serves as a embeded type comment.
+null,#This row serves as a embeded field names.
+null,#This row serves as a embeded field types.
+null,#This row serves as default values.
+null,#This row serves as a foreign key.

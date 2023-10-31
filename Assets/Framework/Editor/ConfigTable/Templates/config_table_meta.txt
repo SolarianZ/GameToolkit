@@ -1,0 +1,18 @@
+[type]
+<type_comment>
+type <type_name>
+<field_comment>
+<field_name>
+<field_type>: int8, int16, int32, int64, uint8, uint16, uint32, uint64, float32, float64, string, mlstr, []
+<embeded_field_comment>
+<embeded_field_name>
+<embeded_field_type>
+<default_values>
+<foreign_key>
+
+array_separator=';'
+
+[enum]
+<enum_comment>
+enum <enum_name>
+Name Value

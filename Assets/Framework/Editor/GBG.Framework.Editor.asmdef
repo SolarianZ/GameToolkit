@@ -1,0 +1,18 @@
+{
+    "name": "GBG.Framework.Editor",
+    "rootNamespace": "GBG.Framework.Editor",
+    "references": [
+        "GUID:587cd0dd140853645b912030e0c17a1a"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
