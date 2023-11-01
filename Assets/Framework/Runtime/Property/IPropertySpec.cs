@@ -11,18 +11,18 @@ namespace GBG.Framework.Property
         RawAddend = 200,
     }
 
-    public enum PropertyConvertion
+    public enum PropertyConvertMode
     {
         Raw = 0, Floor = 100, Ceiling = 200, Round = 300,
     }
 
-    public interface IPropertySpec : IConfig
+    public interface IPropertySpec
     {
         int Id { get; }
         double MinValue { get; }
         double MaxValue { get; }
         PropertyPosition Position { get; }
-        PropertyConvertion Convertion { get; }
+        PropertyConvertMode ConvertMode { get; }
 
         double Clamp(double value)
         {
@@ -31,18 +31,18 @@ namespace GBG.Framework.Property
 
         double Convert(double value)
         {
-            switch (Convertion)
+            switch (ConvertMode)
             {
-                case PropertyConvertion.Raw:
+                case PropertyConvertMode.Raw:
                     return value;
-                case PropertyConvertion.Floor:
+                case PropertyConvertMode.Floor:
                     return Math.Floor(value);
-                case PropertyConvertion.Ceiling:
+                case PropertyConvertMode.Ceiling:
                     return Math.Ceiling(value);
-                case PropertyConvertion.Round:
+                case PropertyConvertMode.Round:
                     return Math.Round(value);
                 default:
-                    throw new NotSupportedException($"Unknown PropertyConvertion '{Convertion}'.");
+                    throw new NotSupportedException($"Unknown PropertyConvertMode '{ConvertMode}'.");
             }
         }
 
@@ -52,12 +52,12 @@ namespace GBG.Framework.Property
         }
     }
 
-    public class PropertySpec : IPropertySpec
+    public class PropertySpec : IPropertySpec, IConfig
     {
         public int Id { get; internal set; }
         public double MinValue { get; internal set; }
         public double MaxValue { get; internal set; }
         public PropertyPosition Position { get; internal set; }
-        public PropertyConvertion Convertion { get; internal set; }
+        public PropertyConvertMode ConvertMode { get; internal set; }
     }
 }
