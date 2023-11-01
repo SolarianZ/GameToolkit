@@ -4,7 +4,7 @@
     {
         Debug,
         Info,
-        Warning,
+        Warn,
         Error,
         Fatal,
     }
@@ -15,7 +15,7 @@
         //[System.Diagnostics.Conditional("GBG_FRAMEWORK_LOG_DEBUG")]
         void LogDebug(string message, object context = null, string tag = null);
         void LogInfo(string message, object context = null, string tag = null);
-        void LogWarning(string message, object context = null, string tag = null);
+        void LogWarn(string message, object context = null, string tag = null);
         void LogError(string message, object context = null, string tag = null);
         void LogFatal(string message, object context = null, string tag = null);
     }
