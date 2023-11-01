@@ -2,9 +2,10 @@
 {
     public interface IViewActor
     {
-        int ActorId { get; }
+        object ResKey { get; }
 
-        void OnUse();
-        void OnRecycle();
+        void OnUseActor();
+        void OnRecycleActor();
+        void OnDestroyActor();
     }
 }
