@@ -4,6 +4,6 @@
     {
         ulong FrameId { get; }
         ulong Time { get; }
-        ulong DeltaTime { get; }
+        uint DeltaTime { get; }
     }
 }
