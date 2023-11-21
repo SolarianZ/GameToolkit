@@ -34,21 +34,21 @@ namespace GBG.Framework.Unity.UI
 
                 EditorGUILayout.Space();
 
-                _debugLocker = EditorGUILayout.TextField("Debug Locker", _debugLocker);
+                _debugLocker = EditorGUILayout.TextField("[Debug] Locker", _debugLocker);
 
-                if (GUILayout.Button("Debug Show"))
+                if (GUILayout.Button("[Debug] Show"))
                 {
                     var debugLocker = string.IsNullOrWhiteSpace(_debugLocker) ? null : _debugLocker;
                     ui.Show(locker: debugLocker);
                 }
 
-                if (GUILayout.Button("Debug Close"))
+                if (GUILayout.Button("[Debug] Close"))
                 {
                     var debugLocker = string.IsNullOrWhiteSpace(_debugLocker) ? null : _debugLocker;
                     ui.Close(locker: debugLocker);
                 }
 
-                if (GUILayout.Button("Print Lockers"))
+                if (GUILayout.Button("[Debug] Print Lockers"))
                 {
                     PrintLockers();
                 }

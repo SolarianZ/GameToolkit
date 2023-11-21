@@ -23,6 +23,7 @@ namespace GBG.Framework.Unity.UI
     public interface IUIController
     {
         bool IsFullScreenOpaque { get; }
+        int Priority { get; }
         UIState State { get; internal set; }
         UICloseMode CloseMode { get; }
 
@@ -73,6 +74,7 @@ namespace GBG.Framework.Unity.UI
         public class BasicSettings
         {
             public bool isFullScreenOpaque;
+            public int priority;
             public UICloseMode closeMode;
         }
 
@@ -80,6 +82,7 @@ namespace GBG.Framework.Unity.UI
         protected BasicSettings basicSettings = new();
 
         bool IUIController.IsFullScreenOpaque => basicSettings.isFullScreenOpaque;
+        int IUIController.Priority => basicSettings.priority;
         UICloseMode IUIController.CloseMode => basicSettings.closeMode;
         UIState IUIController.State { get => UIState; set => UIState = value; }
         public UIState UIState { get; private set; }
