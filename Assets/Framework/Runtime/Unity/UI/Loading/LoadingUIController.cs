@@ -9,8 +9,8 @@ namespace GBG.Framework.Unity.UI
     //[RequireComponent(typeof(GraphicRaycaster))]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(CanvasGroup))]
-    [DisallowMultipleComponent]
-    public sealed partial class LoadingUIController : MonoBehaviour
+    //[DisallowMultipleComponent]
+    public sealed partial class LoadingUIController : UIControllerBase
     {
         public enum State
         {
@@ -62,7 +62,7 @@ namespace GBG.Framework.Unity.UI
             }
         }
 
-        public State ViewState { get; private set; }
+        public State FadeState { get; private set; }
         public int LockCount => _lockers.Count;
 
         private readonly HashSet<object> _lockers = new();
@@ -75,7 +75,7 @@ namespace GBG.Framework.Unity.UI
 
         public void Tick(float deltaTime)
         {
-            if (ViewState == State.FadingIn)
+            if (FadeState == State.FadingIn)
             {
                 _fadeTimer += deltaTime;
                 var alpha = _fadeInCurve.Evaluate(_fadeTimer / _fadeTime);
@@ -86,11 +86,11 @@ namespace GBG.Framework.Unity.UI
                 {
                     _fadeTimer = 0;
                     _fadeTime = 0;
-                    ViewState = State.FadeInComplete;
+                    FadeState = State.FadeInComplete;
                     OnFadeInComplete?.Invoke();
                 }
             }
-            else if (ViewState == State.FadingOut)
+            else if (FadeState == State.FadingOut)
             {
                 _fadeTimer += deltaTime;
                 var alpha = 1 - _fadeInCurve.Evaluate(_fadeTimer / _fadeTime);
@@ -102,7 +102,7 @@ namespace GBG.Framework.Unity.UI
                     _fadeTimer = 0;
                     _fadeTime = 0;
                     _canvas.enabled = false;
-                    ViewState = State.FadeOutComplete;
+                    FadeState = State.FadeOutComplete;
                     OnFadeOutComplete?.Invoke();
                 }
             }
@@ -115,7 +115,7 @@ namespace GBG.Framework.Unity.UI
                 _lockers.Add(locker);
             }
 
-            if (ViewState == State.FadeInComplete)
+            if (FadeState == State.FadeInComplete)
             {
                 return;
             }
@@ -125,13 +125,13 @@ namespace GBG.Framework.Unity.UI
             {
                 _canvasGroup.alpha = 1;
                 _canvas.enabled = true;
-                ViewState = State.FadeInComplete;
+                FadeState = State.FadeInComplete;
                 OnFadeInComplete?.Invoke();
             }
 
             UpdateFadeTimes(newFadeTime, State.FadingIn);
 
-            ViewState = State.FadingIn;
+            FadeState = State.FadingIn;
         }
 
         public void Close(object locker = null, float? fadeOutTime = null)
@@ -141,7 +141,7 @@ namespace GBG.Framework.Unity.UI
                 _lockers.Remove(locker);
             }
 
-            if (ViewState == State.FadeOutComplete)
+            if (FadeState == State.FadeOutComplete)
             {
                 return;
             }
@@ -156,13 +156,18 @@ namespace GBG.Framework.Unity.UI
             {
                 _canvasGroup.alpha = 0;
                 _canvas.enabled = false;
-                ViewState = State.FadeOutComplete;
+                FadeState = State.FadeOutComplete;
                 OnFadeOutComplete?.Invoke();
             }
 
             UpdateFadeTimes(newFadeTime, State.FadingOut);
 
-            ViewState = State.FadingOut;
+            FadeState = State.FadingOut;
+        }
+
+        public override bool IsCloseEffectFinished()
+        {
+            return FadeState == State.FadeOutComplete;
         }
 
         private void UpdateFadeTimes(float newFadeTime, State targetState)
@@ -178,7 +183,7 @@ namespace GBG.Framework.Unity.UI
                 // keep fade progress
                 _fadeTimer = _fadeTimer / _fadeTime * newFadeTime;
                 _fadeTime = newFadeTime;
-                if (ViewState != targetState)
+                if (FadeState != targetState)
                 {
                     _fadeTimer = _fadeTime - _fadeTimer;
                 }
@@ -211,7 +216,7 @@ namespace GBG.Framework.Unity.UI
         {
             CheckCurves();
 
-            ViewState = State.FadeOutComplete;
+            FadeState = State.FadeOutComplete;
             _canvasGroup.alpha = 0;
             _canvas.enabled = false;
         }
