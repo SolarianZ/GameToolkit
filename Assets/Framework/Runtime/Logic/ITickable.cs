@@ -6,6 +6,6 @@
         int Priority { get; }
 
         void Tick();
-        void PostTick();
+        void LateTick();
     }
 }

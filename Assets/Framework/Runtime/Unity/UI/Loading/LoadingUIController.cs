@@ -132,6 +132,8 @@ namespace GBG.Framework.Unity.UI
             UpdateFadeTimes(newFadeTime, State.FadingIn);
 
             FadeState = State.FadingIn;
+
+            ((IUIController)this).Show();
         }
 
         public void Close(object locker = null, float? fadeOutTime = null)
@@ -163,6 +165,8 @@ namespace GBG.Framework.Unity.UI
             UpdateFadeTimes(newFadeTime, State.FadingOut);
 
             FadeState = State.FadingOut;
+
+            ((IUIController)this).Close();
         }
 
         public override bool IsCloseEffectFinished()

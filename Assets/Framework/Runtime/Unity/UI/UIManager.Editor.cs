@@ -54,12 +54,12 @@ namespace GBG.Framework.Unity.UI
 
                     if (GUILayout.Button("[Debug] Create Group"))
                     {
-                        manager.CreateGroup(_debugGroupName, _debugGroupPriority);
+                        manager.TryCreateGroup(_debugGroupName, _debugGroupPriority);
                     }
 
                     if (GUILayout.Button("[Debug] Delete Group"))
                     {
-                        manager.DeleteGroup(_debugGroupName);
+                        manager.TryDeleteGroup(_debugGroupName);
                     }
                 }
                 else

@@ -32,8 +32,12 @@ namespace GBG.Framework.Unity
             if (!_instance)
             {
                 _instance = (T)this;
-                DontDestroyOnLoad(this);
                 IsValidInstance = true;
+
+                if (!transform.parent)
+                {
+                    DontDestroyOnLoad(this);
+                }
             }
             else
             {

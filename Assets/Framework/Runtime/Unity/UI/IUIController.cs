@@ -22,10 +22,14 @@ namespace GBG.Framework.Unity.UI
 
     public interface IUIController
     {
-        bool IsFullScreenOpaque { get; }
+        string Name { get; internal set; }
         int Priority { get; }
         UIState State { get; internal set; }
         UICloseMode CloseMode { get; }
+
+        event Action<IUIController> Closed;
+        event Action<IUIController> Destroyed;
+
 
         void Show();
         void Resume();
@@ -34,8 +38,10 @@ namespace GBG.Framework.Unity.UI
 
         bool IsCloseEffectFinished();
 
+        void SetSiblingIndex(int index);
         void Deactivate();
         void Destroy();
+        bool IsDestroyed();
 
         static bool ProcessUIClosing(IUIController ui)
         {
@@ -73,7 +79,6 @@ namespace GBG.Framework.Unity.UI
         [Serializable]
         public class BasicSettings
         {
-            public bool isFullScreenOpaque;
             public int priority;
             public UICloseMode closeMode;
         }
@@ -81,11 +86,14 @@ namespace GBG.Framework.Unity.UI
         [SerializeField]
         protected BasicSettings basicSettings = new();
 
-        bool IUIController.IsFullScreenOpaque => basicSettings.isFullScreenOpaque;
+        string IUIController.Name { get; set; }
         int IUIController.Priority => basicSettings.priority;
         UICloseMode IUIController.CloseMode => basicSettings.closeMode;
         UIState IUIController.State { get => UIState; set => UIState = value; }
         public UIState UIState { get; private set; }
+
+        public event Action<IUIController> Closed;
+        public event Action<IUIController> Destroyed;
 
 
         void IUIController.Show()
@@ -126,7 +134,7 @@ namespace GBG.Framework.Unity.UI
 
             if (UIState == UIState.Closing || UIState == UIState.Closed)
             {
-                Debug.LogError($"Can not pause a UI that is in '{UIState}' state.", this);
+                //Debug.LogError($"Can not pause a UI that is in '{UIState}' state.", this);
                 return;
             }
 
@@ -143,7 +151,7 @@ namespace GBG.Framework.Unity.UI
 
             if (UIState == UIState.Closing || UIState == UIState.Closed)
             {
-                Debug.LogError($"Can not resume a UI that is in '{UIState}' state.", this);
+                //Debug.LogError($"Can not resume a UI that is in '{UIState}' state.", this);
                 return;
             }
 
@@ -161,20 +169,27 @@ namespace GBG.Framework.Unity.UI
             UIState = UIState.Closing;
             OnClose();
 
-            IUIController.ProcessUIClosing(this);
+            Closed?.Invoke(this);
         }
 
         public abstract bool IsCloseEffectFinished();
 
 
+        void IUIController.SetSiblingIndex(int index) => transform.SetSiblingIndex(index);
         void IUIController.Deactivate() => gameObject.TrySetActive(false);
         void IUIController.Destroy() => Destroy(gameObject);
+        bool IUIController.IsDestroyed() => !gameObject;
 
 
         protected virtual void OnShow() { }
         protected virtual void OnPause() { }
         protected virtual void OnResume() { }
         protected virtual void OnClose() { }
+
+        protected virtual void OnDestroy()
+        {
+            Destroyed?.Invoke(this);
+        }
     }
 }
 #endif
