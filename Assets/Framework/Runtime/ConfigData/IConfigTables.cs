@@ -5,32 +5,37 @@ namespace GBG.Framework.ConfigData
 {
     public interface IConfigTables
     {
-        void Reinitialize(IReadOnlyDictionary<Type, IReadOnlyDictionary<int, IConfig>> configTables);
-
         bool ContainsConfigTable<T>() where T : IConfig;
-        IReadOnlyDictionary<int, IConfig> GetConfigTable<T>() where T : IConfig;
-        bool TryGetConfigTable<T>(out IReadOnlyDictionary<int, IConfig> table) where T : IConfig;
+        IConfigTable<T> GetConfigTable<T>() where T : IConfig;
+        bool TryGetConfigTable<T>(out IConfigTable<T> configTable) where T : IConfig;
 
         bool ContainsConfig<T>(int key) where T : IConfig;
-        T GetConfig<T>(int key) where T : IConfig;
+        IReadOnlyList<T> GetConfigs<T>() where T : IConfig;
+        T GetConfig<T>(int key, T defaultValue = default) where T : IConfig;
         bool TryGetConfig<T>(int key, out T value) where T : IConfig;
     }
 
-    public class ConfigTables : IConfigTables
+    public class DefaultConfigTables : IConfigTables
     {
-        private IReadOnlyDictionary<Type, IReadOnlyDictionary<int, IConfig>> _configTables;
+        private IReadOnlyDictionary<Type, IConfigTablePtr> _configTables;
 
 
-        public ConfigTables(IReadOnlyDictionary<Type, IReadOnlyDictionary<int, IConfig>> configTables)
-        {
-            Reinitialize(configTables);
-        }
-
-        public void Reinitialize(IReadOnlyDictionary<Type, IReadOnlyDictionary<int, IConfig>> configTables)
+        public DefaultConfigTables(IReadOnlyDictionary<Type, IConfigTablePtr> configTables)
         {
             if (_configTables == null)
             {
                 throw new ArgumentNullException(nameof(configTables), $"Argument '{nameof(configTables)} is null.");
+            }
+
+            foreach (var kv in configTables)
+            {
+                var keyType = kv.Key;
+                var valueType = kv.Value.GetConfigType();
+                if (keyType != valueType)
+                {
+                    throw new ArgumentException($"The config table element type '{valueType}' does not match type '{keyType}'.",
+                        nameof(configTables));
+                }
             }
 
             _configTables = configTables;
@@ -41,57 +46,67 @@ namespace GBG.Framework.ConfigData
             return _configTables.ContainsKey(typeof(T));
         }
 
-        public IReadOnlyDictionary<int, IConfig> GetConfigTable<T>() where T : IConfig
+        public IConfigTable<T> GetConfigTable<T>() where T : IConfig
         {
-            if (TryGetConfigTable<T>(out var table))
+            if (TryGetConfigTable<T>(out var configTable))
             {
-                return table;
+                return configTable;
             }
 
             return null;
         }
 
-        public bool TryGetConfigTable<T>(out IReadOnlyDictionary<int, IConfig> table) where T : IConfig
+        public bool TryGetConfigTable<T>(out IConfigTable<T> configTable) where T : IConfig
         {
-            return _configTables.TryGetValue(typeof(T), out table);
+            if (_configTables.TryGetValue(typeof(T), out var tablePtr))
+            {
+                configTable = (IConfigTable<T>)tablePtr;
+                return true;
+            }
+
+            configTable = null;
+            return false;
         }
 
         public bool ContainsConfig<T>(int key) where T : IConfig
         {
-            if (!_configTables.TryGetValue(typeof(T), out var table))
+            if (TryGetConfigTable<T>(out var configTable))
             {
-                return false;
+                return configTable.ContainsConfig(key);
             }
 
-            return table.ContainsKey(key);
+            return false;
         }
 
-        public T GetConfig<T>(int key) where T : IConfig
+        public IReadOnlyList<T> GetConfigs<T>() where T : IConfig
         {
-            if (TryGetConfig<T>(key, out var config))
+            if (TryGetConfigTable<T>(out var configTable))
             {
-                return config;
+                return configTable.GetConfigs();
             }
 
-            return default;
+            return null;
+        }
+
+        public T GetConfig<T>(int key, T defaultValue = default) where T : IConfig
+        {
+            if (TryGetConfig<T>(key, out var configTable))
+            {
+                return configTable;
+            }
+
+            return defaultValue;
         }
 
         public bool TryGetConfig<T>(int key, out T value) where T : IConfig
         {
-            if (!_configTables.TryGetValue(typeof(T), out var table))
+            if (TryGetConfigTable<T>(out var configTable))
             {
-                value = default;
-                return false;
+                return configTable.TryGetConfig(key, out value);
             }
 
-            if (!table.TryGetValue(key, out var config))
-            {
-                value = default;
-                return false;
-            }
-
-            value = (T)config;
-            return true;
+            value = default;
+            return false;
         }
     }
 }
