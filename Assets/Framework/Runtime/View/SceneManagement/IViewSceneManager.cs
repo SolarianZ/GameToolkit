@@ -9,9 +9,9 @@ namespace GBG.Framework.View.SceneManagement
         IReadOnlyList<int> LoadingScenes { get; }
         bool IsLoadingAnyScenes => LoadingScenes != null && LoadingScenes.Count > 0;
 
-        bool IsSceneLoaded(int SceneId) => LoadedScenes?.Contains(SceneId) ?? false;
-        bool IsSceneLoading(int SceneId) => LoadingScenes?.Contains(SceneId) ?? false;
-        void LoadScene(int SceneId);
-        void UnloadScene(int SceneId);
+        bool IsSceneLoaded(int sceneId) => LoadedScenes?.Contains(sceneId) ?? false;
+        bool IsSceneLoading(int sceneId) => LoadingScenes?.Contains(sceneId) ?? false;
+        void LoadScene(int sceneId);
+        void UnloadScene(int sceneId);
     }
 }

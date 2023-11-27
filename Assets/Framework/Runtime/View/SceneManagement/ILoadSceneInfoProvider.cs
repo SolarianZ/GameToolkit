@@ -7,8 +7,7 @@ namespace GBG.Framework.View.SceneManagement
     /// </summary>
     public interface ILoadSceneInfoProvider
     {
-        Vector3 GetCameraPosition();
-        Vector3 GetCameraFocus();
+        Vector3 GetCentralPosition();
         float GetPreloadDistance();
         float GetUnloadDistance();
     }

@@ -3,7 +3,7 @@
     public interface IComponent
     {
         void Initialize();
-        void PostInitialize();
+        void LateInitialize();
         void Destroy();
     }
 }
