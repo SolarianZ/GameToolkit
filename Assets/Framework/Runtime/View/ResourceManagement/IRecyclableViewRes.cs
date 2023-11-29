@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.View.ActorManagement
+﻿namespace GBG.Framework.View.ResourceManagement
 {
     public interface IRecyclableViewRes
     {
