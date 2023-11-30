@@ -5,7 +5,7 @@ namespace GBG.Framework.Unity
 {
     [ExecuteInEditMode]
     [DisallowMultipleComponent]
-    internal partial class EditorOnly : MonoBehaviour
+    public partial class EditorOnly : MonoBehaviour
     {
         public bool DeactivateOnEnterPlayMode = true;
 
