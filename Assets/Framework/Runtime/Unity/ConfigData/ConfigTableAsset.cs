@@ -23,7 +23,7 @@ namespace GBG.Framework.Unity.ConfigData
 
             _table = new Dictionary<Type, ConfigAssetPtr>(Configs.Length);
 
-            foreach (var config in Configs)
+            foreach (ConfigAssetPtr config in Configs)
             {
                 _table.Add(config.GetConfigType(), config);
             }
@@ -37,7 +37,7 @@ namespace GBG.Framework.Unity.ConfigData
 
         public IConfigTable<T> GetConfigTable<T>() where T : IConfig
         {
-            if (TryGetConfigTable<T>(out var configTable))
+            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
             {
                 return configTable;
             }
@@ -48,7 +48,7 @@ namespace GBG.Framework.Unity.ConfigData
         public bool TryGetConfigTable<T>(out IConfigTable<T> configTable) where T : IConfig
         {
             PrepareTable();
-            if (_table.TryGetValue(typeof(T), out var tablePtr))
+            if (_table.TryGetValue(typeof(T), out ConfigAssetPtr tablePtr))
             {
                 configTable = (IConfigTable<T>)tablePtr;
                 return true;
@@ -61,7 +61,7 @@ namespace GBG.Framework.Unity.ConfigData
 
         public bool ContainsConfig<T>(int key) where T : IConfig
         {
-            if (TryGetConfigTable<T>(out var configTable))
+            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
             {
                 return configTable.ContainsConfig(key);
             }
@@ -71,7 +71,7 @@ namespace GBG.Framework.Unity.ConfigData
 
         public IReadOnlyList<T> GetConfigs<T>() where T : IConfig
         {
-            if (TryGetConfigTable<T>(out var configTable))
+            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
             {
                 return configTable.GetConfigs();
             }
@@ -81,7 +81,7 @@ namespace GBG.Framework.Unity.ConfigData
 
         public T GetConfig<T>(int key, T defaultValue = default) where T : IConfig
         {
-            if (TryGetConfig<T>(key, out var config))
+            if (TryGetConfig<T>(key, out T config))
             {
                 return config;
             }
@@ -91,9 +91,8 @@ namespace GBG.Framework.Unity.ConfigData
 
         public bool TryGetConfig<T>(int key, out T value) where T : IConfig
         {
-            if (_table.TryGetValue(typeof(T), out var tablePtr))
+            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
             {
-                var configTable = (IConfigTable<T>)tablePtr;
                 return configTable.TryGetConfig(key, out value);
             }
 

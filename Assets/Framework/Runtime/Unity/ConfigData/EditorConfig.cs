@@ -13,6 +13,13 @@ namespace GBG.Framework.Unity.ConfigData
         public int Id;
 
 
+        #region Unity Messages
+
+        protected virtual void Reset() { }
+
+        #endregion
+
+
         public string CommentOrId()
         {
             return string.IsNullOrEmpty(Comment) ? Id.ToString() : Comment;
