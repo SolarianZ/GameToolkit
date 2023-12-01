@@ -25,7 +25,7 @@ namespace GBG.Framework.Unity.ConfigData
 
             foreach (var config in Configs)
             {
-                _table.Add(config.GetType(), config);
+                _table.Add(config.GetConfigType(), config);
             }
         }
 
