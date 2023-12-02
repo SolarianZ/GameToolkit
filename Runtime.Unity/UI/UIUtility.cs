@@ -3,9 +3,9 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace GBG.GameToolkit.Unity
+namespace GBG.GameToolkit.Unity.UI
 {
-    public static class UIUtils
+    public static class UIUtility
     {
         #region Position
 

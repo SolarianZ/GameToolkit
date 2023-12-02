@@ -1,7 +1,7 @@
 ﻿#if UNITY_2022_1_OR_NEWER || GBG_FRAMEWORK_ENABLE_UNITY_APIS
 namespace GBG.GameToolkit.Unity
 {
-    public static class Converters
+    public static class Convertion
     {
         public static System.Numerics.Vector2 ToSystem(this UnityEngine.Vector2 value) => new System.Numerics.Vector2(value.x, value.y);
         public static System.Numerics.Vector3 ToSystem(this UnityEngine.Vector3 value) => new System.Numerics.Vector3(value.x, value.y, value.z);

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GBG.GameToolkit.Unity
 {
-    public static class GameObjectUtils
+    public static class GameObjectUtility
     {
         public static void TrySetActive(this Component component, bool active)
         {

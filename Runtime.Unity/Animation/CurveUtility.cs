@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GBG.GameToolkit.Unity
 {
-    public static class CurveUtils
+    public static class CurveUtility
     {
         public static bool IsNormalized(this AnimationCurve curve, float tolerant = 0.001f)
         {

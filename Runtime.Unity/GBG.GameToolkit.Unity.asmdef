@@ -1,7 +1,9 @@
 {
-    "name": "GBG.GameToolkit",
-    "rootNamespace": "GBG.GameToolkit",
-    "references": [],
+    "name": "GBG.GameToolkit.Unity",
+    "rootNamespace": "GBG.GameToolkit.Unity",
+    "references": [
+        "GUID:587cd0dd140853645b912030e0c17a1a"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
@@ -10,5 +12,5 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": true
+    "noEngineReferences": false
 }

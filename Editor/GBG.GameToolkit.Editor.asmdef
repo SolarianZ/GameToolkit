@@ -2,7 +2,8 @@
     "name": "GBG.GameToolkit.Editor",
     "rootNamespace": "GBG.GameToolkit.Editor",
     "references": [
-        "GUID:587cd0dd140853645b912030e0c17a1a"
+        "GUID:587cd0dd140853645b912030e0c17a1a",
+        "GUID:6c289c08d5c27e84a9dda895f399df4d"
     ],
     "includePlatforms": [
         "Editor"
