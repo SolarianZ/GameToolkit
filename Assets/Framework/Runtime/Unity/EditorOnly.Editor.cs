@@ -1,12 +1,12 @@
 ﻿#if UNITY_EDITOR
-using GBG.Framework.Unity.ConfigData;
 using System;
 using System.Linq;
+using GBG.GameToolkit.Unity.ConfigData;
 using UnityEditor;
 using UnityEngine;
 using UDebug = UnityEngine.Debug;
 
-namespace GBG.Framework.Unity
+namespace GBG.GameToolkit.Unity
 {
     partial class EditorOnly
     {

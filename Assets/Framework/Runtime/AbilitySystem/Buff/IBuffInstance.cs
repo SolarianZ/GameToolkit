@@ -1,4 +1,4 @@
-namespace GBG.Framework.Ability.Buff
+namespace GBG.GameToolkit.Ability.Buff
 {
     public interface IBuffInstance { }
 }

@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace GBG.Framework.Unity.UI
+namespace GBG.GameToolkit.Unity.UI
 {
     public enum UIState
     {

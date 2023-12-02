@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UDebug = UnityEngine.Debug;
 
-namespace GBG.Framework.Editor.Utility
+namespace GBG.GameToolkit.Editor.Utility
 {
     public static class MissingScriptTool
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace GBG.Framework.Editor.ConfigData
+namespace GBG.GameToolkit.Editor.ConfigData
 {
     public static class CsvUtility
     {

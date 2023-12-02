@@ -7,7 +7,7 @@ using UCamera = UnityEngine.Camera;
 using UnityEditor;
 #endif
 
-namespace GBG.Framework.Unity.URP
+namespace GBG.GameToolkit.Unity.URP
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UCamera))]

@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace GBG.Framework.View.ResourceManagement
+namespace GBG.GameToolkit.View.ResourceManagement
 {
     /// <summary>
     /// Provides information to determine which areas should be loaded.

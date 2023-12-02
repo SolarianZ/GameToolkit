@@ -1,5 +1,5 @@
 ﻿#if UNITY_2022_1_OR_NEWER || GBG_FRAMEWORK_ENABLE_UNITY_APIS
-namespace GBG.Framework.Unity
+namespace GBG.GameToolkit.Unity
 {
     public static class Converters
     {

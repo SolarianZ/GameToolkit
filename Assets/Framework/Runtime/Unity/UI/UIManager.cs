@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GBG.Framework.Unity.UI
+namespace GBG.GameToolkit.Unity.UI
 {
     public partial class UIManager : MonoSingleton<UIManager>
     {

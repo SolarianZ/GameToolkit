@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GBG.Framework.Process
+namespace GBG.GameToolkit.Process
 {
     public interface IComplexPipelineView : IPipelineView, IEnumerable<IPipelineView>
     {

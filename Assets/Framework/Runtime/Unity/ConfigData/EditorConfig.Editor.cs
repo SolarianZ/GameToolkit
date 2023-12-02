@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UObject = UnityEngine.Object;
 
-namespace GBG.Framework.Unity.ConfigData
+namespace GBG.GameToolkit.Unity.ConfigData
 {
     [Serializable]
     public struct EditorConfigMessage

@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.View.ResourceManagement
+﻿namespace GBG.GameToolkit.View.ResourceManagement
 {
     public sealed class ViewResManagerServerProxy : IViewResManager
     {

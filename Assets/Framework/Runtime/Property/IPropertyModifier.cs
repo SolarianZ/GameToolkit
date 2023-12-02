@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.Property
+﻿namespace GBG.GameToolkit.Property
 {
     public enum PropertyModifyMode
     {

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using UnityEngine;
 using UDebug = UnityEngine.Debug;
 
-namespace GBG.Framework.Unity
+namespace GBG.GameToolkit.Unity
 {
     public static class DebugDrawer
     {

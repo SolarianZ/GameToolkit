@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.Ability.PassiveSkill
+﻿namespace GBG.GameToolkit.Ability.PassiveSkill
 {
     public interface IPassiveSkillConfig { }
 }

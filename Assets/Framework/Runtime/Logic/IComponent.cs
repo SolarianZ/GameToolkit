@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.Logic
+﻿namespace GBG.GameToolkit.Logic
 {
     public interface IComponent
     {

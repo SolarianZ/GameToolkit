@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.ConfigData
+﻿namespace GBG.GameToolkit.ConfigData
 {
     //public interface IConfigTableLoader
     //{

@@ -1,7 +1,7 @@
-﻿using GBG.Framework.ConfigData;
-using System;
+﻿using System;
+using GBG.GameToolkit.ConfigData;
 
-namespace GBG.Framework.Property
+namespace GBG.GameToolkit.Property
 {
     public enum PropertyPosition
     {

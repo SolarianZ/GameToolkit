@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GBG.Framework.Unity.UI
+namespace GBG.GameToolkit.Unity.UI
 {
     //[RequireComponent(typeof(Graphic))]
     //[RequireComponent(typeof(GraphicRaycaster))]

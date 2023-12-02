@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace GBG.Framework.Unity
+namespace GBG.GameToolkit.Unity
 {
     public static class UIUtils
     {

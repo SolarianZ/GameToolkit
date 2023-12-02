@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace GBG.Framework.Unity.UI
+namespace GBG.GameToolkit.Unity.UI
 {
     partial class LoadingUIController
     {

@@ -1,10 +1,10 @@
-﻿using GBG.Framework.Unity.ConfigData;
-using System.Linq;
+﻿using System.Linq;
+using GBG.GameToolkit.Unity.ConfigData;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GBG.Framework.Editor.ConfigData
+namespace GBG.GameToolkit.Editor.ConfigData
 {
     [CustomEditor(typeof(ConfigTableAsset))]
     public class ConfigTableAssetEditor : UnityEditor.Editor

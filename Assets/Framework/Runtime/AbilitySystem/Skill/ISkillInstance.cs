@@ -1,4 +1,4 @@
-namespace GBG.Framework.Ability.Skill
+namespace GBG.GameToolkit.Ability.Skill
 {
     public interface ISkillInstance { }
 }

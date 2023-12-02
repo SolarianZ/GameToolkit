@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GBG.Framework.ConfigData
+namespace GBG.GameToolkit.ConfigData
 {
     public interface IConfigTables
     {

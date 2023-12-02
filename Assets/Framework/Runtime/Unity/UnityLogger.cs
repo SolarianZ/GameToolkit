@@ -1,11 +1,11 @@
 ﻿#if UNITY_2022_1_OR_NEWER || GBG_FRAMEWORK_ENABLE_UNITY_APIS
-using GBG.Framework.Log;
 using System;
 using System.Threading;
+using GBG.GameToolkit.Log;
 using UDebug = UnityEngine.Debug;
 using UObject = UnityEngine.Object;
 
-namespace GBG.Framework.Unity
+namespace GBG.GameToolkit.Unity
 {
     public class UnityLogger : ILogger
     {

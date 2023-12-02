@@ -1,4 +1,4 @@
-﻿namespace GBG.Framework.Log
+﻿namespace GBG.GameToolkit.Log
 {
     public enum LogLevel
     {

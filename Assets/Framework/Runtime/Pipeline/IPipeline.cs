@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GBG.Framework.Process
+namespace GBG.GameToolkit.Process
 {
     // Pipeline Stage Step
 

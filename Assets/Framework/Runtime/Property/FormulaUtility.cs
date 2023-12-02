@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GBG.Framework.Property
+namespace GBG.GameToolkit.Property
 {
     public static class FormulaUtility
     {
