@@ -1,12 +1,10 @@
 {
-    "name": "GBG.Framework.Editor",
-    "rootNamespace": "GBG.Framework.Editor",
+    "name": "GBG.GameToolkit.URP",
+    "rootNamespace": "GBG.GameToolkit.URP",
     "references": [
-        "GUID:587cd0dd140853645b912030e0c17a1a"
+        "GUID:15fc0a57446b3144c949da3e2b9737a9"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": false,
