@@ -1,5 +1,4 @@
-﻿#if UNITY_2022_1_OR_NEWER || GBG_FRAMEWORK_ENABLE_UNITY_APIS
-namespace GBG.GameToolkit.Unity
+﻿namespace GBG.GameToolkit.Unity
 {
     public static class Convertion
     {
@@ -14,4 +13,3 @@ namespace GBG.GameToolkit.Unity
         public static UnityEngine.Quaternion ToUnity(this System.Numerics.Quaternion value) => new UnityEngine.Quaternion(value.X, value.Y, value.Z, value.W);
     }
 }
-#endif

@@ -1,5 +1,4 @@
-﻿#if UNITY_2022_1_OR_NEWER || GBG_FRAMEWORK_ENABLE_UNITY_APIS
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -110,4 +109,3 @@ namespace GBG.GameToolkit.Unity.UI
         }
     }
 }
-#endif

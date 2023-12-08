@@ -1,5 +1,4 @@
-﻿#if UNITY_2022_1_OR_NEWER || GBG_FRAMEWORK_ENABLE_UNITY_APIS
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using UnityEngine;
 using UDebug = UnityEngine.Debug;
 
@@ -261,4 +260,3 @@ namespace GBG.GameToolkit.Unity
         }
     }
 }
-#endif

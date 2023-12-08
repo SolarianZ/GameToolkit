@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR && UNITY_2022_1_OR_NEWER
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
