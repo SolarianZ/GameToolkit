@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
-using System;
-using System.Linq;
 using GBG.GameToolkit.Unity.ConfigData;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UDebug = UnityEngine.Debug;
@@ -29,7 +28,7 @@ namespace GBG.GameToolkit.Unity
             }
 
             Texture2D icon;
-            if (!instance.CompareTag("EditorOnly"))
+            if (!instance.CompareTag(Tag))
             {
                 if (!_errorIcon)
                 {
@@ -66,20 +65,6 @@ namespace GBG.GameToolkit.Unity
         {
             EditorApplication.hierarchyWindowItemOnGUI -= OnHierarchyWindowItemGUI;
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemGUI;
-        }
-
-        private void Start()
-        {
-            if (DeactivateOnEnterPlayMode && Application.isPlaying)
-            {
-                gameObject.TrySetActive(false);
-            }
-
-            if (!IsTagValid())
-            {
-                UDebug.LogError($"The game object '{name}' has an {nameof(EditorOnly)} component, " +
-                    $"but its tag is not 'EditorOnly'.", this);
-            }
         }
 
 
@@ -139,8 +124,14 @@ namespace GBG.GameToolkit.Unity
         {
             if (!Target.IsTagValid())
             {
-                string message = $"Game objects with the {nameof(EditorOnly)} component should use the tag 'EditorOnly'.";
+                string message = $"Game objects with the {nameof(EditorOnly)} component should use the tag '{EditorOnly.Tag}'.";
                 EditorGUILayout.HelpBox(message, MessageType.Error);
+
+                if (GUILayout.Button($"Set tag to '{EditorOnly.Tag}'"))
+                {
+                    Undo.RecordObject(Target.gameObject, $"Set tag to '{EditorOnly.Tag}'");
+                    Target.gameObject.tag = EditorOnly.Tag;
+                }
             }
 
             base.OnInspectorGUI();
@@ -170,11 +161,7 @@ namespace GBG.GameToolkit.Unity
                 return;
             }
 
-            Undo.RecordObject(EditorOnly.EditorConfigTableAssetCache, "Export Configs");
             Target.EditorExportConfigs(EditorOnly.EditorConfigTableAssetCache);
-            EditorUtility.SetDirty(EditorOnly.EditorConfigTableAssetCache);
-            AssetDatabase.SaveAssetIfDirty(EditorOnly.EditorConfigTableAssetCache);
-
             UDebug.Log($"Export configs to '{EditorOnly.EditorConfigTableAssetCache}'.", Target);
         }
     }

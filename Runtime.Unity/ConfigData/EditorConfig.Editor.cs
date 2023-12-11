@@ -16,45 +16,38 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
     partial class EditorConfig
     {
-        private static EditorConfigMessage[] EditorEmptyMessages { get; } = Array.Empty<EditorConfigMessage>();
-
-        protected List<EditorConfigMessage> EditorValidationMessages { get; } = new();
-
-
-        public virtual IReadOnlyList<EditorConfigMessage> Validate()
+        public virtual void EditorValidate(List<EditorConfigMessage> results)
         {
             if (Id != 0)
             {
-                return EditorEmptyMessages;
+                return;
             }
 
-            EditorValidationMessages.Clear();
-
             // Id
-            EditorValidationMessages.Add(new EditorConfigMessage()
+            results.Add(new EditorConfigMessage()
             {
                 Type = MessageType.Error,
                 Content = "'Id' cannot be '0'.",
                 Context = this,
             });
-
-            return EditorValidationMessages;
         }
     }
 
     [CustomEditor(typeof(EditorConfig), true)]
     class EditorConfigInspector : UnityEditor.Editor
     {
+        private static List<EditorConfigMessage> _validationMessages = new();
         private EditorConfig Target => (EditorConfig)target;
 
 
         public override void OnInspectorGUI()
         {
-            // Validate
-            IReadOnlyList<EditorConfigMessage> messages = Target.Validate();
-            for (int i = 0; i < messages.Count; i++)
+            // EditorValidate
+            _validationMessages.Clear();
+            Target.EditorValidate(_validationMessages);
+            for (int i = 0; i < _validationMessages.Count; i++)
             {
-                EditorConfigMessage message = messages[i];
+                EditorConfigMessage message = _validationMessages[i];
                 EditorGUILayout.HelpBox(message.Content, message.Type);
             }
 
