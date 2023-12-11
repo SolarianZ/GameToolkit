@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using GBG.GameToolkit.ConfigData;
+﻿using GBG.GameToolkit.ConfigData;
+using System;
 using UnityEngine;
 
 namespace GBG.GameToolkit.Unity.ConfigData
@@ -37,17 +37,19 @@ namespace GBG.GameToolkit.Unity.ConfigData
             }
 
             TAsset asset = (TAsset)configTable;
-            List<TConfig> configs = new(asset.Configs);
-            var oldIndex = configs.FindIndex(c => c.Id == config.Id);
-            if (oldIndex > -1)
+            for (int i = 0; i < asset.Configs.Length; i++)
             {
-                configs[oldIndex] = config;
+                if (asset.Configs[i].Id == config.Id)
+                {
+                    asset.Configs[i] = config;
+                    return;
+                }
             }
-            else
-            {
-                configs.Add(config);
-            }
-            asset.Configs = configs.ToArray();
+
+            TConfig[] configs = new TConfig[asset.Configs.Length + 1];
+            Array.Copy(asset.Configs, configs, asset.Configs.Length);
+            configs[asset.Configs.Length] = config;
+            asset.Configs = configs;
         }
     }
 }
