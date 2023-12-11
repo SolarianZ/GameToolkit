@@ -1,6 +1,9 @@
 ﻿using GBG.GameToolkit.ConfigData;
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
@@ -26,9 +29,9 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         public abstract void ExportConfig(ConfigTableAsset configTables);
 
-        public static void SetConfig<TConfig, TAsset>(ConfigTableAsset configTables, TConfig config)
+        public static void SetConfig<TConfig>(ConfigTableAsset configTables, TConfig config,
+            bool setDirtyAndSave = true, string undoName = null)
             where TConfig : IConfig
-            where TAsset : ConfigAsset<TConfig>
         {
             if (!configTables.TryGetConfigTable<TConfig>(out var configTable))
             {
@@ -36,12 +39,26 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 return;
             }
 
-            TAsset asset = (TAsset)configTable;
+            ConfigAsset<TConfig> asset = (ConfigAsset<TConfig>)configTable;
+#if UNITY_EDITOR
+            if (!string.IsNullOrEmpty(undoName))
+            {
+                Undo.RecordObject(asset, undoName);
+            }
+#endif
+
             for (int i = 0; i < asset.Configs.Length; i++)
             {
                 if (asset.Configs[i].Id == config.Id)
                 {
                     asset.Configs[i] = config;
+#if UNITY_EDITOR
+                    if (setDirtyAndSave)
+                    {
+                        EditorUtility.SetDirty(asset);
+                        AssetDatabase.SaveAssetIfDirty(asset);
+                    }
+#endif
                     return;
                 }
             }
@@ -50,6 +67,13 @@ namespace GBG.GameToolkit.Unity.ConfigData
             Array.Copy(asset.Configs, configs, asset.Configs.Length);
             configs[asset.Configs.Length] = config;
             asset.Configs = configs;
+#if UNITY_EDITOR
+            if (setDirtyAndSave)
+            {
+                EditorUtility.SetDirty(asset);
+                AssetDatabase.SaveAssetIfDirty(asset);
+            }
+#endif
         }
     }
 }
