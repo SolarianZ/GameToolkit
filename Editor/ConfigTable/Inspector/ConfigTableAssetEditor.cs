@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using GBG.GameToolkit.Unity.ConfigData;
+﻿using GBG.GameToolkit.Unity.ConfigData;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Editor.ConfigData
 {
-    [CustomEditor(typeof(ConfigTableListAsset))]
-    public class ConfigTableAssetEditor : UnityEditor.Editor
+    [CustomEditor(typeof(ConfigTableCollectionAsset))]
+    public class ConfigTableCollectionAssetEditor : UnityEditor.Editor
     {
         public override VisualElement CreateInspectorGUI()
         {
@@ -50,18 +50,18 @@ namespace GBG.GameToolkit.Editor.ConfigData
                 configs[i] = asset;
             }
 
-            var configTableAsset = (ConfigTableListAsset)target;
-            Undo.RecordObject(configTableAsset, "Recollect Config Assets");
-            configTableAsset.Configs = configs;
-            EditorUtility.SetDirty(configTableAsset);
+            var collectionAsset = (ConfigTableCollectionAsset)target;
+            Undo.RecordObject(collectionAsset, "Recollect Config Assets");
+            collectionAsset.Configs = configs;
+            EditorUtility.SetDirty(collectionAsset);
         }
 
         private void DistinctConfigAssets()
         {
-            var configTableAsset = (ConfigTableListAsset)target;
-            Undo.RecordObject(configTableAsset, "Distinct Config Assets");
-            configTableAsset.Configs.Distinct();
-            EditorUtility.SetDirty(configTableAsset);
+            var collectionAsset = (ConfigTableCollectionAsset)target;
+            Undo.RecordObject(collectionAsset, "Distinct Config Assets");
+            collectionAsset.Configs = collectionAsset.Configs.Distinct().ToArray();
+            EditorUtility.SetDirty(collectionAsset);
         }
     }
 }

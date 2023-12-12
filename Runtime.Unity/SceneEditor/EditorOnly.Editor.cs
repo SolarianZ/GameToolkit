@@ -58,7 +58,7 @@ namespace GBG.GameToolkit.Unity
         [Tooltip("Used to automatically find config table asset.")]
         public string EditorConfigMode;
 
-        internal static ConfigTableListAsset EditorConfigTableAssetCache;
+        internal static ConfigTableCollectionAsset EditorConfigTableCollectionAssetCache;
 
 
         private void OnEnable()
@@ -68,12 +68,12 @@ namespace GBG.GameToolkit.Unity
         }
 
 
-        public void EditorExportConfigs(ConfigTableListAsset configTableAsset)
+        public void EditorExportConfigs(ConfigTableCollectionAsset configTables)
         {
             var configComps = GetComponentsInChildren<EditorConfig>();
             foreach (EditorConfig configComp in configComps)
             {
-                configComp.ExportConfig(configTableAsset);
+                configComp.ExportConfig(configTables);
             }
         }
     }
@@ -91,33 +91,33 @@ namespace GBG.GameToolkit.Unity
 
         private void TrySearchConfigTableAsset()
         {
-            if (EditorOnly.EditorConfigTableAssetCache)
+            if (EditorOnly.EditorConfigTableCollectionAssetCache)
             {
                 return;
             }
 
-            var configTableAssets = Resources.FindObjectsOfTypeAll(typeof(ConfigTableListAsset));
-            if (configTableAssets.Length == 0)
+            var configCollections = Resources.FindObjectsOfTypeAll(typeof(ConfigTableCollectionAsset));
+            if (configCollections.Length == 0)
             {
                 return;
             }
 
-            ConfigTableListAsset configTableAsset;
-            if (configTableAssets.Length == 1)
+            ConfigTableCollectionAsset configTables;
+            if (configCollections.Length == 1)
             {
-                configTableAsset = (ConfigTableListAsset)configTableAssets[0];
+                configTables = (ConfigTableCollectionAsset)configCollections[0];
             }
             else
             {
-                configTableAsset = (ConfigTableListAsset)configTableAssets.FirstOrDefault(asset
+                configTables = (ConfigTableCollectionAsset)configCollections.FirstOrDefault(asset
                     => asset.name.Contains(Target.EditorConfigMode));
-                if (!configTableAsset)
+                if (!configTables)
                 {
-                    configTableAsset = (ConfigTableListAsset)configTableAssets[0];
+                    configTables = (ConfigTableCollectionAsset)configCollections[0];
                 }
             }
 
-            EditorOnly.EditorConfigTableAssetCache = configTableAsset;
+            EditorOnly.EditorConfigTableCollectionAssetCache = configTables;
         }
 
         public override void OnInspectorGUI()
@@ -143,8 +143,8 @@ namespace GBG.GameToolkit.Unity
 
             EditorGUILayout.Space();
 
-            EditorOnly.EditorConfigTableAssetCache = (ConfigTableListAsset)EditorGUILayout.ObjectField("Config Table Asset",
-                EditorOnly.EditorConfigTableAssetCache, typeof(ConfigTableListAsset), false);
+            EditorOnly.EditorConfigTableCollectionAssetCache = (ConfigTableCollectionAsset)EditorGUILayout.ObjectField("Config Table Collection",
+                EditorOnly.EditorConfigTableCollectionAssetCache, typeof(ConfigTableCollectionAsset), false);
 
             if (GUILayout.Button("Export Configs"))
             {
@@ -154,15 +154,15 @@ namespace GBG.GameToolkit.Unity
 
         public void ExportConfigs()
         {
-            if (!EditorOnly.EditorConfigTableAssetCache)
+            if (!EditorOnly.EditorConfigTableCollectionAssetCache)
             {
                 EditorUtility.DisplayDialog("Error",
                    "Please assign a config table asset before export.", "Ok");
                 return;
             }
 
-            Target.EditorExportConfigs(EditorOnly.EditorConfigTableAssetCache);
-            UDebug.Log($"Export configs to '{EditorOnly.EditorConfigTableAssetCache}'.", Target);
+            Target.EditorExportConfigs(EditorOnly.EditorConfigTableCollectionAssetCache);
+            UDebug.Log($"Export configs to '{EditorOnly.EditorConfigTableCollectionAssetCache}'.", Target);
         }
     }
 }

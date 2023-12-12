@@ -37,9 +37,9 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return $"#{Id} {Comment}";
         }
 
-        public abstract void ExportConfig(ConfigTableListAsset configTables);
+        public abstract void ExportConfig(ConfigTableCollectionAsset configTables);
 
-        public static void SetConfig<TConfig>(ConfigTableListAsset configTables, TConfig config,
+        public static void SetConfig<TConfig>(ConfigTableCollectionAsset configTables, TConfig config,
             bool setDirtyAndSave = true, string undoName = null)
             where TConfig : IConfig
         {

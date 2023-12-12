@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
-    [CreateAssetMenu(menuName = "Bamboo/Config Data/Config Table List")]
-    public class ConfigTableListAsset : ScriptableObject, IConfigTableProvider
+    [CreateAssetMenu(menuName = "Bamboo/Config Data/Config Table Collection")]
+    public class ConfigTableCollectionAsset : ScriptableObject, IConfigTableProvider
     {
         public ConfigTableAssetPtr[] Configs = Array.Empty<ConfigTableAssetPtr>();
 
