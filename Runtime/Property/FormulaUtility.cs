@@ -84,7 +84,7 @@ namespace GBG.GameToolkit.Property
                     throw new ArgumentException($"PropertySpec '{pair.Key}' does not exist.");
                 }
 
-                var value = spec.GetFinalValue(pair.Value);
+                var value = spec.Clamp(pair.Value);
                 switch (spec.Position)
                 {
                     case PropertyPosition.BaseAddend:

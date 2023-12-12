@@ -11,7 +11,7 @@ namespace GBG.GameToolkit.Property
         RawAddend = 200,
     }
 
-    public enum PropertyConvertMode
+    public enum PropertyApproximation
     {
         Raw = 0, Floor = 100, Ceiling = 200, Round = 300,
     }
@@ -22,33 +22,28 @@ namespace GBG.GameToolkit.Property
         double MinValue { get; }
         double MaxValue { get; }
         PropertyPosition Position { get; }
-        PropertyConvertMode ConvertMode { get; }
+        PropertyApproximation ConvertMode { get; }
 
         double Clamp(double value)
         {
             return Math.Clamp(value, MinValue, MaxValue);
         }
 
-        double Convert(double value)
+        double Approximate(double value)
         {
             switch (ConvertMode)
             {
-                case PropertyConvertMode.Raw:
+                case PropertyApproximation.Raw:
                     return value;
-                case PropertyConvertMode.Floor:
+                case PropertyApproximation.Floor:
                     return Math.Floor(value);
-                case PropertyConvertMode.Ceiling:
+                case PropertyApproximation.Ceiling:
                     return Math.Ceiling(value);
-                case PropertyConvertMode.Round:
+                case PropertyApproximation.Round:
                     return Math.Round(value);
                 default:
-                    throw new NotSupportedException($"Unknown PropertyConvertMode '{ConvertMode}'.");
+                    throw new NotSupportedException($"Unknown PropertyApproximation '{ConvertMode}'.");
             }
-        }
-
-        double GetFinalValue(double value)
-        {
-            return Clamp(Convert(value));
         }
     }
 
@@ -60,12 +55,13 @@ namespace GBG.GameToolkit.Property
         double IPropertySpec.MinValue => MinValue;
         double IPropertySpec.MaxValue => MaxValue;
         PropertyPosition IPropertySpec.Position => Position;
-        PropertyConvertMode IPropertySpec.ConvertMode => ConvertMode;
+        PropertyApproximation IPropertySpec.ConvertMode => ConvertMode;
 
+        public string Comment;
         public int Id;
         public double MinValue;
         public double MaxValue;
         public PropertyPosition Position;
-        public PropertyConvertMode ConvertMode;
+        public PropertyApproximation ConvertMode;
     }
 }
