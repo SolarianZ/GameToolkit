@@ -22,9 +22,19 @@ namespace GBG.GameToolkit.Unity.ConfigData
         #endregion
 
 
-        public string CommentOrId()
+        public string GetExportedComment()
         {
-            return string.IsNullOrEmpty(Comment) ? Id.ToString() : Comment;
+            if (string.IsNullOrEmpty(Comment))
+            {
+                return $"#{Id} {name}";
+            }
+
+            if (Comment.StartsWith($"#{Id}", StringComparison.Ordinal))
+            {
+                return Comment;
+            }
+
+            return $"#{Id} {Comment}";
         }
 
         public abstract void ExportConfig(ConfigTableAsset configTables);
