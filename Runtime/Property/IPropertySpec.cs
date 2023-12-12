@@ -1,5 +1,5 @@
-﻿using System;
-using GBG.GameToolkit.ConfigData;
+﻿using GBG.GameToolkit.ConfigData;
+using System;
 
 namespace GBG.GameToolkit.Property
 {
@@ -52,12 +52,20 @@ namespace GBG.GameToolkit.Property
         }
     }
 
+    [Serializable]
     public class PropertySpec : IPropertySpec, IConfig
     {
-        public int Id { get; internal set; }
-        public double MinValue { get; internal set; }
-        public double MaxValue { get; internal set; }
-        public PropertyPosition Position { get; internal set; }
-        public PropertyConvertMode ConvertMode { get; internal set; }
+        int IPropertySpec.Id => Id;
+        int IConfig.Id => Id;
+        double IPropertySpec.MinValue => MinValue;
+        double IPropertySpec.MaxValue => MaxValue;
+        PropertyPosition IPropertySpec.Position => Position;
+        PropertyConvertMode IPropertySpec.ConvertMode => ConvertMode;
+
+        public int Id;
+        public double MinValue;
+        public double MaxValue;
+        public PropertyPosition Position;
+        public PropertyConvertMode ConvertMode;
     }
 }

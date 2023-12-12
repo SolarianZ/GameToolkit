@@ -58,7 +58,7 @@ namespace GBG.GameToolkit.Unity
         [Tooltip("Used to automatically find config table asset.")]
         public string EditorConfigMode;
 
-        internal static ConfigTableAsset EditorConfigTableAssetCache;
+        internal static ConfigTableListAsset EditorConfigTableAssetCache;
 
 
         private void OnEnable()
@@ -68,7 +68,7 @@ namespace GBG.GameToolkit.Unity
         }
 
 
-        public void EditorExportConfigs(ConfigTableAsset configTableAsset)
+        public void EditorExportConfigs(ConfigTableListAsset configTableAsset)
         {
             var configComps = GetComponentsInChildren<EditorConfig>();
             foreach (EditorConfig configComp in configComps)
@@ -96,24 +96,24 @@ namespace GBG.GameToolkit.Unity
                 return;
             }
 
-            var configTableAssets = Resources.FindObjectsOfTypeAll(typeof(ConfigTableAsset));
+            var configTableAssets = Resources.FindObjectsOfTypeAll(typeof(ConfigTableListAsset));
             if (configTableAssets.Length == 0)
             {
                 return;
             }
 
-            ConfigTableAsset configTableAsset;
+            ConfigTableListAsset configTableAsset;
             if (configTableAssets.Length == 1)
             {
-                configTableAsset = (ConfigTableAsset)configTableAssets[0];
+                configTableAsset = (ConfigTableListAsset)configTableAssets[0];
             }
             else
             {
-                configTableAsset = (ConfigTableAsset)configTableAssets.FirstOrDefault(asset
+                configTableAsset = (ConfigTableListAsset)configTableAssets.FirstOrDefault(asset
                     => asset.name.Contains(Target.EditorConfigMode));
                 if (!configTableAsset)
                 {
-                    configTableAsset = (ConfigTableAsset)configTableAssets[0];
+                    configTableAsset = (ConfigTableListAsset)configTableAssets[0];
                 }
             }
 
@@ -143,8 +143,8 @@ namespace GBG.GameToolkit.Unity
 
             EditorGUILayout.Space();
 
-            EditorOnly.EditorConfigTableAssetCache = (ConfigTableAsset)EditorGUILayout.ObjectField("Config Table Asset",
-                EditorOnly.EditorConfigTableAssetCache, typeof(ConfigTableAsset), false);
+            EditorOnly.EditorConfigTableAssetCache = (ConfigTableListAsset)EditorGUILayout.ObjectField("Config Table Asset",
+                EditorOnly.EditorConfigTableAssetCache, typeof(ConfigTableListAsset), false);
 
             if (GUILayout.Button("Export Configs"))
             {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GBG.GameToolkit.ConfigData
 {
-    public interface IConfigTables
+    public interface IConfigTableProvider
     {
         bool ContainsConfigTable<T>() where T : IConfig;
         IConfigTable<T> GetConfigTable<T>() where T : IConfig;
@@ -15,12 +15,12 @@ namespace GBG.GameToolkit.ConfigData
         bool TryGetConfig<T>(int key, out T value) where T : IConfig;
     }
 
-    public class DefaultConfigTables : IConfigTables
+    public class DefaultConfigTableProvider : IConfigTableProvider
     {
         private IReadOnlyDictionary<Type, IConfigTablePtr> _configTables;
 
 
-        public DefaultConfigTables(IReadOnlyDictionary<Type, IConfigTablePtr> configTables)
+        public DefaultConfigTableProvider(IReadOnlyDictionary<Type, IConfigTablePtr> configTables)
         {
             if (_configTables == null)
             {

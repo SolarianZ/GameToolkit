@@ -37,9 +37,9 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return $"#{Id} {Comment}";
         }
 
-        public abstract void ExportConfig(ConfigTableAsset configTables);
+        public abstract void ExportConfig(ConfigTableListAsset configTables);
 
-        public static void SetConfig<TConfig>(ConfigTableAsset configTables, TConfig config,
+        public static void SetConfig<TConfig>(ConfigTableListAsset configTables, TConfig config,
             bool setDirtyAndSave = true, string undoName = null)
             where TConfig : IConfig
         {
@@ -49,7 +49,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 return;
             }
 
-            ConfigAsset<TConfig> asset = (ConfigAsset<TConfig>)configTable;
+            ConfigTableAsset<TConfig> asset = (ConfigTableAsset<TConfig>)configTable;
 #if UNITY_EDITOR
             if (!string.IsNullOrEmpty(undoName))
             {

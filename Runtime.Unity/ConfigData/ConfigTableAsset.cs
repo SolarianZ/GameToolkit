@@ -5,13 +5,47 @@ using UnityEngine;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
-    [CreateAssetMenu(menuName = "Bamboo/Config Table Asset")]
-    public class ConfigTableAsset : ScriptableObject, IConfigTables
+    public abstract class ConfigTableAssetPtr : ScriptableObject, IConfigTablePtr
     {
-        public ConfigAssetPtr[] Configs = Array.Empty<ConfigAssetPtr>();
+        public abstract Type GetConfigType();
+    }
 
-        private Dictionary<Type, ConfigAssetPtr> _table;
+    public abstract class ConfigTableAsset<T> : ConfigTableAssetPtr, IConfigTable<T> where T : IConfig
+    {
+        public T[] Configs = Array.Empty<T>();
 
+        private Dictionary<int, T> _table;
+
+
+        public override Type GetConfigType() => typeof(T);
+
+        public bool ContainsConfig(int key)
+        {
+            PrepareTable();
+            return _table.ContainsKey(key);
+        }
+
+        public IReadOnlyList<T> GetConfigs()
+        {
+            return Configs;
+        }
+
+        public T GetConfig(int id, T defaultValue = default)
+        {
+            PrepareTable();
+            if (TryGetConfig(id, out T config))
+            {
+                return config;
+            }
+
+            return defaultValue;
+        }
+
+        public bool TryGetConfig(int id, out T config)
+        {
+            PrepareTable();
+            return _table.TryGetValue(id, out config);
+        }
 
         private void PrepareTable()
         {
@@ -20,83 +54,11 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 return;
             }
 
-            _table = new Dictionary<Type, ConfigAssetPtr>(Configs.Length);
-
-            foreach (ConfigAssetPtr config in Configs)
+            _table = new Dictionary<int, T>(Configs.Length);
+            foreach (T config in Configs)
             {
-                _table.Add(config.GetConfigType(), config);
+                _table.Add(config.Id, config);
             }
-        }
-
-        public bool ContainsConfigTable<T>() where T : IConfig
-        {
-            PrepareTable();
-            return _table.ContainsKey(typeof(T));
-        }
-
-        public IConfigTable<T> GetConfigTable<T>() where T : IConfig
-        {
-            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
-            {
-                return configTable;
-            }
-
-            return null;
-        }
-
-        public bool TryGetConfigTable<T>(out IConfigTable<T> configTable) where T : IConfig
-        {
-            PrepareTable();
-            if (_table.TryGetValue(typeof(T), out ConfigAssetPtr tablePtr))
-            {
-                configTable = (IConfigTable<T>)tablePtr;
-                return true;
-            }
-
-            configTable = null;
-            return false;
-        }
-
-
-        public bool ContainsConfig<T>(int key) where T : IConfig
-        {
-            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
-            {
-                return configTable.ContainsConfig(key);
-            }
-
-            return false;
-        }
-
-        public IReadOnlyList<T> GetConfigs<T>() where T : IConfig
-        {
-            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
-            {
-                return configTable.GetConfigs();
-            }
-
-            return null;
-        }
-
-        public T GetConfig<T>(int key, T defaultValue = default) where T : IConfig
-        {
-            if (TryGetConfig<T>(key, out T config))
-            {
-                return config;
-            }
-
-            return defaultValue;
-        }
-
-        public bool TryGetConfig<T>(int key, out T value) where T : IConfig
-        {
-            if (TryGetConfigTable<T>(out IConfigTable<T> configTable))
-            {
-                return configTable.TryGetConfig(key, out value);
-            }
-
-            value = default;
-            return false;
         }
     }
 }
