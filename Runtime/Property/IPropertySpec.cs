@@ -3,6 +3,13 @@ using System;
 
 namespace GBG.GameToolkit.Property
 {
+    public enum PropertyMergeMode
+    {
+        TakeTheSum,
+        TakeTheMin,
+        TakeTheMax,
+    }
+
     public enum PropertyPosition
     {
         // (ΣBaseAddend)*(1+ΣMulAddend)+ΣRawAddend
@@ -13,7 +20,10 @@ namespace GBG.GameToolkit.Property
 
     public enum PropertyApproximation
     {
-        Raw = 0, Floor = 100, Ceiling = 200, Round = 300,
+        Raw = 0,
+        Floor = 100,
+        Ceiling = 200,
+        Round = 300,
     }
 
     public interface IPropertySpec
@@ -21,6 +31,7 @@ namespace GBG.GameToolkit.Property
         int Id { get; }
         double MinValue { get; }
         double MaxValue { get; }
+        PropertyMergeMode MergeMode { get; }
         PropertyPosition Position { get; }
         PropertyApproximation ConvertMode { get; }
 
@@ -54,6 +65,7 @@ namespace GBG.GameToolkit.Property
         int IConfig.Id => Id;
         double IPropertySpec.MinValue => MinValue;
         double IPropertySpec.MaxValue => MaxValue;
+        PropertyMergeMode IPropertySpec.MergeMode => MergeMode;
         PropertyPosition IPropertySpec.Position => Position;
         PropertyApproximation IPropertySpec.ConvertMode => ConvertMode;
 
@@ -61,6 +73,7 @@ namespace GBG.GameToolkit.Property
         public int Id;
         public double MinValue;
         public double MaxValue;
+        public PropertyMergeMode MergeMode;
         public PropertyPosition Position;
         public PropertyApproximation ConvertMode;
     }
