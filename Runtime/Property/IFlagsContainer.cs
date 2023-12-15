@@ -2,9 +2,7 @@
 {
     public interface IFlagsContainer : IFlagsProvider
     {
-        void AddFlagAt(int flagIndex);
-        void RemoveFlagAt(int flagIndex);
-        void AddFlags(ulong flags);
-        void RemoveFlags(ulong flags);
+        bool AddFlagsProvider(IFlagsProvider flagsProvider);
+        bool RemoveFlagsProvider(IFlagsProvider flagsProvider);
     }
 }

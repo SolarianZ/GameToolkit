@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace GBG.GameToolkit.Property
 {
-    public class PropertyContainer : IPropertiesContainer
+    public class DefaultPropertiesContainer : IPropertiesContainer
     {
-        public bool CachePropertyValues { get; }
+        public bool CachePropertyValues { get; set; }
 
         private readonly IPropertySpecsProvider _propertySpecsProvider;
         private HashSet<IPropertiesProvider> _propertiesProviders;
@@ -14,7 +14,7 @@ namespace GBG.GameToolkit.Property
         public event PropertyChangedHandler PropertyChanged;
 
 
-        public PropertyContainer(IPropertySpecsProvider propertySpecsProvider, bool cachePropertyValues)
+        public DefaultPropertiesContainer(IPropertySpecsProvider propertySpecsProvider, bool cachePropertyValues)
         {
             _propertySpecsProvider = propertySpecsProvider;
             CachePropertyValues = cachePropertyValues;
@@ -38,9 +38,9 @@ namespace GBG.GameToolkit.Property
             return false;
         }
 
-        public double GetPropertyValue(int specId, double defaultValue)
+        public double GetPropertyValue(int specId, double defaultValue, bool clamp = true)
         {
-            if (TryGetPropertyValue(specId, out double value))
+            if (TryGetPropertyValue(specId, out double value, clamp))
             {
                 return value;
             }
@@ -48,7 +48,7 @@ namespace GBG.GameToolkit.Property
             return defaultValue;
         }
 
-        public bool TryGetPropertyValue(int specId, out double value)
+        public bool TryGetPropertyValue(int specId, out double value, bool clamp = true)
         {
             if (CachePropertyValues && _propertyValueCaches != null &&
                 _propertyValueCaches.TryGetValue(specId, out double? valueCache))
@@ -119,6 +119,11 @@ namespace GBG.GameToolkit.Property
                     throw new Exception($"Unknown property merge mode: {propertySpec.MergeMode}.");
             }
 
+            if (clamp && hasProperty)
+            {
+                value = propertySpec.Clamp(value);
+            }
+
             if (CachePropertyValues)
             {
                 _propertyValueCaches ??= new Dictionary<int, double?>();
@@ -134,6 +139,7 @@ namespace GBG.GameToolkit.Property
             if (_propertiesProviders.Add(propertiesProvider))
             {
                 propertiesProvider.PropertyChanged += OnSubPropertyChanged;
+                OnSubPropertyChanged(null);
             }
 
             return false;
@@ -149,17 +155,25 @@ namespace GBG.GameToolkit.Property
             if (_propertiesProviders.Remove(propertiesProvider))
             {
                 propertiesProvider.PropertyChanged -= OnSubPropertyChanged;
+                OnSubPropertyChanged(null);
                 return true;
             }
 
             return false;
         }
 
-        private void OnSubPropertyChanged(int specId)
+        private void OnSubPropertyChanged(int? specId)
         {
             if (CachePropertyValues && _propertyValueCaches != null)
             {
-                _propertyValueCaches.Remove(specId);
+                if (specId.HasValue)
+                {
+                    _propertyValueCaches.Remove(specId.Value);
+                }
+                else
+                {
+                    _propertyValueCaches.Clear();
+                }
             }
 
             PropertyChanged?.Invoke(specId);
