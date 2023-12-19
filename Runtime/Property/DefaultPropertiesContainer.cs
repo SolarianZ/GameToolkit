@@ -22,9 +22,10 @@ namespace GBG.GameToolkit.Property
 
         public bool ContainsProperty(int specId)
         {
-            if (_propertyValueCaches?.ContainsKey(specId) ?? false)
+            if (_propertyValueCaches != null &&
+                _propertyValueCaches.TryGetValue(specId, out double? valueCache))
             {
-                return true;
+                return valueCache.HasValue;
             }
 
             foreach (IPropertiesProvider propertiesProvider in _propertiesProviders)
