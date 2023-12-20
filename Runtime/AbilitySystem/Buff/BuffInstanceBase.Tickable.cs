@@ -2,15 +2,21 @@
 
 namespace GBG.GameToolkit.Ability.Buff
 {
-    partial class BuffInstanceBase :ITickable
+    partial class BuffInstanceBase : ITickable
     {
-        int ITickable.Channel { get; }
-        int ITickable.Priority { get; }
+        int ITickable.TickChannel { get; }
+        int ITickable.TickPriority { get; }
+        protected IClock Clock { get; }
 
 
         void ITickable.Tick()
         {
             if (Target == null)
+            {
+                return;
+            }
+
+            if (_isExpiredNonVirtual)
             {
                 return;
             }
@@ -25,7 +31,15 @@ namespace GBG.GameToolkit.Ability.Buff
                 return;
             }
 
+            if (_isExpiredNonVirtual)
+            {
+                return;
+            }
+
+            ElapsedTime += Clock.DeltaTime;
             OnLateTick();
+
+            //_isExpiredNonVirtual = IsExpired();
         }
 
         protected virtual void OnTick() { }

@@ -69,6 +69,23 @@ namespace GBG.GameToolkit.Property
             return false;
         }
 
+        public void ClearAllFlagsProviders()
+        {
+            if (_flagsProviders == null)
+            {
+                return;
+            }
+
+            foreach (IFlagsProvider flagsProvider in _flagsProviders)
+            {
+                flagsProvider.FlagsChanged -= OnSubFlagsChanged;
+            }
+
+            _flagsProviders.Clear();
+
+            OnSubFlagsChanged();
+        }
+
         private void OnSubFlagsChanged()
         {
             if (CacheFlags)

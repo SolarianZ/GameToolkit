@@ -27,12 +27,12 @@ namespace GBG.GameToolkit.Unity.ScenePartition
         public SceneData[] Subscenes = Array.Empty<SceneData>();
 
 
-        public bool IsInSceneRange(float position0, float position1)
+        public bool IsPositionInSceneRange(float position0, float position1)
         {
-            return GetSubsceneIndex(position0, position1) != -1;
+            return GetSubsceneIndexByPosition(position0, position1) != -1;
         }
 
-        public (int index0, int index1) GetSubsceneIndex2D(float position0, float position1)
+        public (int index0, int index1) GetSubsceneIndex2DByPosition(float position0, float position1)
         {
             int index0, index1;
             switch (PartitionType)
@@ -84,9 +84,9 @@ namespace GBG.GameToolkit.Unity.ScenePartition
             return (index0, index1);
         }
 
-        public int GetSubsceneIndex(float position0, float position1)
+        public int GetSubsceneIndexByPosition(float position0, float position1)
         {
-            (int index0, int index1) = GetSubsceneIndex2D(position0, position1);
+            (int index0, int index1) = GetSubsceneIndex2DByPosition(position0, position1);
             if (index0 == -1 || index1 == -1)
             {
                 return -1;
@@ -96,14 +96,21 @@ namespace GBG.GameToolkit.Unity.ScenePartition
             return index;
         }
 
-        public SceneData GetSubsceneData(float position0, float position1)
+        public SceneData GetSubsceneDataByPosition(float position0, float position1)
         {
-            int index = GetSubsceneIndex(position0, position1);
+            int index = GetSubsceneIndexByPosition(position0, position1);
             if (index == -1)
             {
                 return default;
             }
 
+            SceneData sceneData = Subscenes[index];
+            return sceneData;
+        }
+
+        public SceneData GetSubsceneDataByIndices(int index0, int index1)
+        {
+            int index = PartitionCount0 * index1 + index0;
             SceneData sceneData = Subscenes[index];
             return sceneData;
         }

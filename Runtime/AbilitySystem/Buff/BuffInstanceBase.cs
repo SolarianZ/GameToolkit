@@ -7,27 +7,61 @@ namespace GBG.GameToolkit.Ability.Buff
     {
         public abstract int InstanceId { get; }
         public abstract IRuntimeBuffConfig Config { get; }
+        public ulong ElapsedTime { get; private set; }
         protected object Target { get; private set; }
+        protected object Context { get; private set; }
 
-        // TODO: Tick duration and used times
+        private bool _isExpiredNonVirtual;
+
 
         protected BuffInstanceBase(IPropertySpecsProvider propertySpecsProvider)
         {
             _propertySpecsProvider = propertySpecsProvider;
         }
 
-        protected virtual ulong GetBuffDuration()
+        public virtual ulong GetBuffDuration()
         {
             return Config.Duration;
         }
 
-        protected virtual int GetBuffUsedTimes()
+        public virtual int GetBuffAvailableTimes()
+        {
+            return Config.AvailableTimes;
+        }
+
+        public virtual int GetBuffUsedTimes()
         {
             return 0;
         }
 
+        public virtual bool IsExpired()
+        {
+            if (_isExpiredNonVirtual)
+            {
+                return true;
+            }
 
-        void IBuffInstance.OnAttachToTarget(object target)
+            ulong buffDuration = GetBuffDuration();
+            if (buffDuration > 0 && ElapsedTime >= buffDuration)
+            {
+                return true;
+            }
+
+            int availableTimes = GetBuffAvailableTimes();
+            if (availableTimes > 0)
+            {
+                int usedTimes = GetBuffUsedTimes();
+                if (usedTimes >= availableTimes)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        void IBuffInstance.OnAttachToTarget(object target, object context)
         {
             if (Target != null)
             {
@@ -37,6 +71,8 @@ namespace GBG.GameToolkit.Ability.Buff
             }
 
             Target = target;
+            Context = context;
+            _isExpiredNonVirtual = false;
 
             OnAttachToTarget();
         }
@@ -53,6 +89,8 @@ namespace GBG.GameToolkit.Ability.Buff
             OnDetachFromTarget();
 
             Target = null;
+            Context = null;
+            _isExpiredNonVirtual = true;
         }
 
         protected virtual void OnAttachToTarget() { }

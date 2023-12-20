@@ -1,6 +1,8 @@
-﻿namespace GBG.GameToolkit.Ability.Buff
+﻿using GBG.GameToolkit.ConfigData;
+
+namespace GBG.GameToolkit.Ability.Buff
 {
-    public interface IBuffConfig
+    public interface IBuffConfig : IConfig
     {
         IRuntimeBuffConfig GetOrCreateRuntimeConfig();
     }

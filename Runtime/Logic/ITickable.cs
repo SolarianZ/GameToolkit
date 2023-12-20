@@ -2,8 +2,8 @@
 {
     public interface ITickable
     {
-        int Channel { get; }
-        int Priority { get; }
+        int TickChannel { get; }
+        int TickPriority { get; }
 
         void Tick();
         void LateTick();

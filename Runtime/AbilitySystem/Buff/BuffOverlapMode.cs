@@ -5,8 +5,8 @@
         Overlap = 0,
         //OverlapButInheritTime = 1,
 
-        Replace = 100,
-        ReplaceIfDurationIsLonger = 101,
+        //Replace = 100,
+        //ReplaceIfDurationIsLonger = 101,
 
         Ignore = 200,
     }

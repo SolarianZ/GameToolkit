@@ -4,5 +4,6 @@
     {
         bool AddFlagsProvider(IFlagsProvider flagsProvider);
         bool RemoveFlagsProvider(IFlagsProvider flagsProvider);
+        void ClearAllFlagsProviders();
     }
 }

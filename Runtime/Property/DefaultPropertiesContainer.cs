@@ -163,6 +163,23 @@ namespace GBG.GameToolkit.Property
             return false;
         }
 
+        public void ClearAllPropertiesProviders()
+        {
+            if (_propertiesProviders == null)
+            {
+                return;
+            }
+
+            foreach (IPropertiesProvider propertiesProvider in _propertiesProviders)
+            {
+                propertiesProvider.PropertyChanged -= OnSubPropertyChanged;
+            }
+
+            _propertiesProviders.Clear();
+
+            OnSubPropertyChanged(null);
+        }
+
         private void OnSubPropertyChanged(int? specId)
         {
             if (CachePropertyValues && _propertyValueCaches != null)

@@ -4,6 +4,7 @@
     {
         bool AddPropertiesProvider(IPropertiesProvider propertiesProvider);
         bool RemovePropertiesProvider(IPropertiesProvider propertiesProvider);
+        void ClearAllPropertiesProviders();
 
         //void AddPropertyModifier(IPropertyModifier modifier);
         //bool RemovePropertyModifier(IPropertyModifier modifier);

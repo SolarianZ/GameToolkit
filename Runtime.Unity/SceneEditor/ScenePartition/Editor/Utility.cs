@@ -111,11 +111,11 @@ namespace GBG.GameToolkit.Unity.ScenePartition.Editor
                 switch (partitionData.PartitionType)
                 {
                     case ScenePartitionType.XZ:
-                        subsceneIndex = partitionData.GetSubsceneIndex(subsceneBounds.center.x, subsceneBounds.center.z);
+                        subsceneIndex = partitionData.GetSubsceneIndexByPosition(subsceneBounds.center.x, subsceneBounds.center.z);
                         break;
 
                     case ScenePartitionType.XY:
-                        subsceneIndex = partitionData.GetSubsceneIndex(subsceneBounds.center.x, subsceneBounds.center.y);
+                        subsceneIndex = partitionData.GetSubsceneIndexByPosition(subsceneBounds.center.x, subsceneBounds.center.y);
                         break;
 
                     default:
