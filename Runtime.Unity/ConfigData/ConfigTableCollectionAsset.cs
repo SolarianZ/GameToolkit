@@ -1,32 +1,61 @@
-﻿using System;
+﻿using GBG.GameToolkit.ConfigData;
+using System;
 using System.Collections.Generic;
-using GBG.GameToolkit.ConfigData;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
     [CreateAssetMenu(menuName = "Bamboo/Config Data/Config Table Collection")]
-    public class ConfigTableCollectionAsset : ScriptableObject, IConfigTableProvider
+    public class ConfigTableCollectionAsset : ScriptableObject, IConfigTableProvider, IValidatable
     {
-        public ConfigTableAssetPtr[] Configs = Array.Empty<ConfigTableAssetPtr>();
+        [TextArea]
+        public string Comment;
+        [UnityEngine.Serialization.FormerlySerializedAs("ConfigTables")]
+        public ConfigTableAssetPtr[] ConfigTables = Array.Empty<ConfigTableAssetPtr>();
 
         private Dictionary<Type, ConfigTableAssetPtr> _table;
 
 
-        private void PrepareTable()
+        public virtual void Validate([NotNull] List<ValidationResult> results)
         {
-            if (_table != null)
+            HashSet<ConfigTableAssetPtr> configSet = new HashSet<ConfigTableAssetPtr>();
+            HashSet<Type> typeSet = new HashSet<Type>();
+            foreach (ConfigTableAssetPtr configTable in ConfigTables)
             {
-                return;
-            }
+                if (!configTable)
+                {
+                    results.Add(new ValidationResult
+                    {
+                        Type = ValidationResult.ResultType.Error,
+                        Content = $"Config table reference is null.",
+                        Context = this,
+                    });
+                    continue;
+                }
 
-            _table = new Dictionary<Type, ConfigTableAssetPtr>(Configs.Length);
+                if (!configSet.Add(configTable))
+                {
+                    results.Add(new ValidationResult
+                    {
+                        Type = ValidationResult.ResultType.Error,
+                        Content = $"Duplicate config table asset: {configTable}.",
+                        Context = this,
+                    });
+                }
 
-            foreach (ConfigTableAssetPtr config in Configs)
-            {
-                _table.Add(config.GetConfigType(), config);
+                if (!typeSet.Add(configTable.GetConfigType()))
+                {
+                    results.Add(new ValidationResult
+                    {
+                        Type = ValidationResult.ResultType.Error,
+                        Content = $"Duplicate config table type: {configTable.GetConfigType()}.",
+                        Context = this,
+                    });
+                }
             }
         }
+
 
         public bool ContainsConfigTable<T>() where T : IConfig
         {
@@ -97,6 +126,25 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
             value = default;
             return false;
+        }
+
+        private void PrepareTable()
+        {
+            if (_table != null)
+            {
+                return;
+            }
+
+            _table = new Dictionary<Type, ConfigTableAssetPtr>(ConfigTables.Length);
+
+            foreach (ConfigTableAssetPtr configTable in ConfigTables)
+            {
+                Type configType = configTable.GetConfigType();
+                if (!_table.TryAdd(configType, configTable))
+                {
+                    Debug.LogError($"Duplicate config table type: {configType}.", this);
+                }
+            }
         }
     }
 }

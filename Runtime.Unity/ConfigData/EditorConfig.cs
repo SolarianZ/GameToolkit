@@ -1,6 +1,10 @@
 ﻿using GBG.GameToolkit.ConfigData;
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -8,7 +12,7 @@ using UnityEditor;
 namespace GBG.GameToolkit.Unity.ConfigData
 {
     [DisallowMultipleComponent]
-    public abstract partial class EditorConfig : MonoBehaviour
+    public abstract partial class EditorConfig : MonoBehaviour, IValidatable
     {
         [TextArea]
         public string Comment;
@@ -21,6 +25,22 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         #endregion
 
+
+        public virtual void Validate([NotNull] List<ValidationResult> results)
+        {
+            if (Id != 0)
+            {
+                return;
+            }
+
+            // Id
+            results.Add(new ValidationResult()
+            {
+                Type = ValidationResult.ResultType.Error,
+                Content = "'Id' cannot be '0'.",
+                Context = this,
+            });
+        }
 
         public string GetExportedComment()
         {

@@ -1,57 +1,38 @@
 ﻿#if UNITY_EDITOR
-using System;
+using GBG.GameToolkit.Unity.Editor;
 using System.Collections.Generic;
 using UnityEditor;
-using UObject = UnityEngine.Object;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
-    [Serializable]
-    public struct EditorConfigMessage
-    {
-        public MessageType Type;
-        public string Content;
-        public UObject Context;
-    }
-
-    partial class EditorConfig
-    {
-        public virtual void EditorValidate(List<EditorConfigMessage> results)
-        {
-            if (Id != 0)
-            {
-                return;
-            }
-
-            // Id
-            results.Add(new EditorConfigMessage()
-            {
-                Type = MessageType.Error,
-                Content = "'Id' cannot be '0'.",
-                Context = this,
-            });
-        }
-    }
-
     [CustomEditor(typeof(EditorConfig), true)]
-    class EditorConfigInspector : UnityEditor.Editor
+    class EditorConfigInspector : ValidatableEditor
     {
-        private static List<EditorConfigMessage> _validationMessages = new();
-        private EditorConfig Target => (EditorConfig)target;
+        protected override ListView ValidationResultListView { get; set; }
 
 
-        public override void OnInspectorGUI()
+        public override VisualElement CreateInspectorGUI()
         {
-            // EditorValidate
-            _validationMessages.Clear();
-            Target.EditorValidate(_validationMessages);
-            for (int i = 0; i < _validationMessages.Count; i++)
+            var rootContainer = new VisualElement
             {
-                EditorConfigMessage message = _validationMessages[i];
-                EditorGUILayout.HelpBox(message.Content, message.Type);
-            }
+                name = "RootContainer",
+            };
 
-            base.OnInspectorGUI();
+            var validationResultScroll = EditorValidationUtility.CreateValidationResultScrollView();
+            ValidationResultListView = EditorValidationUtility.CreateSharedValidationResultListView();
+            validationResultScroll.Add(ValidationResultListView);
+            rootContainer.Add(validationResultScroll);
+
+            var defaultEditor = new VisualElement
+            {
+                name = "Default Editor",
+            };
+            InspectorElement.FillDefaultInspector(defaultEditor, serializedObject, this);
+            rootContainer.Add(defaultEditor);
+
+            return rootContainer;
         }
     }
 }

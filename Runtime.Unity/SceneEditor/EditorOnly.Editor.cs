@@ -146,7 +146,7 @@ namespace GBG.GameToolkit.Unity
             EditorOnly.EditorConfigTableCollectionAssetCache = (ConfigTableCollectionAsset)EditorGUILayout.ObjectField("Config Table Collection",
                 EditorOnly.EditorConfigTableCollectionAssetCache, typeof(ConfigTableCollectionAsset), false);
 
-            if (GUILayout.Button("Export Configs"))
+            if (GUILayout.Button("Export ConfigTables"))
             {
                 ExportConfigs();
             }

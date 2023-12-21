@@ -17,7 +17,7 @@ namespace GBG.GameToolkit.Unity
 
         public const string Tag = "EditorOnly";
 
-        public EnterPlayModeAction PlayModeAction = EnterPlayModeAction.Deactivate;
+        public EnterPlayModeAction PlayModeAction = EnterPlayModeAction.Destroy;
 
 
         private void Awake()
