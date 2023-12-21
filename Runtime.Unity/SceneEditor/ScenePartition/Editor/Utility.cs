@@ -97,6 +97,27 @@ namespace GBG.GameToolkit.Unity.ScenePartition.Editor
             return true;
         }
 
+        public static void GenerateLighting(ref RootScene rootSceneComp)
+        {
+            if (!EditorUtility.DisplayDialog("Warning",
+                "This operation will bake the lighting data for all the scene partitions and may take a long time. Do you want to continue?",
+                "Continue", "Cancel"))
+            {
+                return;
+            }
+
+            LoadAllScenes(ref rootSceneComp);
+            string[] scenePaths = new string[SceneManager.loadedSceneCount];
+            for (int i = 0; i < SceneManager.loadedSceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                scenePaths[i] = scene.path;
+            }
+
+            //Lightmapping.ClearLightingDataAsset();
+            Lightmapping.BakeMultipleScenes(scenePaths);
+        }
+
         public static void CalculateScenePartition(ScenePartitionData partitionData,
             SceneData[] rawSubscenes, Bounds[] rawSubsceneBoundsList)
         {
