@@ -55,12 +55,13 @@ namespace GBG.GameToolkit.Unity.Editor
         {
             ScrollView validationResultScroll = new ScrollView
             {
-                name = "Message ScrollView",
+                name = "ValidationResultScrollView",
                 style =
                 {
                     maxHeight = 300,
                 }
             };
+            validationResultScroll.AddToClassList("validation-result-scroll-view");
 
             return validationResultScroll;
         }
@@ -69,9 +70,9 @@ namespace GBG.GameToolkit.Unity.Editor
             Func<VisualElement> makeItem, Action<VisualElement, int> bindItem,
             Action<VisualElement, int> unbindItem, float fixedItemHeight = 50)
         {
-            ListView validationResultList = new ListView
+            ListView validationResultListView = new ListView
             {
-                name = "Message List",
+                name = "ValidationResultListView",
                 itemsSource = itemSource,
                 makeItem = makeItem,
                 bindItem = bindItem,
@@ -82,8 +83,14 @@ namespace GBG.GameToolkit.Unity.Editor
                 reorderable = false,
                 selectionType = SelectionType.Single,
             };
+            validationResultListView.AddToClassList("validation-result-list-view");
 
-            return validationResultList;
+            if (validationResultListView.itemsSource != null && validationResultListView.itemsSource.Count == 0)
+            {
+                validationResultListView.Q<Label>(className: "unity-list-view__empty-label").style.display = DisplayStyle.None;
+            }
+
+            return validationResultListView;
         }
 
         public static ListView CreateSharedValidationResultListView(float fixedItemHeight = 50)

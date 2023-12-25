@@ -19,6 +19,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
             {
                 name = "RootContainer",
             };
+            rootContainer.AddToClassList("root-container__custom-inspector");
 
             var validationResultScroll = EditorValidationUtility.CreateValidationResultScrollView();
             ValidationResultListView = EditorValidationUtility.CreateSharedValidationResultListView();
@@ -27,8 +28,9 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
             var defaultEditor = new VisualElement
             {
-                name = "Default Editor",
+                name = "DefaultEditor",
             };
+            defaultEditor.AddToClassList("default-editor__inspector");
             InspectorElement.FillDefaultInspector(defaultEditor, serializedObject, this);
             rootContainer.Add(defaultEditor);
 

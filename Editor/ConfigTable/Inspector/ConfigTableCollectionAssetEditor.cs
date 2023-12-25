@@ -1,7 +1,5 @@
-﻿using GBG.GameToolkit.Unity;
-using GBG.GameToolkit.Unity.ConfigData;
+﻿using GBG.GameToolkit.Unity.ConfigData;
 using GBG.GameToolkit.Unity.Editor;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -22,6 +20,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             {
                 name = "RootContainer",
             };
+            rootContainer.AddToClassList("root-container__custom-inspector");
 
             var validationResultScroll = EditorValidationUtility.CreateValidationResultScrollView();
             ValidationResultListView = EditorValidationUtility.CreateSharedValidationResultListView();
@@ -30,25 +29,30 @@ namespace GBG.GameToolkit.Editor.ConfigData
 
             var defaultEditor = new VisualElement
             {
-                name = "Default Editor",
+                name = "DefaultEditor",
             };
+            defaultEditor.AddToClassList("default-editor__inspector");
             InspectorElement.FillDefaultInspector(defaultEditor, serializedObject, this);
             rootContainer.Add(defaultEditor);
 
             var recollectButton = new Button(RecollectConfigAssets)
             {
+                name = "RecollectConfigAssetsButton",
                 text = "Recollect Config Assets",
                 style =
                 {
                     marginTop = 10,
                 }
             };
+            recollectButton.AddToClassList("recollect-config-assets-button");
             rootContainer.Add(recollectButton);
 
             var distinctButton = new Button(DistinctConfigAssets)
             {
+                name = "DistinctConfigAssetsButton",
                 text = "Distinct Config Assets",
             };
+            distinctButton.AddToClassList("distinct-config-assets-button");
             rootContainer.Add(distinctButton);
 
             return rootContainer;

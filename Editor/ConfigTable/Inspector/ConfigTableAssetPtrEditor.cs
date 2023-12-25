@@ -21,6 +21,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             {
                 name = "RootContainer",
             };
+            rootContainer.AddToClassList("root-container__custom-inspector");
 
             var validationResultScroll = EditorValidationUtility.CreateValidationResultScrollView();
             ValidationResultListView = EditorValidationUtility.CreateSharedValidationResultListView();
@@ -29,19 +30,22 @@ namespace GBG.GameToolkit.Editor.ConfigData
 
             var defaultEditor = new VisualElement
             {
-                name = "Default Editor",
+                name = "DefaultEditor",
             };
+            defaultEditor.AddToClassList("default-editor__inspector");
             InspectorElement.FillDefaultInspector(defaultEditor, serializedObject, this);
             rootContainer.Add(defaultEditor);
 
             var distinctButton = new Button(DistinctConfigs)
             {
+                name = "DistinctConfigsButton",
                 text = "Distinct Configs",
                 style =
                 {
                     marginTop = 10,
                 }
             };
+            distinctButton.AddToClassList("distinct-configs-button");
             rootContainer.Add(distinctButton);
 
             return rootContainer;
