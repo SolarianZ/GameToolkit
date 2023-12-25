@@ -1,8 +1,9 @@
-﻿using GBG.GameToolkit.Unity.Editor;
+﻿#if UNITY_EDITOR // Fix compile errors on build
+using GBG.GameToolkit.Unity.ScenePartition;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace GBG.GameToolkit.Unity.ScenePartition.Editor
+namespace GBG.GameToolkit.Unity.Editor.ScenePartition
 {
     [CustomEditor(typeof(RootScene))]
     public class RootSceneEditor : ValidatableEditor
@@ -66,3 +67,4 @@ namespace GBG.GameToolkit.Unity.ScenePartition.Editor
         }
     }
 }
+#endif

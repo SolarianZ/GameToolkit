@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR // Fix compile errors on build
+using GBG.GameToolkit.Unity.ScenePartition;
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -7,7 +9,7 @@ using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UObject = UnityEngine.Object;
 
-namespace GBG.GameToolkit.Unity.ScenePartition.Editor
+namespace GBG.GameToolkit.Unity.Editor.ScenePartition
 {
     public delegate SceneData[] SubScenesCollector(Scene rootSceneComp);
 
@@ -216,3 +218,4 @@ namespace GBG.GameToolkit.Unity.ScenePartition.Editor
         }
     }
 }
+#endif
