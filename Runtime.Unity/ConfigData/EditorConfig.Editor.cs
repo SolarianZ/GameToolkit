@@ -1,8 +1,6 @@
 ﻿#if UNITY_EDITOR
 using GBG.GameToolkit.Unity.Editor;
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Unity.ConfigData
@@ -15,24 +13,10 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         public override VisualElement CreateInspectorGUI()
         {
-            var rootContainer = new VisualElement
-            {
-                name = "RootContainer",
-            };
-            rootContainer.AddToClassList("root-container__custom-inspector");
-
-            var validationResultScroll = EditorValidationUtility.CreateValidationResultScrollView();
-            ValidationResultListView = EditorValidationUtility.CreateSharedValidationResultListView();
-            validationResultScroll.Add(ValidationResultListView);
-            rootContainer.Add(validationResultScroll);
-
-            var defaultEditor = new VisualElement
-            {
-                name = "DefaultEditor",
-            };
-            defaultEditor.AddToClassList("default-editor__inspector");
-            InspectorElement.FillDefaultInspector(defaultEditor, serializedObject, this);
-            rootContainer.Add(defaultEditor);
+            EditorValidationUtility.CreateValidationResultViewsAndDefaultInspector(serializedObject, this,
+                out var rootContainer, out _,
+                out var validationResultListView, out _);
+            ValidationResultListView = validationResultListView;
 
             return rootContainer;
         }

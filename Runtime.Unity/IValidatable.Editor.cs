@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Unity.Editor
@@ -50,6 +51,32 @@ namespace GBG.GameToolkit.Unity.Editor
             EditorGUILayout.HelpBox(result.Content, (MessageType)result.Type, wide);
         }
 
+        public static void CreateValidationResultViewsAndDefaultInspector(
+            SerializedObject serializedObject, UnityEditor.Editor editor,
+            out VisualElement rootContainer,
+            out ScrollView validationResultScroll,
+            out ListView validationResultListView,
+            out VisualElement defaultInspectorContainer)
+        {
+            rootContainer = new VisualElement
+            {
+                name = "RootContainer",
+            };
+            rootContainer.AddToClassList("root-container__custom-inspector");
+
+            validationResultScroll = EditorValidationUtility.CreateValidationResultScrollView();
+            validationResultListView = EditorValidationUtility.CreateSharedValidationResultListView();
+            validationResultScroll.Add(validationResultListView);
+            rootContainer.Add(validationResultScroll);
+
+            defaultInspectorContainer = new VisualElement
+            {
+                name = "DefaultInspectorContainer",
+            };
+            defaultInspectorContainer.AddToClassList("default-inspector-container");
+            InspectorElement.FillDefaultInspector(defaultInspectorContainer, serializedObject, editor);
+            rootContainer.Add(defaultInspectorContainer);
+        }
 
         public static ScrollView CreateValidationResultScrollView()
         {
@@ -72,7 +99,7 @@ namespace GBG.GameToolkit.Unity.Editor
         {
             ListView validationResultListView = new ListView
             {
-                name = "ValidationResultListView",
+                name = "validationResultListView",
                 itemsSource = itemSource,
                 makeItem = makeItem,
                 bindItem = bindItem,

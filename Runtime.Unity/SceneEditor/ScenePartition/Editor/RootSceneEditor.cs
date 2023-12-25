@@ -1,41 +1,68 @@
-﻿using UnityEditor;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using GBG.GameToolkit.Unity.Editor;
+using UnityEditor;
+using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Unity.ScenePartition.Editor
 {
     [CustomEditor(typeof(RootScene))]
-    public class RootSceneEditor : UnityEditor.Editor
+    public class RootSceneEditor : ValidatableEditor
     {
-        // TODO: Use UIToolkit and ValidatableEditor
-        public override void OnInspectorGUI()
+        protected override ListView ValidationResultListView { get; set; }
+
+
+        public override VisualElement CreateInspectorGUI()
         {
-            base.OnInspectorGUI();
+            EditorValidationUtility.CreateValidationResultViewsAndDefaultInspector(serializedObject, this,
+                out var rootContainer, out _,
+                out var validationResultListView, out _);
+            ValidationResultListView = validationResultListView;
 
-            if (Application.isPlaying)
+            var collectSubscenesButton = new Button(CollectSubScenes)
             {
-                return;
-            }
+                name = "CollectSubscenesButton",
+                text = "Collect Subscenes",
+                style =
+                {
+                    marginTop = 10,
+                }
+            };
+            collectSubscenesButton.AddToClassList("collect-subscenes-button");
+            rootContainer.Add(collectSubscenesButton);
 
-            EditorGUILayout.Space();
+            var loadAllScenesButton = new Button(LoadAllScenes)
+            {
+                name = "LoadAllScenesButton",
+                text = "Load All Scenes",
+            };
+            loadAllScenesButton.AddToClassList("load-all-scenes-button");
+            rootContainer.Add(loadAllScenesButton);
 
+            var generateLightingButton = new Button(GenerateLighting)
+            {
+                name = "GenerateLightingButton",
+                text = "Generate Lighting",
+            };
+            generateLightingButton.AddToClassList("generate-lighting-button");
+            rootContainer.Add(generateLightingButton);
+
+            return rootContainer;
+        }
+
+        private void CollectSubScenes()
+        {
+            Utility.CollectSubscenes((RootScene)target);
+        }
+
+        private void LoadAllScenes()
+        {
             RootScene rootSceneComp = (RootScene)target;
-            if (GUILayout.Button("Collect Subscenes"))
-            {
-                // TEST
-                //Utility.SubscenesCollector = Utility.CollectSubsceneWithSuffixPNumberInSameFolder;
-                Utility.CollectSubscenes(rootSceneComp);
-            }
+            Utility.LoadAllScenes(ref rootSceneComp);
+        }
 
-            if (GUILayout.Button("Load All Scenes"))
-            {
-                Utility.LoadAllScenes(ref rootSceneComp);
-            }
-
-            if (GUILayout.Button("Generate Lighting"))
-            {
-                Utility.GenerateLighting(ref rootSceneComp);
-            }
+        private void GenerateLighting()
+        {
+            RootScene rootSceneComp = (RootScene)target;
+            Utility.GenerateLighting(ref rootSceneComp);
         }
     }
 }
