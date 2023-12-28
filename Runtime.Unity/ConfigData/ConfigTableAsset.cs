@@ -24,6 +24,22 @@ namespace GBG.GameToolkit.Unity.ConfigData
         public T[] Configs = Array.Empty<T>();
 
         private Dictionary<int, T> _table;
+        private bool _isDirty = true;
+
+
+        #region Unity Messages
+
+        protected virtual void OnValidate()
+        {
+            _isDirty = true;
+        }
+
+        protected virtual void Awake()
+        {
+            _isDirty = true;
+        }
+
+        #endregion
 
 
         public override Type GetConfigType() => typeof(T);
@@ -90,12 +106,18 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         private void PrepareTable()
         {
-            if (_table != null)
+            if (_table == null)
+            {
+                _table = new Dictionary<int, T>(Configs.Length);
+                _isDirty = true;
+            }
+
+            if (!_isDirty)
             {
                 return;
             }
 
-            _table = new Dictionary<int, T>(Configs.Length);
+            _table.Clear();
             foreach (T config in Configs)
             {
                 if (!_table.TryAdd(config.Id, config))
@@ -103,6 +125,8 @@ namespace GBG.GameToolkit.Unity.ConfigData
                     Debug.LogError($"Duplicate config id: {config.Id}. Config type: {typeof(T)}.", this);
                 }
             }
+
+            _isDirty = false;
         }
     }
 }
