@@ -13,7 +13,7 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
 {
     public delegate SceneData[] SubScenesCollector(Scene rootSceneComp);
 
-    public static class Utility
+    public static class EditorScenePartitionUtility
     {
         public static SubScenesCollector SubscenesCollector;
 
@@ -24,7 +24,7 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
                 return true;
             }
 
-            string message = $"Please assign `{typeof(Utility).FullName}.{nameof(SubscenesCollector)}` before collecting subscenes.";
+            string message = $"Please assign `{typeof(EditorScenePartitionUtility).FullName}.{nameof(SubscenesCollector)}` before collecting subscenes.";
             EditorUtility.DisplayDialog("Error", message, "Ok");
 
             return false;

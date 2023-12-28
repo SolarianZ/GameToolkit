@@ -42,7 +42,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
             });
         }
 
-        public string GetExportedComment()
+        public virtual string GenerateComment()
         {
             if (string.IsNullOrEmpty(Comment))
             {

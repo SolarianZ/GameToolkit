@@ -1,7 +1,6 @@
 ﻿using GBG.GameToolkit.Unity.ConfigData;
 using GBG.GameToolkit.Unity.Editor;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Editor.ConfigData
@@ -36,18 +35,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
 
         private void DistinctConfigs()
         {
-            if (Application.isPlaying)
-            {
-                EditorUtility.DisplayDialog("Error",
-                    "This action cannot be performed in play mode.", "Ok");
-                return;
-            }
-
-            ConfigTableAssetPtr configTable = (ConfigTableAssetPtr)target;
-            Undo.RecordObject(configTable, "Distinct Configs");
-            configTable.DistinctConfigs();
-            EditorUtility.SetDirty(configTable);
-            AssetDatabase.SaveAssetIfDirty(configTable);
+            EditorConfigAssetUtility.DistinctConfigs((ConfigTableAssetPtr)target);
         }
     }
 }

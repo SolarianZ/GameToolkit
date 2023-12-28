@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GBG.GameToolkit.Editor.ConfigData
 {
-    public static class CsvUtility
+    public static class EditorCsvUtility
     {
         /// <summary>
         /// Re-saves all CSV files in the specified folder using UTF-8 with BOM encoding.

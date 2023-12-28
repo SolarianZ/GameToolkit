@@ -51,19 +51,19 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
 
         private void CollectSubScenes()
         {
-            Utility.CollectSubscenes((RootScene)target);
+            EditorScenePartitionUtility.CollectSubscenes((RootScene)target);
         }
 
         private void LoadAllScenes()
         {
             RootScene rootSceneComp = (RootScene)target;
-            Utility.LoadAllScenes(ref rootSceneComp);
+            EditorScenePartitionUtility.LoadAllScenes(ref rootSceneComp);
         }
 
         private void GenerateLighting()
         {
             RootScene rootSceneComp = (RootScene)target;
-            Utility.GenerateLighting(ref rootSceneComp);
+            EditorScenePartitionUtility.GenerateLighting(ref rootSceneComp);
         }
     }
 }
