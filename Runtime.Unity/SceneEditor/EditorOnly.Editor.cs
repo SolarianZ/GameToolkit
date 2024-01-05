@@ -60,6 +60,19 @@ namespace GBG.GameToolkit.Unity
 
         internal static ConfigTableCollectionAsset EditorConfigTableCollectionAssetCache;
 
+        internal static void EditorSaveAllDirtyConfigAssets()
+        {
+            if (!EditorConfigTableCollectionAssetCache)
+            {
+                return;
+            }
+
+            foreach (ConfigTableAssetPtr asset in EditorConfigTableCollectionAssetCache.ConfigTables)
+            {
+                AssetDatabase.SaveAssetIfDirty(asset);
+            }
+        }
+
 
         private void OnEnable()
         {
@@ -68,12 +81,18 @@ namespace GBG.GameToolkit.Unity
         }
 
 
-        public void EditorExportConfigs(ConfigTableCollectionAsset configTables)
+        public void EditorExportConfigs(ConfigTableCollectionAsset configTables, bool saveAssets)
         {
+            if (!configTables)
+            {
+                Debug.LogError("Config table collection asset is null.", this);
+                return;
+            }
+
             var configComps = GetComponentsInChildren<EditorConfig>();
             foreach (EditorConfig configComp in configComps)
             {
-                configComp.ExportConfig(configTables);
+                configComp.ExportConfig(configTables, saveAssets);
             }
         }
     }
@@ -161,7 +180,8 @@ namespace GBG.GameToolkit.Unity
                 return;
             }
 
-            Target.EditorExportConfigs(EditorOnly.EditorConfigTableCollectionAssetCache);
+            Target.EditorExportConfigs(EditorOnly.EditorConfigTableCollectionAssetCache, false);
+            EditorOnly.EditorSaveAllDirtyConfigAssets();
             UDebug.Log($"Export configs to '{EditorOnly.EditorConfigTableCollectionAssetCache}'.", Target);
         }
     }

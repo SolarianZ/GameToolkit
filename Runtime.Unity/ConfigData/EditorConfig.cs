@@ -57,10 +57,10 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return $"#{Id} {Comment}";
         }
 
-        public abstract void ExportConfig(ConfigTableCollectionAsset configTables);
+        public abstract void ExportConfig(ConfigTableCollectionAsset configTables, bool saveAsset = true);
 
         public static void SetConfig<TConfig>(ConfigTableCollectionAsset configTables, TConfig config,
-            bool setDirtyAndSave = true, string undoName = null)
+            bool saveAsset = true, string undoName = null)
             where TConfig : IConfig
         {
             if (!configTables.TryGetConfigTable<TConfig>(out var configTable))
@@ -79,13 +79,14 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
             for (int i = 0; i < asset.Configs.Length; i++)
             {
+                // Override existing config item
                 if (asset.Configs[i].Id == config.Id)
                 {
                     asset.Configs[i] = config;
 #if UNITY_EDITOR
-                    if (setDirtyAndSave)
+                    EditorUtility.SetDirty(asset);
+                    if (saveAsset)
                     {
-                        EditorUtility.SetDirty(asset);
                         AssetDatabase.SaveAssetIfDirty(asset);
                     }
 #endif
@@ -93,14 +94,15 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 }
             }
 
+            // Add new config item
             TConfig[] configs = new TConfig[asset.Configs.Length + 1];
             Array.Copy(asset.Configs, configs, asset.Configs.Length);
             configs[asset.Configs.Length] = config;
             asset.Configs = configs;
 #if UNITY_EDITOR
-            if (setDirtyAndSave)
+            EditorUtility.SetDirty(asset);
+            if (saveAsset)
             {
-                EditorUtility.SetDirty(asset);
                 AssetDatabase.SaveAssetIfDirty(asset);
             }
 #endif
