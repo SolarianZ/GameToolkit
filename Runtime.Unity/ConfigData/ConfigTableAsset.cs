@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
@@ -17,6 +18,10 @@ namespace GBG.GameToolkit.Unity.ConfigData
         public abstract void Validate([NotNull] List<ValidationResult> results);
 
         public abstract void DistinctConfigs();
+
+        public abstract void DeleteMultiConfigs(IEnumerable<int> idList);
+
+        public abstract void DeleteRangeConfigs(int startId, int endId);
     }
 
     public abstract class ConfigTableAsset<T> : ConfigTableAssetPtr, IConfigTable<T> where T : IConfig
@@ -75,6 +80,16 @@ namespace GBG.GameToolkit.Unity.ConfigData
             Configs = Configs.Distinct(new ConfigDistinctComparer<T>()).ToArray();
         }
 
+        public override void DeleteMultiConfigs(IEnumerable<int> idList)
+        {
+            Configs = Configs.Where(config => !idList.Contains(config.Id)).ToArray();
+        }
+
+        public override void DeleteRangeConfigs(int startId, int endId)
+        {
+            Assert.IsTrue(startId <= endId);
+            Configs = Configs.Where(config => config.Id < startId || config.Id > endId).ToArray();
+        }
 
         public bool ContainsConfig(int key)
         {
