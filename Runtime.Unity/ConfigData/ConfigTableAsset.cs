@@ -52,9 +52,19 @@ namespace GBG.GameToolkit.Unity.ConfigData
         public override void Validate([NotNull] List<ValidationResult> results)
         {
             HashSet<int> idSet = new HashSet<int>();
-            foreach (T config in Configs)
+            for (int i = 0; i < Configs.Length; i++)
             {
-                if (!idSet.Add(config.Id))
+                T config = Configs[i];
+                if (config == null)
+                {
+                    results.Add(new ValidationResult
+                    {
+                        Type = ValidationResult.ResultType.Error,
+                        Content = $"Null config entry at index '{i}'.",
+                        Context = this,
+                    });
+                }
+                else if (!idSet.Add(config.Id))
                 {
                     results.Add(new ValidationResult
                     {
