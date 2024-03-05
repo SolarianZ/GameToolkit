@@ -11,6 +11,7 @@ using UnityEditor;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
+    [SelectionBase]
     [DisallowMultipleComponent]
     public abstract partial class EditorConfig : MonoBehaviour, IValidatable
     {

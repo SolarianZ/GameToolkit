@@ -1,0 +1,19 @@
+{
+    "name": "GBG.GameToolkit.Unity.Editor",
+    "rootNamespace": "GBG.GameToolkit.Unity.Editor",
+    "references": [
+        "GUID:587cd0dd140853645b912030e0c17a1a",
+        "GUID:6c289c08d5c27e84a9dda895f399df4d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

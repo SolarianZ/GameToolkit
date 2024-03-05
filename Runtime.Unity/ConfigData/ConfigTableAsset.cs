@@ -26,8 +26,21 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
     public abstract class ConfigTableAsset<T> : ConfigTableAssetPtr, IConfigTable<T> where T : IConfig
     {
-        public T[] Configs = Array.Empty<T>();
+        public T[] Configs
+        {
+            get
+            {
+                return _configs;
+            }
+            set
+            {
+                _configs = value;
+                _isDirty = true;
+            }
+        }
 
+        [UnityEngine.Serialization.FormerlySerializedAs("Configs")]
+        private T[] _configs = Array.Empty<T>();
         private Dictionary<int, T> _table;
         private bool _isDirty = true;
 
@@ -131,7 +144,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         private void PrepareTable()
         {
-            if (_table == null)
+            if (_table == null /*|| _table.Count != Configs.Length*/)
             {
                 _table = new Dictionary<int, T>(Configs.Length);
                 _isDirty = true;
