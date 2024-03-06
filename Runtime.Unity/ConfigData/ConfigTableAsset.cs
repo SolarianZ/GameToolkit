@@ -10,7 +10,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
 {
     public abstract class ConfigTableAssetPtr : ScriptableObject, IConfigTablePtr, IValidatable
     {
-        [TextArea]
+        [TextArea(0, 3)]
         public string Comment;
 
         public abstract Type GetConfigType();
@@ -40,6 +40,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
         }
 
         [UnityEngine.Serialization.FormerlySerializedAs("Configs")]
+        [SerializeField]
         private T[] _configs = Array.Empty<T>();
         private Dictionary<int, T> _table;
         private bool _isDirty = true;
@@ -60,7 +61,13 @@ namespace GBG.GameToolkit.Unity.ConfigData
         #endregion
 
 
-        public override Type GetConfigType() => typeof(T);
+        public new void SetDirty()
+        {
+            _isDirty = true;
+#pragma warning disable CS0618 // Type or member is obsolete
+            base.SetDirty();
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
 
         public override void Validate([NotNull] List<ValidationResult> results)
         {
@@ -98,6 +105,10 @@ namespace GBG.GameToolkit.Unity.ConfigData
             }
         }
 
+
+        public override Type GetConfigType() => typeof(T);
+
+
         public override void DistinctConfigs()
         {
             Configs = Configs.Distinct(new ConfigDistinctComparer<T>()).ToArray();
@@ -114,6 +125,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
             Configs = Configs.Where(config => config.Id < startId || config.Id > endId).ToArray();
         }
 
+
         public bool ContainsConfig(int key)
         {
             PrepareTable();
@@ -125,7 +137,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return Configs;
         }
 
-        public T GetConfig(int id, T defaultValue = default)
+        public T GetConfig(int id)
         {
             PrepareTable();
             if (TryGetConfig(id, out T config))
@@ -133,7 +145,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 return config;
             }
 
-            return defaultValue;
+            return default;
         }
 
         public bool TryGetConfig(int id, out T config)

@@ -9,13 +9,48 @@ namespace GBG.GameToolkit.Unity.ConfigData
     [CreateAssetMenu(menuName = "Bamboo/Config Data/Config Table Collection")]
     public class ConfigTableCollectionAsset : ScriptableObject, IConfigTableProvider, IValidatable
     {
-        [TextArea]
+        public ConfigTableAssetPtr[] ConfigTables
+        {
+            get { return _configTables; }
+            set
+            {
+                _configTables = value;
+                _isDirty = true;
+            }
+        }
+
+        [TextArea(0, 3)]
         public string Comment;
         [UnityEngine.Serialization.FormerlySerializedAs("ConfigTables")]
-        public ConfigTableAssetPtr[] ConfigTables = Array.Empty<ConfigTableAssetPtr>();
+        [SerializeField]
+        private ConfigTableAssetPtr[] _configTables = Array.Empty<ConfigTableAssetPtr>();
 
         private Dictionary<Type, ConfigTableAssetPtr> _table;
+        private bool _isDirty = true;
 
+
+        #region Unity Messages
+
+        protected virtual void OnValidate()
+        {
+            _isDirty = true;
+        }
+
+        protected virtual void Awake()
+        {
+            _isDirty = true;
+        }
+
+        #endregion
+
+
+        public new void SetDirty()
+        {
+            _isDirty = true;
+#pragma warning disable CS0618 // Type or member is obsolete
+            base.SetDirty();
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
 
         public virtual void Validate([NotNull] List<ValidationResult> results)
         {
@@ -107,14 +142,14 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return null;
         }
 
-        public T GetConfig<T>(int key, T defaultValue = default) where T : IConfig
+        public T GetConfig<T>(int key) where T : IConfig
         {
             if (TryGetConfig<T>(key, out T config))
             {
                 return config;
             }
 
-            return defaultValue;
+            return default;
         }
 
         public bool TryGetConfig<T>(int key, out T value) where T : IConfig
@@ -130,12 +165,18 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         private void PrepareTable()
         {
-            if (_table != null)
+            if (_table == null /*|| _table.Count != ConfigTables.Length*/)
+            {
+                _table = new Dictionary<Type, ConfigTableAssetPtr>(ConfigTables.Length);
+                _isDirty = true;
+            }
+
+            if (!_isDirty)
             {
                 return;
             }
 
-            _table = new Dictionary<Type, ConfigTableAssetPtr>(ConfigTables.Length);
+            _table.Clear();
 
             foreach (ConfigTableAssetPtr configTable in ConfigTables)
             {
@@ -144,6 +185,8 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 {
                     Debug.LogError($"Duplicate config table type: {configType}.", this);
                 }
+
+                _isDirty = false;
             }
         }
     }

@@ -11,7 +11,7 @@ namespace GBG.GameToolkit.ConfigData
 
         bool ContainsConfig<T>(int key) where T : IConfig;
         IReadOnlyList<T> GetConfigs<T>() where T : IConfig;
-        T GetConfig<T>(int key, T defaultValue = default) where T : IConfig;
+        T GetConfig<T>(int key) where T : IConfig;
         bool TryGetConfig<T>(int key, out T value) where T : IConfig;
     }
 
@@ -88,14 +88,14 @@ namespace GBG.GameToolkit.ConfigData
             return null;
         }
 
-        public T GetConfig<T>(int key, T defaultValue = default) where T : IConfig
+        public T GetConfig<T>(int key) where T : IConfig
         {
             if (TryGetConfig<T>(key, out var configTable))
             {
                 return configTable;
             }
 
-            return defaultValue;
+            return default;
         }
 
         public bool TryGetConfig<T>(int key, out T value) where T : IConfig

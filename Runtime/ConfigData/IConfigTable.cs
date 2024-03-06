@@ -12,7 +12,7 @@ namespace GBG.GameToolkit.ConfigData
     {
         bool ContainsConfig(int key);
         IReadOnlyList<T> GetConfigs();
-        T GetConfig(int key, T defaultValue = default);
+        T GetConfig(int key);
         bool TryGetConfig(int key, out T value);
     }
 }
