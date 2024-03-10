@@ -3,8 +3,6 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -88,6 +86,8 @@ namespace GBG.GameToolkit.Unity.ConfigData
                     EditorUtility.SetDirty(asset);
                     if (saveAsset)
                     {
+                        // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+                        AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(asset));
                         AssetDatabase.SaveAssetIfDirty(asset);
                     }
 #endif
@@ -104,6 +104,8 @@ namespace GBG.GameToolkit.Unity.ConfigData
             EditorUtility.SetDirty(asset);
             if (saveAsset)
             {
+                // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+                AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(asset));
                 AssetDatabase.SaveAssetIfDirty(asset);
             }
 #endif

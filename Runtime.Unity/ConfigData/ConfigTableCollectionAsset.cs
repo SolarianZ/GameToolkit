@@ -46,10 +46,13 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         public new void SetDirty()
         {
-            _isDirty = true;
 #pragma warning disable CS0618 // Type or member is obsolete
             base.SetDirty();
 #pragma warning restore CS0618 // Type or member is obsolete
+            _isDirty = true;
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
 
         public virtual void Validate([NotNull] List<ValidationResult> results)

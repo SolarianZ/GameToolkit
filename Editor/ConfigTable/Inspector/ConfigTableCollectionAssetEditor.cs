@@ -2,6 +2,7 @@
 using GBG.GameToolkit.Unity.Editor;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -66,6 +67,8 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(collectionAsset, "Recollect Config Assets");
             collectionAsset.ConfigTables = configTables;
             EditorUtility.SetDirty(collectionAsset);
+            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
             AssetDatabase.SaveAssetIfDirty(collectionAsset);
         }
 
@@ -82,6 +85,8 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(collectionAsset, "Distinct Config Assets");
             collectionAsset.ConfigTables = collectionAsset.ConfigTables.Distinct().ToArray();
             EditorUtility.SetDirty(collectionAsset);
+            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
             AssetDatabase.SaveAssetIfDirty(collectionAsset);
         }
     }
