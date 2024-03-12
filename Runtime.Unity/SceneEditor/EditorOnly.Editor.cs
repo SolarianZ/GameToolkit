@@ -69,9 +69,12 @@ namespace GBG.GameToolkit.Unity
 
             foreach (ConfigTableAssetPtr asset in EditorConfigTableCollectionAssetCache.ConfigTables)
             {
-                // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
-                AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(asset));
-                AssetDatabase.SaveAssetIfDirty(asset);
+                if (EditorUtility.IsDirty(asset))
+                {
+                    // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+                    AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(asset));
+                    AssetDatabase.SaveAssetIfDirty(asset);
+                }
             }
         }
 
