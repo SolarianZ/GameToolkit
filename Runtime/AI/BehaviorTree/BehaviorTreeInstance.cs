@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GBG.GameToolkit.AI.Common;
 using GBG.GameToolkit.AI.Parameter;
 
 namespace GBG.GameToolkit.AI.BehaviorTree
@@ -38,7 +37,7 @@ namespace GBG.GameToolkit.AI.BehaviorTree
             RootNode = rootNode;
             if (RootNode == null)
             {
-                Debugger.Log(Debugger.LevelError, "Behavior Tree", $"Root node not found. Comment: {Context.BTComment}", this);
+                Debugger.Log(LogLevel.ERROR, "Behavior Tree", $"Root node not found. Comment: {Context.BTComment}", this);
             }
 
             Initialize();

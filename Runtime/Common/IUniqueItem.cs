@@ -1,4 +1,4 @@
-﻿namespace GBG.GameToolkit.AI.Common
+﻿namespace GBG.GameToolkit
 {
     public interface IUniqueItem
     {

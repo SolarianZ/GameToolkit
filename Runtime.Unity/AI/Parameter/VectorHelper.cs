@@ -2,7 +2,7 @@ using GBG.GameToolkit.AI.Parameter;
 using UVector4 = UnityEngine.Vector4;
 using UQuaternion = UnityEngine.Quaternion;
 
-namespace GBG.GameToolkit.AI.Unity.Parameter
+namespace GBG.GameToolkit.Unity.AI.Parameter
 {
     public static class VectorHelper
     {

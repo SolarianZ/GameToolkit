@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using GBG.GameToolkit.AI.BehaviorTree;
 using GBG.GameToolkit.AI.Parameter;
-using GBG.GameToolkit.AI.Unity.Parameter;
+using GBG.GameToolkit.Unity.AI.Parameter;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
     /// <summary>
     /// 行为树数据。

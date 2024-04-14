@@ -3,7 +3,7 @@ using GBG.GameToolkit.AI.Parameter;
 using UnityEngine;
 using UObject = UnityEngine.Object;
 
-namespace GBG.GameToolkit.AI.Unity.Parameter
+namespace GBG.GameToolkit.Unity.AI.Parameter
 {
     [Serializable]
     public class UnityParamLiteral : IParamLiteral

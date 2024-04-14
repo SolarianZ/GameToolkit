@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GBG.GameToolkit.AI.Condition;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.Condition
+namespace GBG.GameToolkit.Unity.AI.Condition
 {
     /// <summary>
     /// 条件组数据。<br/>

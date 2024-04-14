@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.GameToolkit.AI.Common;
-using GBG.GameToolkit.AI.Unity.StateMachine;
+using GBG.GameToolkit.AI.StateMachine;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.StateMachine
+namespace GBG.GameToolkit.Unity.AI.StateMachine
 {
     /// <summary>
     /// 状态机节点数据。

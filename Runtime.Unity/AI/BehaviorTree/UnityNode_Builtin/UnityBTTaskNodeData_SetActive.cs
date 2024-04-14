@@ -1,7 +1,7 @@
 ﻿using System;
 using GBG.GameToolkit.AI.BehaviorTree;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
     [Serializable]
     public class UnityBTTaskNodeData_SetActive : UnityBTTaskNodeDataBase

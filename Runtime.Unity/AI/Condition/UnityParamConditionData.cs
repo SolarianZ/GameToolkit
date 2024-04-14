@@ -1,9 +1,9 @@
 ﻿using System;
 using GBG.GameToolkit.AI.Condition;
 using GBG.GameToolkit.AI.Parameter;
-using GBG.GameToolkit.AI.Unity.Parameter;
+using GBG.GameToolkit.Unity.AI.Parameter;
 
-namespace GBG.GameToolkit.AI.Unity.Condition
+namespace GBG.GameToolkit.Unity.AI.Condition
 {
     /// <summary>
     /// 黑板参数条件数据。

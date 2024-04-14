@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using GBG.GameToolkit.AI.Parameter;
 
-namespace GBG.GameToolkit.AI.Unity.Parameter
+namespace GBG.GameToolkit.Unity.AI.Parameter
 {
     /// <summary>
     /// 黑板数据。

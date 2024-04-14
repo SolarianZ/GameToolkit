@@ -1,5 +1,4 @@
 ﻿using System;
-using GBG.GameToolkit.AI.Common;
 using GBG.GameToolkit.AI.Parameter;
 
 namespace GBG.GameToolkit.AI.Condition

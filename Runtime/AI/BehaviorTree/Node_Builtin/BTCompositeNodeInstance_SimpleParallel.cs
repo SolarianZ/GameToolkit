@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using GBG.GameToolkit.AI.Common;
 
 namespace GBG.GameToolkit.AI.BehaviorTree
 {

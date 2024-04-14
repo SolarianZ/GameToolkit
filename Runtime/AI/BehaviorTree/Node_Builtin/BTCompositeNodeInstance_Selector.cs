@@ -1,6 +1,4 @@
-﻿using GBG.GameToolkit.AI.Common;
-
-namespace GBG.GameToolkit.AI.BehaviorTree
+﻿namespace GBG.GameToolkit.AI.BehaviorTree
 {
     /// <summary>
     /// 行为树复合节点 - 选择器节点。<br/>

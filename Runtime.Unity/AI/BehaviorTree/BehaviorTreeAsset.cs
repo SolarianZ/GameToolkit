@@ -3,9 +3,9 @@ using GBG.GameToolkit.AI.BehaviorTree;
 using GBG.GameToolkit.AI.Parameter;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
-    [CreateAssetMenu(menuName = "Test/AI/Behavior Tree Asset")]
+    [CreateAssetMenu(menuName = "Bamboo/AI/Behavior Tree Asset")]
     public class UnityBehaviorTreeAsset : ScriptableObject, IBehaviorTreeData
     {
         /// <inheritdoc />

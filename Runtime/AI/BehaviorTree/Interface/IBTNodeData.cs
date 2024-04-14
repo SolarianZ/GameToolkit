@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GBG.GameToolkit.AI.Common;
 using GBG.GameToolkit.AI.Condition;
 
 namespace GBG.GameToolkit.AI.BehaviorTree

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
     /// <summary>
     /// 行为树任务节点数据。<br/>

@@ -1,7 +1,7 @@
 ﻿using System;
 using GBG.GameToolkit.AI.BehaviorTree;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
     /// <summary>
     /// 行为树任务节点数据 - 等待指定的时间。

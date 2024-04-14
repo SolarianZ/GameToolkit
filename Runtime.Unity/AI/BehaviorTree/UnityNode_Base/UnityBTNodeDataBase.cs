@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using GBG.GameToolkit.AI.BehaviorTree;
-using GBG.GameToolkit.AI.Common;
 using GBG.GameToolkit.AI.Condition;
-using GBG.GameToolkit.AI.Unity.Condition;
+using GBG.GameToolkit.Unity.AI.Condition;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
     /// <summary>
     /// 行为树节点数据。

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GBG.GameToolkit.AI.Common;
 using GBG.GameToolkit.AI.Parameter;
 
 namespace GBG.GameToolkit.AI.StateMachine
@@ -41,7 +40,7 @@ namespace GBG.GameToolkit.AI.StateMachine
             EntryNode = entryNode;
             if (EntryNode == null)
             {
-                Debugger.Log(Debugger.LevelError, "State Machine", $"Entry node not found. Comment: {Context.SMComment}", this);
+                Debugger.Log(LogLevel.ERROR, "State Machine", $"Entry node not found. Comment: {Context.SMComment}", this);
             }
 
             Initialize();

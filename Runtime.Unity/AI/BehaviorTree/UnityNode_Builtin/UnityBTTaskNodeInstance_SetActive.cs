@@ -2,7 +2,7 @@ using GBG.GameToolkit.AI.BehaviorTree;
 using GBG.GameToolkit.AI.Parameter;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.BehaviorTree
+namespace GBG.GameToolkit.Unity.AI.BehaviorTree
 {
     public class UnityBTTaskNodeInstance_SetActive : BTTaskNodeInstanceBase
     {

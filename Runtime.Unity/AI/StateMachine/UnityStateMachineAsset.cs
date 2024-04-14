@@ -3,9 +3,9 @@ using GBG.GameToolkit.AI.Parameter;
 using GBG.GameToolkit.AI.StateMachine;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.StateMachine
+namespace GBG.GameToolkit.Unity.AI.StateMachine
 {
-    [CreateAssetMenu(menuName = "Test/AI/State Machine Asset")]
+    [CreateAssetMenu(menuName = "Bamboo/AI/State Machine Asset")]
     public class UnityStateMachineAsset : ScriptableObject, IStateMachineData
     {
         /// <inheritdoc />

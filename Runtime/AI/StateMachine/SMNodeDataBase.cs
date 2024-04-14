@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GBG.GameToolkit.AI.Common;
 
 namespace GBG.GameToolkit.AI.StateMachine
 {

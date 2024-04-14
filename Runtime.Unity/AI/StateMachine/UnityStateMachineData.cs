@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using GBG.GameToolkit.AI.Parameter;
 using GBG.GameToolkit.AI.StateMachine;
-using GBG.GameToolkit.AI.Unity.Parameter;
+using GBG.GameToolkit.Unity.AI.Parameter;
 using UnityEngine;
 
-namespace GBG.GameToolkit.AI.Unity.StateMachine
+namespace GBG.GameToolkit.Unity.AI.StateMachine
 {
     /// <summary>
     /// 状态机数据。

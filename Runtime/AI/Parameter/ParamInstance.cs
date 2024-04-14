@@ -1,5 +1,4 @@
 ﻿using System;
-using GBG.GameToolkit.AI.Common;
 
 namespace GBG.GameToolkit.AI.Parameter
 {

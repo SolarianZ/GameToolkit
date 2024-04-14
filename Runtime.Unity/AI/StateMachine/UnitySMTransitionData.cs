@@ -1,8 +1,8 @@
 ﻿using System;
 using GBG.GameToolkit.AI.StateMachine;
-using GBG.GameToolkit.AI.Unity.Condition;
+using GBG.GameToolkit.Unity.AI.Condition;
 
-namespace GBG.GameToolkit.AI.Unity.StateMachine
+namespace GBG.GameToolkit.Unity.AI.StateMachine
 {
     /// <summary>
     /// 状态机状态转换数据。
