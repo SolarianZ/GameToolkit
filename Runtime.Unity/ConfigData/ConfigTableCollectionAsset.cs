@@ -59,14 +59,15 @@ namespace GBG.GameToolkit.Unity.ConfigData
         {
             HashSet<ConfigTableAssetPtr> configSet = new HashSet<ConfigTableAssetPtr>();
             HashSet<Type> typeSet = new HashSet<Type>();
-            foreach (ConfigTableAssetPtr configTable in ConfigTables)
+            for (var i = 0; i < ConfigTables.Length; i++)
             {
+                ConfigTableAssetPtr configTable = ConfigTables[i];
                 if (!configTable)
                 {
                     results.Add(new ValidationResult
                     {
                         Type = ValidationResult.ResultType.Error,
-                        Content = $"Config table reference is null.",
+                        Content = $"Null config table asset reference. Index: {i}.",
                         Context = this,
                     });
                     continue;
@@ -77,7 +78,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
                     results.Add(new ValidationResult
                     {
                         Type = ValidationResult.ResultType.Error,
-                        Content = $"Duplicate config table asset: {configTable}.",
+                        Content = $"Duplicate config table asset reference. Index: {i}.",
                         Context = this,
                     });
                 }
@@ -87,7 +88,7 @@ namespace GBG.GameToolkit.Unity.ConfigData
                     results.Add(new ValidationResult
                     {
                         Type = ValidationResult.ResultType.Error,
-                        Content = $"Duplicate config table type: {configTable.GetConfigType()}.",
+                        Content = $"Duplicate config table type. Index: {i}, type: {configTable.GetConfigType()}.",
                         Context = this,
                     });
                 }
@@ -181,16 +182,23 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
             _table.Clear();
 
-            foreach (ConfigTableAssetPtr configTable in ConfigTables)
+            for (var i = 0; i < ConfigTables.Length; i++)
             {
+                ConfigTableAssetPtr configTable = ConfigTables[i];
+                if (!configTable)
+                {
+                    Debug.LogError($"Null config table asset reference. Index: {i}.", this);
+                    continue;
+                }
+
                 Type configType = configTable.GetConfigType();
                 if (!_table.TryAdd(configType, configTable))
                 {
-                    Debug.LogError($"Duplicate config table type: {configType}.", this);
+                    Debug.LogError($"Duplicate config table type. Index: {i}, type: {configType}.", this);
                 }
-
-                _isDirty = false;
             }
+
+            _isDirty = false;
         }
     }
 }

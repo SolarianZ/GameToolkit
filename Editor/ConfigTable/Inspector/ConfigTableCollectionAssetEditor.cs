@@ -67,7 +67,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(collectionAsset, "Recollect Config Assets");
             collectionAsset.ConfigTables = configTables;
             EditorUtility.SetDirty(collectionAsset);
-            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
             AssetDatabase.SaveAssetIfDirty(collectionAsset);
         }
@@ -85,7 +85,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(collectionAsset, "Distinct Config Assets");
             collectionAsset.ConfigTables = collectionAsset.ConfigTables.Distinct().ToArray();
             EditorUtility.SetDirty(collectionAsset);
-            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
             AssetDatabase.SaveAssetIfDirty(collectionAsset);
         }

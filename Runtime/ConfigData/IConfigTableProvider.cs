@@ -22,7 +22,7 @@ namespace GBG.GameToolkit.ConfigData
 
         public DefaultConfigTableProvider(IReadOnlyDictionary<Type, IConfigTablePtr> configTables)
         {
-            if (_configTables == null)
+            if (configTables == null)
             {
                 throw new ArgumentNullException(nameof(configTables), $"Argument '{nameof(configTables)} is null.");
             }

@@ -71,7 +71,7 @@ namespace GBG.GameToolkit.Unity
             {
                 if (EditorUtility.IsDirty(asset))
                 {
-                    // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+                    // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
                     AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(asset));
                     AssetDatabase.SaveAssetIfDirty(asset);
                 }

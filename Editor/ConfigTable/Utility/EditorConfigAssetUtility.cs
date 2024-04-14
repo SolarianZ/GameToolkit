@@ -19,7 +19,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(configTable, "Distinct Configs");
             configTable.DistinctConfigs();
             EditorUtility.SetDirty(configTable);
-            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(configTable));
             AssetDatabase.SaveAssetIfDirty(configTable);
         }
@@ -36,7 +36,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(configTable, "Delete Multi Configs");
             configTable.DeleteMultiConfigs(idList);
             EditorUtility.SetDirty(configTable);
-            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(configTable));
             AssetDatabase.SaveAssetIfDirty(configTable);
         }
@@ -60,7 +60,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             Undo.RecordObject(configTable, "Delete Range Configs");
             configTable.DeleteRangeConfigs(startId, endId);
             EditorUtility.SetDirty(configTable);
-            // MEMO Unity Bug: https://forum.unity.com/threads/the-version-control-system-wont-checkout-changed-assets-when-using-assetdatabase-saveassetifdirty.1554779/
+            // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(configTable));
             AssetDatabase.SaveAssetIfDirty(configTable);
         }
