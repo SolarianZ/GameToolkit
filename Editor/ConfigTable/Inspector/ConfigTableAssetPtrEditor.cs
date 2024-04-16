@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Editor.ConfigData
 {
-    [CustomEditor(typeof(ConfigTableAssetPtr), true)]
+    [CustomEditor(typeof(ConfigListAssetPtr), true)]
     public class ConfigTableAssetPtrEditor : ValidatableEditor
     {
         protected override ListView ValidationResultListView { get; set; }
@@ -108,7 +108,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
 
         private void DistinctConfigs()
         {
-            EditorConfigAssetUtility.DistinctConfigs((ConfigTableAssetPtr)target);
+            EditorConfigAssetUtility.DistinctConfigs((ConfigListAssetPtr)target);
         }
 
         private void DeleteMultiConfigs(string idListString)
@@ -124,12 +124,12 @@ namespace GBG.GameToolkit.Editor.ConfigData
                 }
             }
 
-            EditorConfigAssetUtility.DeleteMultiConfigs((ConfigTableAssetPtr)target, idList);
+            EditorConfigAssetUtility.DeleteMultiConfigs((ConfigListAssetPtr)target, idList);
         }
 
         private void DeleteRangeConfigs(int startId, int endId)
         {
-            EditorConfigAssetUtility.DeleteRangeConfigs((ConfigTableAssetPtr)target, startId, endId);
+            EditorConfigAssetUtility.DeleteRangeConfigs((ConfigListAssetPtr)target, startId, endId);
         }
     }
 }

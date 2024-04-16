@@ -58,7 +58,7 @@ namespace GBG.GameToolkit.Unity
         [Tooltip("Used to automatically find config table asset.")]
         public string EditorConfigMode;
 
-        internal static ConfigTableCollectionAsset EditorConfigTableCollectionAssetCache;
+        internal static ConfigTableAsset EditorConfigTableCollectionAssetCache;
 
         internal static void EditorSaveAllDirtyConfigAssets()
         {
@@ -67,7 +67,7 @@ namespace GBG.GameToolkit.Unity
                 return;
             }
 
-            foreach (ConfigTableAssetPtr asset in EditorConfigTableCollectionAssetCache.ConfigTables)
+            foreach (ConfigListAssetPtr asset in EditorConfigTableCollectionAssetCache.ConfigLists)
             {
                 if (EditorUtility.IsDirty(asset))
                 {
@@ -86,7 +86,7 @@ namespace GBG.GameToolkit.Unity
         }
 
 
-        public void EditorExportConfigs(ConfigTableCollectionAsset configTables, bool saveAssets)
+        public void EditorExportConfigs(ConfigTableAsset configTables, bool saveAssets)
         {
             if (!configTables)
             {
@@ -120,24 +120,24 @@ namespace GBG.GameToolkit.Unity
                 return;
             }
 
-            var configCollections = Resources.FindObjectsOfTypeAll(typeof(ConfigTableCollectionAsset));
+            var configCollections = Resources.FindObjectsOfTypeAll(typeof(ConfigTableAsset));
             if (configCollections.Length == 0)
             {
                 return;
             }
 
-            ConfigTableCollectionAsset configTables;
+            ConfigTableAsset configTables;
             if (configCollections.Length == 1)
             {
-                configTables = (ConfigTableCollectionAsset)configCollections[0];
+                configTables = (ConfigTableAsset)configCollections[0];
             }
             else
             {
-                configTables = (ConfigTableCollectionAsset)configCollections.FirstOrDefault(asset
+                configTables = (ConfigTableAsset)configCollections.FirstOrDefault(asset
                     => asset.name.Contains(Target.EditorConfigMode));
                 if (!configTables)
                 {
-                    configTables = (ConfigTableCollectionAsset)configCollections[0];
+                    configTables = (ConfigTableAsset)configCollections[0];
                 }
             }
 
@@ -167,10 +167,10 @@ namespace GBG.GameToolkit.Unity
 
             EditorGUILayout.Space();
 
-            EditorOnly.EditorConfigTableCollectionAssetCache = (ConfigTableCollectionAsset)EditorGUILayout.ObjectField("Config Table Collection",
-                EditorOnly.EditorConfigTableCollectionAssetCache, typeof(ConfigTableCollectionAsset), false);
+            EditorOnly.EditorConfigTableCollectionAssetCache = (ConfigTableAsset)EditorGUILayout.ObjectField("Config Table Collection",
+                EditorOnly.EditorConfigTableCollectionAssetCache, typeof(ConfigTableAsset), false);
 
-            if (GUILayout.Button("Export ConfigTables"))
+            if (GUILayout.Button("Export ConfigLists"))
             {
                 ExportConfigs();
             }

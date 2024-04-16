@@ -56,19 +56,19 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return $"#{Id} {Comment}";
         }
 
-        public abstract void ExportConfig(ConfigTableCollectionAsset configTables, bool saveAsset = true);
+        public abstract void ExportConfig(ConfigTableAsset configTables, bool saveAsset = true);
 
-        public static void SetConfig<TConfig>(ConfigTableCollectionAsset configTables, TConfig config,
+        public static void SetConfig<TConfig>(ConfigTableAsset configTables, TConfig config,
             bool saveAsset = true, string undoName = null)
             where TConfig : IConfig
         {
-            if (!configTables.TryGetConfigTable<TConfig>(out var configTable))
+            if (!configTables.TryGetConfigList<TConfig>(out var configTable))
             {
                 Debug.LogError($"Cannot find table of type '{typeof(TConfig)}' in config table '{configTables}'.", configTables);
                 return;
             }
 
-            ConfigTableAsset<TConfig> asset = (ConfigTableAsset<TConfig>)configTable;
+            ConfigListAsset<TConfig> asset = (ConfigListAsset<TConfig>)configTable;
 #if UNITY_EDITOR
             if (!string.IsNullOrEmpty(undoName))
             {

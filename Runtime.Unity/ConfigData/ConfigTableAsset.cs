@@ -2,47 +2,44 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace GBG.GameToolkit.Unity.ConfigData
 {
-    public abstract class ConfigTableAssetPtr : ScriptableObject, IConfigTablePtr, IValidatable
+    [CreateAssetMenu(menuName = "Bamboo/Config Data/Config Table Asset")]
+    public class ConfigTableAsset : ScriptableObject, IConfigTable, IValidatable
     {
-        [TextArea(0, 3)]
-        public string Comment;
-
-        public abstract Type GetConfigType();
-
-        public abstract void Validate([NotNull] List<ValidationResult> results);
-
-        public abstract void DistinctConfigs();
-
-        public abstract void DeleteMultiConfigs(IEnumerable<int> idList);
-
-        public abstract void DeleteRangeConfigs(int startId, int endId);
-    }
-
-    public abstract class ConfigTableAsset<T> : ConfigTableAssetPtr, IConfigTable<T> where T : IConfig
-    {
-        public T[] Configs
+        public SingletonConfigAssetPtr[] SingletonConfigs
         {
-            get
-            {
-                return _configs;
-            }
+            get { return _singletonConfigs; }
             set
             {
-                _configs = value;
-                _isDirty = true;
+                _singletonConfigs = value;
+                SetDirty();
+            }
+        }
+        public ConfigListAssetPtr[] ConfigLists
+        {
+            get { return _configLists; }
+            set
+            {
+                _configLists = value;
+                SetDirty();
             }
         }
 
-        [UnityEngine.Serialization.FormerlySerializedAs("Configs")]
+        [TextArea(0, 3)]
+        public string Comment;
         [SerializeField]
-        private T[] _configs = Array.Empty<T>();
-        private Dictionary<int, T> _table;
+        private SingletonConfigAssetPtr[] _singletonConfigs = Array.Empty<SingletonConfigAssetPtr>();
+        [UnityEngine.Serialization.FormerlySerializedAs("ConfigLists")]
+        [UnityEngine.Serialization.FormerlySerializedAs("_configTables")]
+        [SerializeField]
+        private ConfigListAssetPtr[] _configLists = Array.Empty<ConfigListAssetPtr>();
+
+        private const string LogTag = "GBG|ConfigTableAsset";
+        private Dictionary<Type, SingletonConfigAssetPtr> _singleConfigTable;
+        private Dictionary<Type, ConfigListAssetPtr> _configTable;
         private bool _isDirty = true;
 
 
@@ -50,12 +47,12 @@ namespace GBG.GameToolkit.Unity.ConfigData
 
         protected virtual void OnValidate()
         {
-            _isDirty = true;
+            SetDirty();
         }
 
         protected virtual void Awake()
         {
-            _isDirty = true;
+            SetDirty();
         }
 
         #endregion
@@ -72,36 +69,40 @@ namespace GBG.GameToolkit.Unity.ConfigData
 #endif
         }
 
-        public override void Validate([NotNull] List<ValidationResult> results)
+        public virtual void Validate([NotNull] List<ValidationResult> results)
         {
-            HashSet<int> idSet = new HashSet<int>();
-            for (int i = 0; i < Configs.Length; i++)
+            HashSet<ConfigListAssetPtr> configSet = new HashSet<ConfigListAssetPtr>();
+            HashSet<Type> typeSet = new HashSet<Type>();
+            for (var i = 0; i < ConfigLists.Length; i++)
             {
-                T config = Configs[i];
-                if (config == null)
+                ConfigListAssetPtr configList = ConfigLists[i];
+                if (!configList)
                 {
                     results.Add(new ValidationResult
                     {
                         Type = ValidationResult.ResultType.Error,
-                        Content = $"Null config entry at index '{i}'.",
+                        Content = $"Null config list asset reference. Index: {i}.",
+                        Context = this,
+                    });
+                    continue;
+                }
+
+                if (!configSet.Add(configList))
+                {
+                    results.Add(new ValidationResult
+                    {
+                        Type = ValidationResult.ResultType.Error,
+                        Content = $"Duplicate config list asset reference. Index: {i}.",
                         Context = this,
                     });
                 }
-                else if (!idSet.Add(config.Id))
+
+                if (!typeSet.Add(configList.GetConfigType()))
                 {
                     results.Add(new ValidationResult
                     {
                         Type = ValidationResult.ResultType.Error,
-                        Content = $"Duplicate id: {config.Id}.",
-                        Context = this,
-                    });
-                }
-                else if (config.Id == 0)
-                {
-                    results.Add(new ValidationResult
-                    {
-                        Type = ValidationResult.ResultType.Error,
-                        Content = "Invalid id: 0.",
+                        Content = $"Duplicate config list type. Index: {i}, type: {configList.GetConfigType()}.",
                         Context = this,
                     });
                 }
@@ -109,41 +110,59 @@ namespace GBG.GameToolkit.Unity.ConfigData
         }
 
 
-        public override Type GetConfigType() => typeof(T);
-
-
-        public override void DistinctConfigs()
+        public bool ContainsConfigList<T>() where T : IConfig
         {
-            Configs = Configs.Distinct(new ConfigDistinctComparer<T>()).ToArray();
+            PrepareConfigTable();
+            return _configTable.ContainsKey(typeof(T));
         }
 
-        public override void DeleteMultiConfigs(IEnumerable<int> idList)
+        public IConfigList<T> GetConfigList<T>() where T : IConfig
         {
-            Configs = Configs.Where(config => !idList.Contains(config.Id)).ToArray();
+            if (TryGetConfigList<T>(out IConfigList<T> configList))
+            {
+                return configList;
+            }
+
+            return null;
         }
 
-        public override void DeleteRangeConfigs(int startId, int endId)
+        public bool TryGetConfigList<T>(out IConfigList<T> configList) where T : IConfig
         {
-            Assert.IsTrue(startId <= endId);
-            Configs = Configs.Where(config => config.Id < startId || config.Id > endId).ToArray();
+            PrepareConfigTable();
+            if (_configTable.TryGetValue(typeof(T), out ConfigListAssetPtr listPtr))
+            {
+                configList = (IConfigList<T>)listPtr;
+                return true;
+            }
+
+            configList = null;
+            return false;
         }
 
 
-        public bool ContainsConfig(int key)
+        public bool ContainsConfig<T>(int key) where T : IConfig
         {
-            PrepareTable();
-            return _table.ContainsKey(key);
+            if (TryGetConfigList<T>(out IConfigList<T> configList))
+            {
+                return configList.ContainsConfig(key);
+            }
+
+            return false;
         }
 
-        public IReadOnlyList<T> GetConfigs()
+        public IReadOnlyList<T> GetConfigs<T>() where T : IConfig
         {
-            return Configs;
+            if (TryGetConfigList<T>(out IConfigList<T> configList))
+            {
+                return configList.GetConfigs();
+            }
+
+            return null;
         }
 
-        public T GetConfig(int id)
+        public T GetConfig<T>(int key) where T : IConfig
         {
-            PrepareTable();
-            if (TryGetConfig(id, out T config))
+            if (TryGetConfig<T>(key, out T config))
             {
                 return config;
             }
@@ -151,17 +170,22 @@ namespace GBG.GameToolkit.Unity.ConfigData
             return default;
         }
 
-        public bool TryGetConfig(int id, out T config)
+        public bool TryGetConfig<T>(int key, out T value) where T : IConfig
         {
-            PrepareTable();
-            return _table.TryGetValue(id, out config);
+            if (TryGetConfigList<T>(out IConfigList<T> configList))
+            {
+                return configList.TryGetConfig(key, out value);
+            }
+
+            value = default;
+            return false;
         }
 
-        private void PrepareTable()
+        private void PrepareConfigTable()
         {
-            if (_table == null /*|| _table.Count != Configs.Length*/)
+            if (_configTable == null /*|| _configTable.Count != ConfigLists.Length*/)
             {
-                _table = new Dictionary<int, T>(Configs.Length);
+                _configTable = new Dictionary<Type, ConfigListAssetPtr>(ConfigLists.Length);
                 _isDirty = true;
             }
 
@@ -170,12 +194,86 @@ namespace GBG.GameToolkit.Unity.ConfigData
                 return;
             }
 
-            _table.Clear();
-            foreach (T config in Configs)
+            _configTable.Clear();
+
+            for (var i = 0; i < ConfigLists.Length; i++)
             {
-                if (!_table.TryAdd(config.Id, config))
+                ConfigListAssetPtr configList = ConfigLists[i];
+                if (!configList)
                 {
-                    Debug.LogError($"Duplicate config id: {config.Id}. Config type: {typeof(T)}.", this);
+                    Debugger.LogError($"Null config list asset reference. Index: {i}.", this, LogTag);
+                    continue;
+                }
+
+                Type configType = configList.GetConfigType();
+                if (!_configTable.TryAdd(configType, configList))
+                {
+                    Debugger.LogError($"Duplicate config list type. Index: {i}, type: {configType}.", this, LogTag);
+                }
+            }
+
+            _isDirty = false;
+        }
+
+
+        public bool ContainsSingletonConfig<T>() where T : ISingletonConfig
+        {
+            PrepareSingletonConfigTable();
+            return _singleConfigTable.ContainsKey(typeof(T));
+        }
+
+        public T GetSingletonConfig<T>() where T : ISingletonConfig
+        {
+            if (TryGetSingletonConfig<T>(out T t))
+            {
+                return t;
+            }
+
+            return default;
+        }
+
+        public bool TryGetSingletonConfig<T>(out T value) where T : ISingletonConfig
+        {
+            PrepareSingletonConfigTable();
+            if (_singleConfigTable.TryGetValue(typeof(T), out SingletonConfigAssetPtr singletonConfig) &&
+                singletonConfig is T t)
+            {
+                value = t;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private void PrepareSingletonConfigTable()
+        {
+            if (_singleConfigTable == null /*|| _singleConfigTable.Count != SingletonConfigs.Length*/)
+            {
+                _singleConfigTable = new Dictionary<Type, SingletonConfigAssetPtr>(SingletonConfigs.Length);
+                _isDirty = true;
+            }
+
+            if (!_isDirty)
+            {
+                return;
+            }
+
+            _singleConfigTable.Clear();
+
+            for (var i = 0; i < SingletonConfigs.Length; i++)
+            {
+                SingletonConfigAssetPtr config = SingletonConfigs[i];
+                if (!config)
+                {
+                    Debugger.LogError($"Null singleton config asset reference. Index: {i}.", this, LogTag);
+                    continue;
+                }
+
+                Type configType = config.GetConfigType();
+                if (!_singleConfigTable.TryAdd(configType, config))
+                {
+                    Debugger.LogError($"Duplicate singleton config type. Index: {i}, type: {configType}.", this, LogTag);
                 }
             }
 

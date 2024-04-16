@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Editor.ConfigData
 {
-    [CustomEditor(typeof(ConfigTableCollectionAsset))]
+    [CustomEditor(typeof(ConfigTableAsset))]
     public class ConfigTableCollectionAssetEditor : ValidatableEditor
     {
         protected override ListView ValidationResultListView { get; set; }
@@ -53,19 +53,19 @@ namespace GBG.GameToolkit.Editor.ConfigData
                 return;
             }
 
-            var assetGuids = AssetDatabase.FindAssets($"t:{nameof(ConfigTableAssetPtr)}");
-            var configTables = new ConfigTableAssetPtr[assetGuids.Length];
+            string[] assetGuids = AssetDatabase.FindAssets($"t:{nameof(ConfigListAssetPtr)}");
+            ConfigListAssetPtr[] configTables = new ConfigListAssetPtr[assetGuids.Length];
             for (int i = 0; i < assetGuids.Length; i++)
             {
                 var assetGuid = assetGuids[i];
                 var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
-                var asset = AssetDatabase.LoadAssetAtPath<ConfigTableAssetPtr>(assetPath);
+                var asset = AssetDatabase.LoadAssetAtPath<ConfigListAssetPtr>(assetPath);
                 configTables[i] = asset;
             }
 
-            var collectionAsset = (ConfigTableCollectionAsset)target;
+            var collectionAsset = (ConfigTableAsset)target;
             Undo.RecordObject(collectionAsset, "Recollect Config Assets");
-            collectionAsset.ConfigTables = configTables;
+            collectionAsset.ConfigLists = configTables;
             EditorUtility.SetDirty(collectionAsset);
             // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
@@ -81,9 +81,10 @@ namespace GBG.GameToolkit.Editor.ConfigData
                 return;
             }
 
-            var collectionAsset = (ConfigTableCollectionAsset)target;
+            var collectionAsset = (ConfigTableAsset)target;
             Undo.RecordObject(collectionAsset, "Distinct Config Assets");
-            collectionAsset.ConfigTables = collectionAsset.ConfigTables.Distinct().ToArray();
+            collectionAsset.SingletonConfigs = collectionAsset.SingletonConfigs.Distinct().ToArray();
+            collectionAsset.ConfigLists = collectionAsset.ConfigLists.Distinct().ToArray();
             EditorUtility.SetDirty(collectionAsset);
             // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));

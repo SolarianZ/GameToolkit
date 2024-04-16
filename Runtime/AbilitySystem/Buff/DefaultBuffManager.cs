@@ -9,14 +9,14 @@ namespace GBG.GameToolkit.Ability.Buff
         where TBuffConfig : IBuffConfig
     {
         private readonly IBuffFactory _buffFactory;
-        private readonly IConfigTableProvider _configsProvider;
+        private readonly IConfigTable _configsProvider;
         private object _buffTarget;
         private object _buffContext;
         private bool _isInitialized;
         private readonly List<IBuffInstance> _activeBuffs = new();
 
 
-        public DefaultBuffManager(IBuffFactory buffFactory, IConfigTableProvider config,
+        public DefaultBuffManager(IBuffFactory buffFactory, IConfigTable config,
             IPropertySpecsProvider propertySpecsProvider)
         {
             _buffFactory = buffFactory;

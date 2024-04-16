@@ -7,7 +7,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
 {
     public static class EditorConfigAssetUtility
     {
-        public static void DistinctConfigs(this ConfigTableAssetPtr configTable)
+        public static void DistinctConfigs(this ConfigListAssetPtr configTable)
         {
             if (Application.isPlaying)
             {
@@ -24,7 +24,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             AssetDatabase.SaveAssetIfDirty(configTable);
         }
 
-        public static void DeleteMultiConfigs(this ConfigTableAssetPtr configTable, IEnumerable<int> idList)
+        public static void DeleteMultiConfigs(this ConfigListAssetPtr configTable, IEnumerable<int> idList)
         {
             if (Application.isPlaying)
             {
@@ -41,7 +41,7 @@ namespace GBG.GameToolkit.Editor.ConfigData
             AssetDatabase.SaveAssetIfDirty(configTable);
         }
 
-        public static void DeleteRangeConfigs(this ConfigTableAssetPtr configTable, int startId, int endId)
+        public static void DeleteRangeConfigs(this ConfigListAssetPtr configTable, int startId, int endId)
         {
             if (Application.isPlaying)
             {
