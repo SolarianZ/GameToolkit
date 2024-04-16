@@ -53,19 +53,10 @@ namespace GBG.GameToolkit.Editor.ConfigData
                 return;
             }
 
-            string[] assetGuids = AssetDatabase.FindAssets($"t:{nameof(ConfigListAssetPtr)}");
-            ConfigListAssetPtr[] configTables = new ConfigListAssetPtr[assetGuids.Length];
-            for (int i = 0; i < assetGuids.Length; i++)
-            {
-                var assetGuid = assetGuids[i];
-                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
-                var asset = AssetDatabase.LoadAssetAtPath<ConfigListAssetPtr>(assetPath);
-                configTables[i] = asset;
-            }
-
             var collectionAsset = (ConfigTableAsset)target;
             Undo.RecordObject(collectionAsset, "Recollect Config Assets");
-            collectionAsset.ConfigLists = configTables;
+            collectionAsset.SingletonConfigs = CollectAssetsOfType<SingletonConfigAssetPtr>();
+            collectionAsset.ConfigLists = CollectAssetsOfType<ConfigListAssetPtr>();
             EditorUtility.SetDirty(collectionAsset);
             // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
             AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
@@ -81,14 +72,29 @@ namespace GBG.GameToolkit.Editor.ConfigData
                 return;
             }
 
-            var collectionAsset = (ConfigTableAsset)target;
-            Undo.RecordObject(collectionAsset, "Distinct Config Assets");
-            collectionAsset.SingletonConfigs = collectionAsset.SingletonConfigs.Distinct().ToArray();
-            collectionAsset.ConfigLists = collectionAsset.ConfigLists.Distinct().ToArray();
-            EditorUtility.SetDirty(collectionAsset);
+            var table = (ConfigTableAsset)target;
+            Undo.RecordObject(table, "Distinct Config Assets");
+            table.SingletonConfigs = table.SingletonConfigs.Distinct().ToArray();
+            table.ConfigLists = table.ConfigLists.Distinct().ToArray();
+            EditorUtility.SetDirty(table);
             // MEMO Unity Bug UUM-66169: https://issuetracker.unity3d.com/issues/assetdatabase-dot-saveassetifdirty-does-not-automatically-check-out-assets
-            AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(collectionAsset));
-            AssetDatabase.SaveAssetIfDirty(collectionAsset);
+            AssetDatabase.MakeEditable(AssetDatabase.GetAssetPath(table));
+            AssetDatabase.SaveAssetIfDirty(table);
+        }
+
+        private static T[] CollectAssetsOfType<T>() where T : UnityEngine.Object
+        {
+            string[] assetGuids = AssetDatabase.FindAssets($"t:{typeof(T).Name}");
+            T[] assets = new T[assetGuids.Length];
+            for (int i = 0; i < assetGuids.Length; i++)
+            {
+                var assetGuid = assetGuids[i];
+                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                var asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+                assets[i] = asset;
+            }
+
+            return assets;
         }
     }
 }
