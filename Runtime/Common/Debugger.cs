@@ -115,6 +115,8 @@ namespace GBG.GameToolkit
             Logger.Invoke(LogLevel.FATAL, tag, message, context);
         }
 
+        [Conditional("UNITY_EDITOR")]
+        [Conditional("DEVELOPMENT_BUILD")]
         [Conditional("GBG_AI_DEBUG")]
         public static void Assert(bool condition, string message)
         {
