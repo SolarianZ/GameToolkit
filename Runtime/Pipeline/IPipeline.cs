@@ -1,4 +1,5 @@
 ﻿using GBG.GameToolkit.Logic;
+using System;
 
 namespace GBG.GameToolkit.Process
 {
@@ -23,12 +24,8 @@ namespace GBG.GameToolkit.Process
         bool KeepTickOnPause { get; set; }
         PipelineState State { get; }
 
-        //event Action<IPipelineView> Started;
-        //event Action<IPipelineView> Paused;
-        //event Action<IPipelineView> Resumed;
-        //event Action<IPipelineView> Canceled;
-        //event Action<IPipelineView> Completed;
         event PipelineStateChangeHandler StateChanged;
+        event Action<IPipelineView> Stopped;
 
         /// <summary>
         /// Get the pipeline execution progress(in range [0,1]).

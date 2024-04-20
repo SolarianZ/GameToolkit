@@ -1,14 +1,15 @@
-﻿using System;
-
-namespace GBG.GameToolkit.Process
+﻿namespace GBG.GameToolkit.Process
 {
     public class SequenceComplexPipeline : ComplexPipelineBase
     {
+        public int ActivePipelineIndex { get; private set; }
+        private bool _skipLateTick;
         private float? _progressCache;
 
 
-        public SequenceComplexPipeline(int id, string name, int priority, int tickChannel, int capacity = 0)
-            : base(id, name, priority, tickChannel, capacity)
+        public SequenceComplexPipeline(int id, string name, int priority, int tickChannel,
+            SubPipelineSortingMode subPipelineSortingMode = SubPipelineSortingMode.ByPriorityDesc, int capacity = 0)
+            : base(id, name, priority, tickChannel, subPipelineSortingMode, capacity)
         {
         }
 
@@ -30,7 +31,7 @@ namespace GBG.GameToolkit.Process
 
             if (denominator == 0)
             {
-                return 0;
+                return 1;
             }
 
             float progress = numerator / denominator;
@@ -39,14 +40,67 @@ namespace GBG.GameToolkit.Process
 
         public override void OnTick()
         {
-            _progressCache = null;
-            throw new NotImplementedException();
+            EvaluateActivePipeline(false);
         }
 
         public override void OnLateTick()
         {
+            EvaluateActivePipeline(true);
+        }
+
+        private void EvaluateActivePipeline(bool isLateTick)
+        {
+            if (ActivePipelineIndex >= DirectSubPipelineCount)
+            {
+                return;
+            }
+
+            IPipeline activePipeline = SubPipelineList[ActivePipelineIndex];
+            if (isLateTick)
+            {
+                if (!_skipLateTick)
+                {
+                    activePipeline.LateTick();
+                }
+                _skipLateTick = false;
+            }
+            else
+            {
+                activePipeline.Tick();
+            }
+
+            if (activePipeline.State == PipelineState.Completed ||
+                activePipeline.State == PipelineState.Canceled)
+            {
+                ActivePipelineIndex++;
+                if (!isLateTick)
+                {
+                    _skipLateTick = true;
+                }
+            }
+
             _progressCache = null;
-            throw new NotImplementedException();
+        }
+
+        protected override void OnStart()
+        {
+            ActivePipelineIndex = 0;
+            _skipLateTick = false;
+            _progressCache = null;
+
+            base.OnStart();
+        }
+
+        protected override void OnCancel()
+        {
+            base.OnCancel();
+
+            ActivePipelineIndex = -1;
+        }
+
+        protected override void OnComplete()
+        {
+            ActivePipelineIndex = -1;
         }
     }
 }

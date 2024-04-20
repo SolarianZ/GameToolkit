@@ -14,6 +14,7 @@ namespace GBG.GameToolkit.Process
         public PipelineState State { get; private set; }
 
         public event PipelineStateChangeHandler StateChanged;
+        public event Action<IPipelineView> Stopped;
 
 
         protected PipelineBase(int id, string name, int priority, int tickChannel)
@@ -26,17 +27,30 @@ namespace GBG.GameToolkit.Process
 
         void ITickable.Tick()
         {
-            if (State == PipelineState.Running)
+            switch (State)
             {
-                OnTick();
-                if (GetProgress() >= 1)
-                {
-                    ChangeStateAndRaiseEvent(PipelineState.Completed);
-                }
-            }
-            else if (KeepTickOnPause && State == PipelineState.Paused)
-            {
-                OnTick();
+                case PipelineState.Running:
+                    OnTick();
+                    if (GetProgress() >= 1)
+                    {
+                        OnComplete();
+                        ChangeStateAndRaiseEvent(PipelineState.Completed);
+                    }
+                    break;
+                case PipelineState.Paused:
+                    if (KeepTickOnPause && State == PipelineState.Paused)
+                    {
+                        OnTick();
+                    }
+                    break;
+
+                case PipelineState.NotStarted:
+                case PipelineState.Canceled:
+                case PipelineState.Completed:
+                    throw new InvalidOperationException($"Cannot tick the pipeline from the '{State}' state.");
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(State), State, null);
             }
         }
 
@@ -44,17 +58,30 @@ namespace GBG.GameToolkit.Process
 
         void ITickable.LateTick()
         {
-            if (State == PipelineState.Running)
+            switch (State)
             {
-                OnLateTick();
-                if (GetProgress() >= 1)
-                {
-                    ChangeStateAndRaiseEvent(PipelineState.Completed);
-                }
-            }
-            else if (KeepTickOnPause && State == PipelineState.Paused)
-            {
-                OnLateTick();
+                case PipelineState.Running:
+                    OnLateTick();
+                    if (GetProgress() >= 1)
+                    {
+                        OnComplete();
+                        ChangeStateAndRaiseEvent(PipelineState.Completed);
+                    }
+                    break;
+                case PipelineState.Paused:
+                    if (KeepTickOnPause && State == PipelineState.Paused)
+                    {
+                        OnLateTick();
+                    }
+                    break;
+
+                case PipelineState.NotStarted:
+                case PipelineState.Canceled:
+                case PipelineState.Completed:
+                    throw new InvalidOperationException($"Cannot late tick the pipeline from the '{State}' state.");
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(State), State, null);
             }
         }
 
@@ -115,6 +142,8 @@ namespace GBG.GameToolkit.Process
 
         protected abstract void OnCancel();
 
+        protected abstract void OnComplete();
+
 
         private void ChangeStateAndRaiseEvent(PipelineState newState)
         {
@@ -124,6 +153,11 @@ namespace GBG.GameToolkit.Process
             PipelineState oldState = State;
             State = newState;
             StateChanged?.Invoke(this, newState, oldState);
+            if (newState == PipelineState.Completed ||
+                newState == PipelineState.Canceled)
+            {
+                Stopped?.Invoke(this);
+            }
         }
     }
 }

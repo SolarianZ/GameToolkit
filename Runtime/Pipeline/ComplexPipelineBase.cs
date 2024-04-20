@@ -7,6 +7,7 @@ namespace GBG.GameToolkit.Process
     {
         public int DirectSubPipelineCount => _subPipelineList.Count;
         public IPipelineView this[int index] => _subPipelineList[index];
+        public SubPipelineSortingMode SubPipelineSortingMode { get; }
         protected IReadOnlyList<IPipeline> SubPipelineList => _subPipelineList;
         private readonly List<IPipeline> _subPipelineList;
         private readonly Dictionary<int, IPipeline> _subPipelineTable;
@@ -14,9 +15,11 @@ namespace GBG.GameToolkit.Process
         public event SubPipelineStageChangeHandler SubPipelineStageChanged;
 
 
-        protected ComplexPipelineBase(int id, string name, int priority, int tickChannel, int capacity = 0)
+        protected ComplexPipelineBase(int id, string name, int priority, int tickChannel,
+            SubPipelineSortingMode subPipelineSortingMode, int capacity = 0)
             : base(id, name, priority, tickChannel)
         {
+            SubPipelineSortingMode = subPipelineSortingMode;
             _subPipelineList = new List<IPipeline>(capacity);
             _subPipelineTable = new Dictionary<int, IPipeline>(capacity);
         }
@@ -86,7 +89,19 @@ namespace GBG.GameToolkit.Process
             }
 
             _subPipelineTable.Add(pipeline.Id, pipeline);
-            InsertSubPipelineToListByPriority(pipeline);
+
+            switch (SubPipelineSortingMode)
+            {
+                case SubPipelineSortingMode.ByPriorityDesc:
+                    InsertSubPipelineToListByPriority(pipeline);
+                    break;
+                case SubPipelineSortingMode.ByAddedOrder:
+                    _subPipelineList.Add(pipeline);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(SubPipelineSortingMode),
+                        SubPipelineSortingMode, null);
+            }
 
             pipeline.StateChanged += OnDirectSubPipelineStateChanged;
             if (pipeline is IComplexPipeline complexPipeline)
@@ -112,7 +127,18 @@ namespace GBG.GameToolkit.Process
                 return false;
             }
 
-            InsertSubPipelineToListByPriority(pipeline);
+            switch (SubPipelineSortingMode)
+            {
+                case SubPipelineSortingMode.ByPriorityDesc:
+                    InsertSubPipelineToListByPriority(pipeline);
+                    break;
+                case SubPipelineSortingMode.ByAddedOrder:
+                    _subPipelineList.Add(pipeline);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(SubPipelineSortingMode),
+                        SubPipelineSortingMode, null);
+            }
 
             pipeline.StateChanged += OnDirectSubPipelineStateChanged;
             if (pipeline is IComplexPipeline complexPipeline)

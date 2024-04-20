@@ -6,10 +6,17 @@ namespace GBG.GameToolkit.Process
         IPipelineView changedPipeline, int changedPipelineDepth,
         PipelineState newState, PipelineState oldState);
 
+    public enum SubPipelineSortingMode
+    {
+        ByPriorityDesc,
+        ByAddedOrder,
+    }
+
     public interface IComplexPipelineView : IPipelineView
     {
         int DirectSubPipelineCount { get; }
         IPipelineView this[int index] { get; }
+        SubPipelineSortingMode SubPipelineSortingMode { get; }
 
         event SubPipelineStageChangeHandler SubPipelineStageChanged;
     }
