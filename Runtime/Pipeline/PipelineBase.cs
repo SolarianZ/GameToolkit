@@ -1,5 +1,6 @@
 ﻿using GBG.GameToolkit.Logic;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace GBG.GameToolkit.Process
 {
@@ -12,6 +13,7 @@ namespace GBG.GameToolkit.Process
         public int TickPriority => Priority;
         public bool KeepTickOnPause { get; set; }
         public PipelineState State { get; private set; }
+        public bool IsStopped => State == PipelineState.Completed || State == PipelineState.Canceled;
 
         public event PipelineStateChangeHandler StateChanged;
         public event Action<IPipelineView> Stopped;
@@ -25,29 +27,45 @@ namespace GBG.GameToolkit.Process
             TickChannel = tickChannel;
         }
 
+        public abstract float GetProgress();
+
         void ITickable.Tick()
+        {
+            Evaluate(false);
+        }
+
+        void ITickable.LateTick()
+        {
+            Evaluate(true);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void Evaluate(bool isLateTick)
         {
             switch (State)
             {
                 case PipelineState.Running:
-                    OnTick();
-                    if (GetProgress() >= 1)
+                    if (isLateTick) { OnLateTick(); }
+                    else { OnTick(); }
+
+                    if (IsExecutionComplete())
                     {
                         OnComplete();
                         ChangeStateAndRaiseEvent(PipelineState.Completed);
                     }
                     break;
                 case PipelineState.Paused:
-                    if (KeepTickOnPause && State == PipelineState.Paused)
+                    if (KeepTickOnPause)
                     {
-                        OnTick();
+                        if (isLateTick) { OnLateTick(); }
+                        else { OnTick(); }
                     }
                     break;
 
                 case PipelineState.NotStarted:
                 case PipelineState.Canceled:
                 case PipelineState.Completed:
-                    throw new InvalidOperationException($"Cannot tick the pipeline from the '{State}' state.");
+                    throw new InvalidOperationException($"Cannot {(isLateTick ? "late tick" : "tick")} the pipeline while in state '{State}'.");
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(State), State, null);
@@ -55,46 +73,13 @@ namespace GBG.GameToolkit.Process
         }
 
         public abstract void OnTick();
-
-        void ITickable.LateTick()
-        {
-            switch (State)
-            {
-                case PipelineState.Running:
-                    OnLateTick();
-                    if (GetProgress() >= 1)
-                    {
-                        OnComplete();
-                        ChangeStateAndRaiseEvent(PipelineState.Completed);
-                    }
-                    break;
-                case PipelineState.Paused:
-                    if (KeepTickOnPause && State == PipelineState.Paused)
-                    {
-                        OnLateTick();
-                    }
-                    break;
-
-                case PipelineState.NotStarted:
-                case PipelineState.Canceled:
-                case PipelineState.Completed:
-                    throw new InvalidOperationException($"Cannot late tick the pipeline from the '{State}' state.");
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(State), State, null);
-            }
-        }
-
         public abstract void OnLateTick();
-
-        /// <inheritdoc/>
-        public abstract float GetProgress();
 
         void IPipeline.Start()
         {
             if (State != PipelineState.NotStarted)
             {
-                throw new InvalidOperationException($"Cannot start the pipeline from the '{State}' state.");
+                throw new InvalidOperationException($"Cannot start the pipeline while in state '{State}'.");
             }
 
             OnStart();
@@ -107,7 +92,7 @@ namespace GBG.GameToolkit.Process
         {
             if (State != PipelineState.Running)
             {
-                throw new InvalidOperationException($"Cannot pause the pipeline from the '{State}' state.");
+                throw new InvalidOperationException($"Cannot pause the pipeline while in state '{State}'.");
             }
 
             OnPause();
@@ -120,7 +105,7 @@ namespace GBG.GameToolkit.Process
         {
             if (State != PipelineState.Paused)
             {
-                throw new InvalidOperationException($"Cannot resume the pipeline from the '{State}' state.");
+                throw new InvalidOperationException($"Cannot resume the pipeline while in state '{State}'.");
             }
 
             OnResume();
@@ -133,7 +118,7 @@ namespace GBG.GameToolkit.Process
         {
             if (State != PipelineState.Running && State != PipelineState.Paused)
             {
-                throw new InvalidOperationException($"Cannot cancel the pipeline from the '{State}' state.");
+                throw new InvalidOperationException($"Cannot cancel the pipeline while in state '{State}'.");
             }
 
             OnCancel();
@@ -144,7 +129,10 @@ namespace GBG.GameToolkit.Process
 
         protected abstract void OnComplete();
 
+        protected abstract bool IsExecutionComplete();
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ChangeStateAndRaiseEvent(PipelineState newState)
         {
             Debugger.Assert(State != newState,

@@ -23,6 +23,10 @@ namespace GBG.GameToolkit.Process
         int Priority { get; }
         bool KeepTickOnPause { get; set; }
         PipelineState State { get; }
+        /// <summary>
+        /// Indicate whether the pipeline is completed or canceled.
+        /// </summary>
+        bool IsStopped { get; }
 
         event PipelineStateChangeHandler StateChanged;
         event Action<IPipelineView> Stopped;

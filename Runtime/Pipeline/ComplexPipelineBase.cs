@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace GBG.GameToolkit.Process
 {
@@ -26,37 +27,46 @@ namespace GBG.GameToolkit.Process
 
         protected override void OnStart()
         {
-            for (int i = 0; i < _subPipelineList.Count; i++)
+            for (int i = 0; i < DirectSubPipelineCount; i++)
             {
-                IPipeline pipeline = _subPipelineList[i];
+                IPipeline pipeline = SubPipelineList[i];
                 pipeline.Start();
             }
         }
 
         protected override void OnPause()
         {
-            for (int i = 0; i < _subPipelineList.Count; i++)
+            for (int i = 0; i < DirectSubPipelineCount; i++)
             {
-                IPipeline pipeline = _subPipelineList[i];
-                pipeline.Pause();
+                IPipeline pipeline = SubPipelineList[i];
+                if (pipeline.State == PipelineState.Running)
+                {
+                    pipeline.Pause();
+                }
             }
         }
 
         protected override void OnResume()
         {
-            for (int i = 0; i < _subPipelineList.Count; i++)
+            for (int i = 0; i < DirectSubPipelineCount; i++)
             {
-                IPipeline pipeline = _subPipelineList[i];
-                pipeline.Resume();
+                IPipeline pipeline = SubPipelineList[i];
+                if (pipeline.State == PipelineState.Paused)
+                {
+                    pipeline.Resume();
+                }
             }
         }
 
         protected override void OnCancel()
         {
-            for (int i = 0; i < _subPipelineList.Count; i++)
+            for (int i = 0; i < DirectSubPipelineCount; i++)
             {
-                IPipeline pipeline = _subPipelineList[i];
-                pipeline.Cancel();
+                IPipeline pipeline = SubPipelineList[i];
+                if (pipeline.State == PipelineState.Running || pipeline.State == PipelineState.Paused)
+                {
+                    pipeline.Cancel();
+                }
             }
         }
 
@@ -151,7 +161,7 @@ namespace GBG.GameToolkit.Process
 
         private void InsertSubPipelineToListByPriority(IPipeline pipeline)
         {
-            for (int i = _subPipelineList.Count - 1; i >= 0; i--)
+            for (int i = DirectSubPipelineCount - 1; i >= 0; i--)
             {
                 IPipeline p = _subPipelineList[i];
                 if (p.Priority <= pipeline.Priority)
@@ -202,7 +212,7 @@ namespace GBG.GameToolkit.Process
 
         public void ClearSubPipelines(bool cancelExecution)
         {
-            for (int i = 0; i < _subPipelineList.Count; i++)
+            for (int i = 0; i < DirectSubPipelineCount; i++)
             {
                 IPipeline pipeline = _subPipelineList[i];
                 pipeline.StateChanged -= OnDirectSubPipelineStateChanged;
@@ -224,7 +234,8 @@ namespace GBG.GameToolkit.Process
         }
 
 
-        private void OnDirectSubPipelineStateChanged(IPipelineView pipeline, PipelineState newState, PipelineState oldState)
+        private void OnDirectSubPipelineStateChanged(IPipelineView pipeline,
+            PipelineState newState, PipelineState oldState)
         {
             SubPipelineStageChanged?.Invoke(this, pipeline, 1, newState, oldState);
         }
@@ -234,6 +245,14 @@ namespace GBG.GameToolkit.Process
             PipelineState newState, PipelineState oldState)
         {
             SubPipelineStageChanged?.Invoke(this, changedPipeline, changedPipelineDepth + 1, newState, oldState);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static bool PipelineCanTick(IPipeline pipeline)
+        {
+            return pipeline.State == PipelineState.Running ||
+                   pipeline.State == PipelineState.Paused;
         }
     }
 }

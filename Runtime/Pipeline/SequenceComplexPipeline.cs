@@ -1,10 +1,11 @@
-﻿namespace GBG.GameToolkit.Process
+﻿using System.Runtime.CompilerServices;
+
+namespace GBG.GameToolkit.Process
 {
     public class SequenceComplexPipeline : ComplexPipelineBase
     {
         public int ActivePipelineIndex { get; private set; }
         private bool _skipLateTick;
-        private float? _progressCache;
 
 
         public SequenceComplexPipeline(int id, string name, int priority, int tickChannel,
@@ -15,40 +16,32 @@
 
         public override float GetProgress()
         {
-            if (_progressCache.HasValue)
+            if (State == PipelineState.NotStarted)
             {
-                return _progressCache.Value;
+                return 0;
             }
 
-            float denominator = 0;
-            float numerator = 0;
-            for (int i = 0; i < DirectSubPipelineCount; i++)
-            {
-                IPipeline pipeline = SubPipelineList[i];
-                numerator += pipeline.GetProgress();
-                denominator++;
-            }
-
-            if (denominator == 0)
+            if (IsStopped)
             {
                 return 1;
             }
 
-            float progress = numerator / denominator;
+            float progress = (ActivePipelineIndex + SubPipelineList[ActivePipelineIndex].GetProgress()) / DirectSubPipelineCount;
             return progress;
         }
 
         public override void OnTick()
         {
-            EvaluateActivePipeline(false);
+            Evaluate(false);
         }
 
         public override void OnLateTick()
         {
-            EvaluateActivePipeline(true);
+            Evaluate(true);
         }
 
-        private void EvaluateActivePipeline(bool isLateTick)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void Evaluate(bool isLateTick)
         {
             if (ActivePipelineIndex >= DirectSubPipelineCount)
             {
@@ -58,19 +51,18 @@
             IPipeline activePipeline = SubPipelineList[ActivePipelineIndex];
             if (isLateTick)
             {
-                if (!_skipLateTick)
+                if (!_skipLateTick && PipelineCanTick(activePipeline))
                 {
                     activePipeline.LateTick();
                 }
-                _skipLateTick = false;
             }
-            else
+            else if (PipelineCanTick(activePipeline))
             {
                 activePipeline.Tick();
             }
+            _skipLateTick = false;
 
-            if (activePipeline.State == PipelineState.Completed ||
-                activePipeline.State == PipelineState.Canceled)
+            if (activePipeline.IsStopped)
             {
                 ActivePipelineIndex++;
                 if (!isLateTick)
@@ -78,15 +70,12 @@
                     _skipLateTick = true;
                 }
             }
-
-            _progressCache = null;
         }
 
         protected override void OnStart()
         {
             ActivePipelineIndex = 0;
             _skipLateTick = false;
-            _progressCache = null;
 
             base.OnStart();
         }
@@ -101,6 +90,11 @@
         protected override void OnComplete()
         {
             ActivePipelineIndex = -1;
+        }
+
+        protected override bool IsExecutionComplete()
+        {
+            return ActivePipelineIndex >= DirectSubPipelineCount;
         }
     }
 }
