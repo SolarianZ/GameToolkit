@@ -235,10 +235,24 @@ namespace GBG.GameToolkit.Unity.ConfigData
         public bool TryGetSingletonConfig<T>(out T value) where T : ISingletonConfig
         {
             PrepareSingletonConfigTable();
-            if (_singleConfigTable.TryGetValue(typeof(T), out SingletonConfigAssetPtr singletonConfig) &&
-                singletonConfig is T t)
+
+            if (!_singleConfigTable.TryGetValue(typeof(T), out SingletonConfigAssetPtr singletonConfig))
+            {
+                value = default;
+                return false;
+            }
+
+            // Use ScriptableObject as a config object directly
+            if (singletonConfig is T t)
             {
                 value = t;
+                return true;
+            }
+
+            // Wrap the config object in ScriptableObject
+            if (singletonConfig is SingletonConfigAsset<T> tAsset)
+            {
+                value = tAsset.Config;
                 return true;
             }
 
