@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace GBG.GameToolkit
@@ -126,6 +127,7 @@ namespace GBG.GameToolkit
             AssertionFailureHandler?.Invoke(message);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void CheckLogger()
         {
             if (Logger == null)
@@ -134,6 +136,7 @@ namespace GBG.GameToolkit
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void CheckAsserter()
         {
             if (AssertionFailureHandler == null)

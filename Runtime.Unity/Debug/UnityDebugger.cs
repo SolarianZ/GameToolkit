@@ -2,12 +2,18 @@
 using UnityEngine.Assertions;
 using UDebug = UnityEngine.Debug;
 using UObject = UnityEngine.Object;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace GBG.GameToolkit.Unity
 {
     public static class UnityDebugger
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+#if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+#endif
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void AutoRegister()
         {
             Debugger.AssertionFailureHandler = AssertionFailureHandler;
