@@ -64,7 +64,7 @@ namespace GBG.GameToolkit.Unity
                 throw new NullReferenceException($"{nameof(PlayableDirector)} is not assigned.");
             }
 
-            BindingKeyInfo key = new BindingKeyInfo(streamName, typeof(T));
+            BindingKeyInfo key = new BindingKeyInfo(streamName, value?.GetType() ?? typeof(T));
             UObject sourceObject = _bindingKeyTable[key];
             _playableDirector.SetGenericBinding(sourceObject, value);
         }
@@ -76,7 +76,7 @@ namespace GBG.GameToolkit.Unity
                 return false;
             }
 
-            BindingKeyInfo key = new BindingKeyInfo(streamName, typeof(T));
+            BindingKeyInfo key = new BindingKeyInfo(streamName, value?.GetType() ?? typeof(T));
             if (_bindingKeyTable.TryGetValue(key, out UObject sourceObject))
             {
                 _playableDirector.SetGenericBinding(sourceObject, value);
@@ -123,7 +123,5 @@ namespace GBG.GameToolkit.Unity
             value = default;
             return false;
         }
-
-
     }
 }
