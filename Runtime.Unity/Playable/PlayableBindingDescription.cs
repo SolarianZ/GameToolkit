@@ -64,6 +64,7 @@ namespace GBG.GameToolkit.Unity
                 throw new NullReferenceException($"{nameof(PlayableDirector)} is not assigned.");
             }
 
+            // TODO FIXME: typeof(T) will return typeof(UObject), but we need the real type
             BindingKeyInfo key = new BindingKeyInfo(streamName, value?.GetType() ?? typeof(T));
             UObject sourceObject = _bindingKeyTable[key];
             _playableDirector.SetGenericBinding(sourceObject, value);
@@ -76,6 +77,7 @@ namespace GBG.GameToolkit.Unity
                 return false;
             }
 
+            // TODO FIXME: typeof(T) will return typeof(UObject), but we need the real type
             BindingKeyInfo key = new BindingKeyInfo(streamName, value?.GetType() ?? typeof(T));
             if (_bindingKeyTable.TryGetValue(key, out UObject sourceObject))
             {

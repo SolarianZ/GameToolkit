@@ -33,9 +33,9 @@ namespace GBG.GameToolkit.Unity
         // Track binding type.
         private Type _type;
 
-        public BindingKeyInfo(string keyName, string outputTargetTypeFullName)
+        public BindingKeyInfo(string streamName, string outputTargetTypeFullName)
         {
-            _streamName = keyName;
+            _streamName = streamName;
             _outputTargetFullName = outputTargetTypeFullName;
             _type = null;
         }
@@ -43,6 +43,12 @@ namespace GBG.GameToolkit.Unity
         public BindingKeyInfo(string streamName, Type outputTargetType) : this(streamName, outputTargetType.FullName)
         {
             _type = outputTargetType;
+        }
+
+        public void Deconstruct(out string streamName, out string outputTargetTypeFullName)
+        {
+            streamName = _streamName;
+            outputTargetTypeFullName = _outputTargetFullName;
         }
 
         public bool IsTypeMatch(Type type)

@@ -20,7 +20,7 @@ namespace GBG.GameToolkit.Unity.Editor
             return gui;
         }
 
-        // fo OnGUI only
+        // for OnGUI only
         //public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         //{
         //    return EditorGUI.GetPropertyHeight(property);

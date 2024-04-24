@@ -5,17 +5,14 @@ namespace GBG.GameToolkit.Unity
 {
     public abstract class SceneAreaTrigger : MonoBehaviour
     {
+        #region Static
+
         public static ulong EnterFunctions { get; set; } = ulong.MaxValue;
         public static ulong ExitFunctions { get; set; } = ulong.MaxValue;
 
         public static event Handler OnTriggered;
         public static event Handler2D OnTriggered2D;
         public static event Handler3D OnTriggered3D;
-
-
-        public abstract AreaParams GetAreaParams();
-        public abstract ulong GetAreaFunctions();
-
 
         // Expose to derived classes for debugging purposes.
         protected static void Trigger(ulong functions, AreaParams areaParams, Component instigatorCollider, bool isExitArea)
@@ -37,12 +34,51 @@ namespace GBG.GameToolkit.Unity
             OnTriggered?.Invoke(functions, areaParams, instigator, isExitArea);
         }
 
+        #endregion
+
+
+        #region Serialized Settings
+
+        [TagPopup]
+        public string[] TagFilters = Array.Empty<string>();
+        public bool InvertTagFilter;
+
+        #endregion
+
+
+        public abstract AreaParams GetAreaParams();
+        public abstract ulong GetAreaFunctions();
+
+
+        protected bool TestTag(Component target)
+        {
+            if (TagFilters == null || TagFilters.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (string tag in TagFilters)
+            {
+                if (target.CompareTag(tag))
+                {
+                    return !InvertTagFilter;
+                }
+            }
+
+            return InvertTagFilter;
+        }
+
 
         #region Unity Messages
 
         // Expose to derived classes for debugging purposes.
         protected void OnTriggerEnter(Collider instigator)
         {
+            if (!TestTag(instigator))
+            {
+                return;
+            }
+
             ulong areaFunctions = GetAreaFunctions();
             if ((areaFunctions & EnterFunctions) == 0)
             {
@@ -55,6 +91,11 @@ namespace GBG.GameToolkit.Unity
         // Expose to derived classes for debugging purposes.
         protected void OnTriggerExit(Collider instigator)
         {
+            if (!TestTag(instigator))
+            {
+                return;
+            }
+
             ulong areaFunctions = GetAreaFunctions();
             if ((areaFunctions & ExitFunctions) == 0)
             {
@@ -67,6 +108,11 @@ namespace GBG.GameToolkit.Unity
         // Expose to derived classes for debugging purposes.
         protected void OnTriggerEnter2D(Collider2D instigator)
         {
+            if (!TestTag(instigator))
+            {
+                return;
+            }
+
             ulong areaFunctions = GetAreaFunctions();
             if ((areaFunctions & EnterFunctions) == 0)
             {
@@ -79,6 +125,11 @@ namespace GBG.GameToolkit.Unity
         // Expose to derived classes for debugging purposes.
         protected void OnTriggerExit2D(Collider2D instigator)
         {
+            if (!TestTag(instigator))
+            {
+                return;
+            }
+
             ulong areaFunctions = GetAreaFunctions();
             if ((areaFunctions & ExitFunctions) == 0)
             {
