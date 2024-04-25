@@ -1,32 +1,34 @@
 ﻿using UnityEditor;
+#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
+#endif
+#if !UNITY_2021_3_OR_NEWER
+using UnityEngine;
+#endif
 
 namespace GBG.GameToolkit.Unity.Editor
 {
     [CustomPropertyDrawer(typeof(TagPopupAttribute))]
     internal class TagPopupPropertyDrawer : PropertyDrawer
     {
+#if UNITY_2021_3_OR_NEWER
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             VisualElement container = new VisualElement()
             {
-                style = { flexDirection = FlexDirection.Row, }
+                style = { flexDirection = FlexDirection.Row }
             };
 
             TagField tagField = new TagField()
             {
-                style = { flexGrow = 1, }
+                style = { flexGrow = 1 }
             };
             tagField.BindProperty(property);
-            tagField.TrackPropertyValue(property, _ => tagField.MarkDirtyRepaint()); // Not work
+            tagField.TrackPropertyValue(property, OnPropertyValueChanged);
             container.Add(tagField);
 
-            Button clearButton = new Button(OnClearButtonClicked)
-            {
-                text = "Clear",
-            };
+            Button clearButton = new Button(OnClearButtonClicked) { text = "Clear" };
             container.Add(clearButton);
 
             return container;
@@ -34,15 +36,28 @@ namespace GBG.GameToolkit.Unity.Editor
 
             void OnClearButtonClicked()
             {
-                // TODO FIXME: The tagField will not refresh until re-open its inspector
+                // TODO FIXME: Property value cleared but the tagField will not refresh until re-open its inspector
                 property.stringValue = string.Empty;
                 property.serializedObject.ApplyModifiedProperties();
                 tagField.MarkDirtyRepaint();
+
+                // TODO FIXME: Not work at all, even can't clear the value of the property
+                //tagField.value = null;
+                //tagField.MarkDirtyRepaint();
+            }
+
+            void OnPropertyValueChanged(SerializedProperty p)
+            {
+                // TODO FIXME: Not work
+                //tagField.SetValueWithoutNotify(p.stringValue);
+                //tagField.MarkDirtyRepaint();
             }
         }
+#endif
 
 
         #region IMGUI
+#if !UNITY_2021_3_OR_NEWER
 
         // Reference: Cinemachine.Editor.CinemachineTagFieldPropertyDrawer
 
@@ -86,6 +101,7 @@ namespace GBG.GameToolkit.Unity.Editor
             GUI.enabled = guiEnabledBak;
         }
 
+#endif
         #endregion
     }
 }

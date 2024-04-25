@@ -15,20 +15,20 @@ namespace GBG.GameToolkit.Unity
         public static event Handler3D OnTriggered3D;
 
         // Expose to derived classes for debugging purposes.
-        protected static void Trigger(ulong functions, AreaParams areaParams, Component instigatorCollider, bool isExitArea)
+        protected static void Trigger(ulong functions, IAreaParams areaParams, Component instigatorCollider, bool isExitArea)
         {
             OnTriggered?.Invoke(functions, areaParams, instigatorCollider, isExitArea);
         }
 
         // Expose to derived classes for debugging purposes.
-        protected static void Trigger2D(ulong functions, AreaParams areaParams, Collider2D instigator, bool isExitArea)
+        protected static void Trigger2D(ulong functions, IAreaParams areaParams, Collider2D instigator, bool isExitArea)
         {
             OnTriggered2D?.Invoke(functions, areaParams, instigator, isExitArea);
             OnTriggered?.Invoke(functions, areaParams, instigator, isExitArea);
         }
 
         // Expose to derived classes for debugging purposes.
-        protected static void Trigger3D(ulong functions, AreaParams areaParams, Collider instigator, bool isExitArea)
+        protected static void Trigger3D(ulong functions, IAreaParams areaParams, Collider instigator, bool isExitArea)
         {
             OnTriggered3D?.Invoke(functions, areaParams, instigator, isExitArea);
             OnTriggered?.Invoke(functions, areaParams, instigator, isExitArea);
@@ -46,7 +46,7 @@ namespace GBG.GameToolkit.Unity
         #endregion
 
 
-        public abstract AreaParams GetAreaParams();
+        public abstract IAreaParams GetAreaParams();
         public abstract ulong GetAreaFunctions();
 
 
@@ -142,12 +142,11 @@ namespace GBG.GameToolkit.Unity
         #endregion
 
 
-        public delegate void Handler(ulong functions, AreaParams areaParams, Component instigatorCollider, bool isExit);
-        public delegate void Handler2D(ulong functions, AreaParams areaParams, Collider2D instigator, bool isExit);
-        public delegate void Handler3D(ulong functions, AreaParams areaParams, Collider instigator, bool isExit);
+        public delegate void Handler(ulong functions, IAreaParams areaParams, Component instigatorCollider, bool isExit);
+        public delegate void Handler2D(ulong functions, IAreaParams areaParams, Collider2D instigator, bool isExit);
+        public delegate void Handler3D(ulong functions, IAreaParams areaParams, Collider instigator, bool isExit);
 
-        [Serializable]
-        public abstract class AreaParams
+        public interface IAreaParams
         {
         }
     }

@@ -57,28 +57,51 @@ namespace GBG.GameToolkit.Unity
             _playableDirector.CollectGenericBindings(_bindingKeyTable);
         }
 
-        public void SetGenericBinding<T>(string streamName, T value) where T : UObject
+        /// <summary>
+        /// Bind the object to playable track.
+        /// </summary>
+        /// <param name="streamName">Playable track name.</param>
+        /// <param name="trackBindingType">Playable track binding type.</param>
+        /// <param name="value">Object used for bind to playable track.</param>
+        /// <exception cref="NullReferenceException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void SetGenericBinding(string streamName, Type trackBindingType, UObject value)
         {
             if (!_playableDirector)
             {
                 throw new NullReferenceException($"{nameof(PlayableDirector)} is not assigned.");
             }
 
-            // TODO FIXME: typeof(T) will return typeof(UObject), but we need the real type
-            BindingKeyInfo key = new BindingKeyInfo(streamName, value?.GetType() ?? typeof(T));
+            if (streamName == null)
+            {
+                throw new ArgumentNullException(nameof(streamName));
+            }
+
+            if (trackBindingType == null)
+            {
+                throw new ArgumentNullException(nameof(trackBindingType));
+            }
+
+            BindingKeyInfo key = new BindingKeyInfo(streamName, trackBindingType);
             UObject sourceObject = _bindingKeyTable[key];
             _playableDirector.SetGenericBinding(sourceObject, value);
         }
 
-        public bool TrySetGenericBinding<T>(string streamName, T value) where T : UObject
+        /// <summary>
+        /// Try bind the object to playable track.
+        /// </summary>
+        /// <param name="streamName">Playable track name.</param>
+        /// <param name="trackBindingType">Playable track binding type.</param>
+        /// <param name="value">Object used for bind to playable track.</param>
+        /// <returns></returns>
+        public bool TrySetGenericBinding(string streamName, Type trackBindingType, UObject value)
         {
-            if (!_playableDirector)
+            if (!_playableDirector || streamName == null || trackBindingType == null)
             {
                 return false;
             }
 
-            // TODO FIXME: typeof(T) will return typeof(UObject), but we need the real type
-            BindingKeyInfo key = new BindingKeyInfo(streamName, value?.GetType() ?? typeof(T));
+            BindingKeyInfo key = new BindingKeyInfo(streamName, trackBindingType);
             if (_bindingKeyTable.TryGetValue(key, out UObject sourceObject))
             {
                 _playableDirector.SetGenericBinding(sourceObject, value);
@@ -88,38 +111,58 @@ namespace GBG.GameToolkit.Unity
             return false;
         }
 
-        public T GetGenericBinding<T>(string streamName) where T : UObject
+        /// <summary>
+        /// Get the object bound to the playable track.
+        /// </summary>
+        /// <param name="streamName">Playable track name.</param>
+        /// <param name="trackBindingType">Playable track binding type.</param>
+        /// <returns>Object bound to the playable track.</returns>
+        /// <exception cref="NullReferenceException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        public UObject GetGenericBinding(string streamName, Type trackBindingType)
         {
             if (!_playableDirector)
             {
                 throw new NullReferenceException($"{nameof(PlayableDirector)} is not assigned.");
             }
 
-            BindingKeyInfo key = new BindingKeyInfo(streamName, typeof(T));
+            if (streamName == null)
+            {
+                throw new ArgumentNullException(nameof(streamName));
+            }
+
+            if (trackBindingType == null)
+            {
+                throw new ArgumentNullException(nameof(trackBindingType));
+            }
+
+            BindingKeyInfo key = new BindingKeyInfo(streamName, trackBindingType);
             UObject sourceObject = _bindingKeyTable[key];
             UObject value = _playableDirector.GetGenericBinding(sourceObject);
-            T t = (T)value;
 
-            return t;
+            return value;
         }
 
-        public bool TryGetGenericBinding<T>(string streamName, out T value) where T : UObject
+        /// <summary>
+        /// Try get the object bound to the playable track.
+        /// </summary>
+        /// <param name="streamName">Playable track name.</param>
+        /// <param name="trackBindingType">Playable track binding type.</param>
+        /// <param name="value">Object bound to the playable track.</param>
+        /// <returns></returns>
+        public bool TryGetGenericBinding(string streamName, Type trackBindingType, out UObject value)
         {
-            if (!_playableDirector)
+            if (!_playableDirector || streamName == null || trackBindingType == null)
             {
                 value = default;
                 return false;
             }
 
-            BindingKeyInfo key = new BindingKeyInfo(streamName, typeof(T));
+            BindingKeyInfo key = new BindingKeyInfo(streamName, trackBindingType);
             if (_bindingKeyTable.TryGetValue(key, out UObject sourceObject))
             {
-                UObject bindingValue = _playableDirector.GetGenericBinding(sourceObject);
-                if (bindingValue is T t)
-                {
-                    value = t;
-                    return true;
-                }
+                value = _playableDirector.GetGenericBinding(sourceObject);
+                return true;
             }
 
             value = default;
