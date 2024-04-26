@@ -15,42 +15,45 @@ namespace GBG.GameToolkit.Unity.Editor
 #if UNITY_2021_3_OR_NEWER
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
+            bool isInList = property.propertyPath.EndsWith(']');
+            if (isInList)
+            {
+                TagField tagFieldInList = new TagField { name = "TagField" };
+                tagFieldInList.BindProperty(property);
+                return tagFieldInList;
+            }
+
             VisualElement container = new VisualElement()
             {
+                name = "TagFieldContainer",
                 style = { flexDirection = FlexDirection.Row }
             };
 
             TagField tagField = new TagField()
             {
+                name = "TagField",
+                label = property.displayName,
                 style = { flexGrow = 1 }
             };
             tagField.BindProperty(property);
-            tagField.TrackPropertyValue(property, OnPropertyValueChanged);
             container.Add(tagField);
 
-            Button clearButton = new Button(OnClearButtonClicked) { text = "Clear" };
+            Button clearButton = new Button(ClearTagValue)
+            {
+                name = "TagClearButton",
+                text = "Clear"
+            };
             container.Add(clearButton);
 
             return container;
 
-
-            void OnClearButtonClicked()
+            void ClearTagValue()
             {
-                // TODO FIXME: Property value cleared but the tagField will not refresh until re-open its inspector
-                property.stringValue = string.Empty;
-                property.serializedObject.ApplyModifiedProperties();
-                tagField.MarkDirtyRepaint();
-
-                // TODO FIXME: Not work at all, even can't clear the value of the property
-                //tagField.value = null;
-                //tagField.MarkDirtyRepaint();
-            }
-
-            void OnPropertyValueChanged(SerializedProperty p)
-            {
-                // TODO FIXME: Not work
-                //tagField.SetValueWithoutNotify(p.stringValue);
-                //tagField.MarkDirtyRepaint();
+                // MEMO Unity Limitation: https://github.com/Unity-Technologies/UnityCsReference/blob/2022.3/Editor/Mono/UIElements/Controls/TagField.cs#L48
+                tagField.choices.Add(null);
+                tagField.value = null;
+                tagField.choices.RemoveAt(tagField.choices.Count - 1);
+                tagField.index = -1; // after value
             }
         }
 #endif
