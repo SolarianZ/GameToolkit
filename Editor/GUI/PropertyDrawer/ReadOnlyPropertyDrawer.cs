@@ -3,7 +3,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GBG.GameToolkit.Unity.Editor
+namespace GBG.GameToolkit.Unity.Editor.GUI
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     [CustomPropertyDrawer(typeof(ReadOnlyInPlayModeAttribute))]

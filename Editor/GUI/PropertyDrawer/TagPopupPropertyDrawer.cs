@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 using UnityEngine;
 #endif
 
-namespace GBG.GameToolkit.Unity.Editor
+namespace GBG.GameToolkit.Unity.Editor.GUI
 {
     [CustomPropertyDrawer(typeof(TagPopupAttribute))]
     internal class TagPopupPropertyDrawer : PropertyDrawer
