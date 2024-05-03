@@ -1,4 +1,5 @@
 ﻿using GBG.GameToolkit.Unity.Editor.GUI;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -8,6 +9,16 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
     public partial class AssetCheckerWindow
     {
+        #region Controls
+
+        private ObjectField _settingsField;
+        private Button _executeButton;
+        private ListView _resultListView;
+        private CheckResultDetailsView _resultDetailsView;
+
+        #endregion
+
+
         private void CreateGUI()
         {
             minSize = new Vector2(500, 400);
@@ -16,7 +27,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             #region Settings
 
-            // Settings Container
+            // _settingsAsset Container
             VisualElement settingsContainer = new VisualElement
             {
                 name = "SettingsContainer",
@@ -54,15 +65,19 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     flexGrow = 1,
                 }
             };
-            _settingsField.bindingPath = Info.SettingsPropertyPath;
+            _settingsField.bindingPath = nameof(_settings);
             _settingsField.RegisterValueChangedCallback(OnSettingsObjectChanged);
             settingsAssetContainer.Add(_settingsField);
 
             // Create Button
-            Button createSettingsAssetButton = new Button(CreateSettingsAsset)
+            Button createSettingsAssetButton = new Button
             {
                 name = "CreateSettingsAssetButton",
                 text = "New",
+            };
+            createSettingsAssetButton.clicked += () =>
+            {
+                _settings = CreateSettingsAsset();
             };
             settingsAssetContainer.Add(createSettingsAssetButton);
 
@@ -70,12 +85,13 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
 
             // Execution Button
-            _executeButton = new Button(ExecuteChecker)
+            _executeButton = new Button(Execute)
             {
                 name = "ExecuteButton",
                 text = "Execute",
                 style =
                 {
+                    height = 32,
                     marginLeft = 8,
                     marginRight = 8,
                     marginTop = 8,
@@ -142,11 +158,17 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             resultContainer.Pane1.Add(resultLabel);
 
             // Result List View
-            ListView resultListView = new ListView
+            _resultListView = new ListView
             {
                 name = "ResultListView",
+                itemsSource = _checkResults,
+                fixedItemHeight = 28,
+                selectionType = SelectionType.Single,
+                makeItem = MakeResultListItem,
+                bindItem = BindResultListItem,
             };
-            resultContainer.Pane1.Add(resultListView);
+            _resultListView.selectedIndicesChanged += OnCheckResultSelectionChanged;
+            resultContainer.Pane1.Add(_resultListView);
 
             #endregion
 
@@ -164,21 +186,62 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             resultContainer.Pane2.Add(detailsLabel);
 
-            // Details Scroll View
-            ScrollView detailsScrollView = new ScrollView()
+            // Details View
+            _resultDetailsView = new CheckResultDetailsView(_checkResults)
             {
-                name = "DetailsScrollView",
+                name = "CheckResultDetailsView",
             };
-            resultContainer.Pane2.Add(detailsScrollView);
+            _resultDetailsView.AssetRechecked += OnAssetRechecked;
+            _resultDetailsView.AssetRepaired += OnAssetRepaired;
+            resultContainer.Pane2.Add(_resultDetailsView);
 
             #endregion
 
 
-            // Bind properties
+            // SelectResult properties
             root.Bind(new SerializedObject(this));
 
             // Restore values
-            // _settingsField.SetValueWithoutNotify(_settings);
+            // _settingsField.SetValueWithoutNotify(_settingsAsset);
+        }
+
+        private void OnSettingsObjectChanged(ChangeEvent<Object> evt)
+        {
+            LocalCache.SetSettingsAsset(_settings);
+            _executeButton.SetEnabled(_settings);
+        }
+
+        private VisualElement MakeResultListItem()
+        {
+            CheckResultEntryView item = new CheckResultEntryView();
+            return item;
+        }
+
+        private void BindResultListItem(VisualElement element, int index)
+        {
+            AssetCheckResult result = _checkResults[index];
+            CheckResultEntryView item = (CheckResultEntryView)element;
+            item.Bind(result);
+        }
+
+        private void OnCheckResultSelectionChanged(IEnumerable<int> selectedIndices)
+        {
+            int index = _resultListView.selectedIndex;
+            _resultDetailsView.SelectResult(index);
+        }
+
+        private void OnAssetRechecked(int index)
+        {
+            LocalCache.SetCheckResults(_checkResults);
+            _resultListView.RefreshItem(index);
+        }
+
+        private void OnAssetRepaired(int index)
+        {
+            LocalCache.SetCheckResults(_checkResults);
+            _checkResults.RemoveAt(index);
+            _resultListView.Rebuild();
+            _resultListView.ClearSelection();
         }
     }
 }

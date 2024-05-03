@@ -1,21 +1,17 @@
+using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
+using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
-    public partial class AssetCheckerWindow : EditorWindow
+    public partial class AssetCheckerWindow : EditorWindow, IHasCustomMenu
     {
-        static class Info
-        {
-            public const string SettingsFieldName = "SettingsField";
-            public const string SettingsPropertyPath = "_settings";
-            public const string CreateSettingsAssetButtonName = "CreateSettingsAssetButton";
-            public const string ExecuteButtonName = "ExecuteButton";
-        }
+        #region Static
+
+        const string LogTag = "AssetChecker";
+
 
         [MenuItem("Tools/Bamboo/Asset Checker")]
         public static void Open()
@@ -23,28 +19,128 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             GetWindow<AssetCheckerWindow>("AssetCheckerWindow");
         }
 
+        #endregion
+
 
         [SerializeField]
-        private VisualTreeAsset _mainVisualTreeAsset;
+        private AssetCheckerSettings _settings;
+        private readonly List<AssetCheckResult> _checkResults = new List<AssetCheckResult>();
+        private AssetCheckerLocalCache LocalCache => AssetCheckerLocalCache.instance;
 
 
-        #region Controls
+        #region Unity Message
 
-        private ObjectField _settingsField;
-        private Button _executeButton;
+        private void OnEnable()
+        {
+            _settings = LocalCache.GetSettingsAsset();
+            _checkResults.AddRange(LocalCache.GetCheckResults());
+        }
 
         #endregion
 
-        private void OnSettingsObjectChanged(ChangeEvent<Object> evt)
-        {
-            _executeButton.SetEnabled(_settings);
-        }
 
-        private void ExecuteChecker()
+        public void Execute()
         {
             Assert.IsTrue(_settings);
 
-            Debug.LogError(_settings);
+            if (!_settings.assetProvider)
+            {
+                string errorMessage = $"No asset provider specified in the settings.";
+                Debugger.LogError(errorMessage, _settings, LogTag);
+                EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
+                return;
+            }
+
+            AssetChecker[] checkers = _settings.assetCheckers;
+            if (_settings.assetCheckers == null || _settings.assetCheckers.Length == 0)
+            {
+                string errorMessage = $"No asset checker specified in the settings.";
+                Debugger.LogError(errorMessage, _settings, LogTag);
+                EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
+                return;
+            }
+
+            IReadOnlyList<UObject> assets = _settings.assetProvider.GetAssets();
+            if (assets == null || assets.Count == 0)
+            {
+                return;
+            }
+
+            _checkResults.Clear();
+            bool hasNullChecker = false;
+            for (int i = 0; i < assets.Count; i++)
+            {
+                UObject asset = assets[i];
+                Assert.IsTrue(asset);
+
+                for (int j = 0; j < checkers.Length; j++)
+                {
+                    AssetChecker checker = checkers[j];
+                    if (!checker)
+                    {
+                        hasNullChecker = true;
+                        continue;
+                    }
+
+                    AssetCheckResult result = checker.CheckAsset(asset);
+                    if (result != null)
+                    {
+                        _checkResults.Add(result);
+                    }
+                }
+            }
+
+            if (hasNullChecker)
+            {
+                string errorMessage = $"There are null asset checkers in the settings, please check.";
+                Debugger.LogError(errorMessage, _settings, LogTag);
+                EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
+            }
+
+            LocalCache.SetCheckResults(_checkResults);
+
+            _resultListView.Rebuild();
+            _resultListView.ClearSelection();
+            _resultDetailsView.ClearSelection();
         }
+
+        public AssetCheckerSettings GetSettingsAsset()
+        {
+            return _settings;
+        }
+
+        public void SetSettingsAsset(AssetCheckerSettings settings)
+        {
+            _settingsField.value = settings;
+        }
+
+        public AssetCheckerSettings CreateSettingsAsset()
+        {
+            string savePath = EditorUtility.SaveFilePanelInProject("Create new settings asset",
+                nameof(AssetCheckerSettings), "asset", null);
+            if (string.IsNullOrEmpty(savePath))
+            {
+                return null;
+            }
+
+            AssetCheckerSettings settings = CreateInstance<AssetCheckerSettings>();
+            AssetDatabase.CreateAsset(settings, savePath);
+            EditorGUIUtility.PingObject(settings);
+
+            return settings;
+        }
+
+
+        #region Custom Menu
+
+        public void AddItemsToMenu(GenericMenu menu)
+        {
+            menu.AddItem(new GUIContent("[Debug] Inspect local cache asset"), false, () =>
+            {
+                Selection.activeObject = LocalCache;
+            });
+        }
+
+        #endregion
     }
 }
