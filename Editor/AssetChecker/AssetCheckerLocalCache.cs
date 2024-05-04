@@ -13,6 +13,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckerSettings _settingsAsset;
         [SerializeField]
+        private CheckResultStats _checkResultStats = new CheckResultStats();
+        [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
         // TODO: Splitter position
 
@@ -26,6 +28,20 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             _settingsAsset = settings;
 
+            Save(true);
+        }
+
+        public CheckResultStats GetCheckResultStats()
+        {
+            CheckResultStats stats = (CheckResultStats)_checkResultStats.Clone();
+            return stats;
+        }
+
+        public void SetCheckResultStats(CheckResultStats stats)
+        {
+            _checkResultStats = stats == null
+                ? new CheckResultStats()
+                : (CheckResultStats)stats.Clone();
             Save(true);
         }
 

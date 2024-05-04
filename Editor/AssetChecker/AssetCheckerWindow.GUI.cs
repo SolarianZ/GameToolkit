@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
@@ -14,7 +15,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private ObjectField _settingsField;
         private HelpBox _executionHelpBox;
         private Button _executeButton;
-        private HelpBox _resultHelpBox;
+        private Label _resultStatsLabel;
         private ListView _resultListView;
         private CheckResultDetailsView _resultDetailsView;
 
@@ -54,7 +55,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             settingsContainer.Add(settingsAssetContainer);
 
-            // Object Field
+            // UObject Field
             _settingsField = new ObjectField
             {
                 name = "SettingsField",
@@ -118,8 +119,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             root.Add(_executeButton);
 
-            UpdateExecutionControls();
-
             #endregion
 
             // Separator
@@ -140,20 +139,20 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 }
             });
 
-            // Execution HelpBox
-            _resultHelpBox = new HelpBox
+            // Result Stats
+            _resultStatsLabel = new Label
             {
-                name = "ResultHelpBox",
-                messageType = HelpBoxMessageType.Error,
+                name = "ResultStatsLabel",
                 style =
                 {
-                    display = DisplayStyle.None,
+                    fontSize = 12,
                     marginLeft = 16,
                     marginRight = 16,
+                    marginTop = 4,
+                    marginBottom = 4,
                 }
             };
-            _resultHelpBox.Q<Label>().style.fontSize = 13;
-            root.Add(_resultHelpBox);
+            root.Add(_resultStatsLabel);
 
             // Result Container
             SplitterView resultContainer = new SplitterView(FlexDirection.Row)
@@ -238,10 +237,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             root.Bind(new SerializedObject(this));
 
             // Restore values
-            // _settingsField.SetValueWithoutNotify(_settingsAsset);
+            UpdateExecutionControls();
+            UpdateResultControls();
         }
 
-        private void OnSettingsObjectChanged(ChangeEvent<Object> evt)
+        private void OnSettingsObjectChanged(ChangeEvent<UObject> evt)
         {
             LocalCache.SetSettingsAsset(_settings);
             UpdateExecutionControls();
@@ -298,6 +298,23 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _executionHelpBox.text = "You should not see this message.";
             _executionHelpBox.style.display = DisplayStyle.None;
             _executeButton.SetEnabled(true);
+        }
+
+        private void UpdateResultControls()
+        {
+            if (_resultStatsLabel == null ||
+                _resultListView == null ||
+                _resultDetailsView == null)
+            {
+                return;
+            }
+
+            _resultStatsLabel.text = $"Total: {_stats.GetTotal()}  Error: {_stats.error}  " +
+               $"Warning: {_stats.warning}  Not Important: {_stats.notImportant}  " +
+               $"Exception: {_stats.exception}";
+            _resultListView.Rebuild();
+            _resultListView.ClearSelection();
+            _resultDetailsView.ClearSelection();
         }
 
         private VisualElement MakeResultListItem()
