@@ -25,7 +25,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckerSettings _settings;
         private readonly List<AssetCheckResult> _checkResults = new List<AssetCheckResult>();
-        private AssetCheckerLocalCache LocalCache => AssetCheckerLocalCache.instance;
+        internal AssetCheckerLocalCache LocalCache => AssetCheckerLocalCache.instance;
 
 
         #region Unity Message
@@ -104,6 +104,21 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _resultDetailsView.ClearSelection();
         }
 
+        public AssetCheckResult[] GetCheckResults()
+        {
+            return _checkResults.ToArray();
+        }
+
+        public void ClearCheckResults()
+        {
+            _checkResults.Clear();
+            LocalCache.SetCheckResults(_checkResults);
+
+            _resultListView.Rebuild();
+            _resultListView.ClearSelection();
+            _resultDetailsView.ClearSelection();
+        }
+
         public AssetCheckerSettings GetSettingsAsset()
         {
             return _settings;
@@ -135,7 +150,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         public void AddItemsToMenu(GenericMenu menu)
         {
-            menu.AddItem(new GUIContent("[Debug] Inspect local cache asset"), false, () =>
+            // Clear Check Results
+            menu.AddItem(new GUIContent("Clear Check Results"), false, ClearCheckResults);
+
+            // Debug
+            menu.AddItem(new GUIContent("[Debug] Inspect Local Cache Asset"), false, () =>
             {
                 Selection.activeObject = LocalCache;
             });

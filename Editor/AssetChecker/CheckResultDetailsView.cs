@@ -25,6 +25,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _results = results;
             style.flexGrow = 1;
 
+            const float ButtonHeight = 28;
+
             _titleLabel = new Label
             {
                 name = "TitleLabel",
@@ -95,9 +97,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 {
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.FlexEnd,
-                    height = 32,
-                    minHeight = 32,
-                    maxHeight = 32,
+                    height = ButtonHeight,
+                    minHeight = ButtonHeight,
+                    maxHeight = ButtonHeight,
                     marginLeft = 4,
                     marginRight = 4,
                     marginTop = 4,

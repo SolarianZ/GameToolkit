@@ -27,7 +27,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             #region Settings
 
-            // _settingsAsset Container
+            // Settings Container
             VisualElement settingsContainer = new VisualElement
             {
                 name = "SettingsContainer",
@@ -91,7 +91,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 text = "Execute",
                 style =
                 {
-                    height = 32,
+                    height = 28,
                     marginLeft = 8,
                     marginRight = 8,
                     marginTop = 8,
