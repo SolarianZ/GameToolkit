@@ -27,6 +27,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private AssetCheckerSettings _settings;
         private CheckResultStats _stats;
         private readonly List<AssetCheckResult> _checkResults = new List<AssetCheckResult>();
+        private readonly List<AssetCheckResult> _filteredCheckResults = new List<AssetCheckResult>();
         internal AssetCheckerLocalCache LocalCache => AssetCheckerLocalCache.instance;
 
 
@@ -37,6 +38,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _settings = LocalCache.GetSettingsAsset();
             _stats = LocalCache.GetCheckResultStats();
             _checkResults.AddRange(LocalCache.GetCheckResults());
+            UpdateFilteredCheckResults();
         }
 
         private void OnFocus()
@@ -72,7 +74,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             IReadOnlyList<UObject> assets = _settings.assetProvider.GetAssets();
             if (assets == null || assets.Count == 0)
             {
-                UpdateResultData();
+                UpdatePersistentResultData();
+                UpdateFilteredCheckResults();
                 UpdateResultControls(true);
                 return;
             }
@@ -114,7 +117,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 }
             }
 
-            UpdateResultData();
+            UpdatePersistentResultData();
+            UpdateFilteredCheckResults();
             UpdateResultControls(true);
 
             if (hasNullChecker)
@@ -125,7 +129,19 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
         }
 
-        private void UpdateResultData()
+        public void SetCheckResultTypeFilter(ResultType filter)
+        {
+            if (filter == LocalCache.GetCheckResultTypeFilter())
+            {
+                return;
+            }
+
+            LocalCache.SetCheckResultTypeFilter(filter);
+            UpdateFilteredCheckResults();
+            UpdateResultControls(true);
+        }
+
+        private void UpdatePersistentResultData()
         {
             _stats.Reset();
             for (int i = 0; i < _checkResults.Count; i++)
@@ -165,7 +181,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         public void ClearCheckResults()
         {
             _checkResults.Clear();
-            UpdateResultData();
+            UpdatePersistentResultData();
+            UpdateFilteredCheckResults();
             UpdateResultControls(true);
         }
 
@@ -204,7 +221,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 clearSelection = true;
             }
 
-            UpdateResultData();
+            UpdatePersistentResultData();
+            UpdateFilteredCheckResults();
             UpdateResultControls(clearSelection);
         }
 
@@ -215,8 +233,23 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 _checkResults.RemoveAt(index);
             }
 
-            UpdateResultData();
+            UpdatePersistentResultData();
+            UpdateFilteredCheckResults();
             UpdateResultControls(success);
+        }
+
+        private void UpdateFilteredCheckResults()
+        {
+            ResultType filter = LocalCache.GetCheckResultTypeFilter();
+            _filteredCheckResults.Clear();
+            for (int i = 0; i < _checkResults.Count; i++)
+            {
+                AssetCheckResult result = _checkResults[i];
+                if ((result.type & filter) != 0)
+                {
+                    _filteredCheckResults.Add(result);
+                }
+            }
         }
 
 
@@ -230,24 +263,24 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             // Result Icon Style
             menu.AddItem(new GUIContent("Result Icon Style/Style 1"),
-                LocalCache.GetResultIconStyle() == ResultIconStyle.Style1,
+                LocalCache.GetCheckResultIconStyle() == ResultIconStyle.Style1,
                 () =>
                 {
-                    LocalCache.SetResultIconStyle(ResultIconStyle.Style1);
+                    LocalCache.SetCheckResultIconStyle(ResultIconStyle.Style1);
                     _resultListView.Rebuild();
                 });
             menu.AddItem(new GUIContent("Result Icon Style/Style 2"),
-                LocalCache.GetResultIconStyle() == ResultIconStyle.Style2,
+                LocalCache.GetCheckResultIconStyle() == ResultIconStyle.Style2,
                 () =>
                 {
-                    LocalCache.SetResultIconStyle(ResultIconStyle.Style2);
+                    LocalCache.SetCheckResultIconStyle(ResultIconStyle.Style2);
                     _resultListView.Rebuild();
                 });
             menu.AddItem(new GUIContent("Result Icon Style/Style 3"),
-                LocalCache.GetResultIconStyle() == ResultIconStyle.Style3,
+                LocalCache.GetCheckResultIconStyle() == ResultIconStyle.Style3,
                 () =>
                 {
-                    LocalCache.SetResultIconStyle(ResultIconStyle.Style3);
+                    LocalCache.SetCheckResultIconStyle(ResultIconStyle.Style3);
                     _resultListView.Rebuild();
                 });
             menu.AddSeparator("");

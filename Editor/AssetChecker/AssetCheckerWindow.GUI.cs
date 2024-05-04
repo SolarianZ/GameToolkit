@@ -198,7 +198,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _resultListView = new ListView
             {
                 name = "ResultListView",
-                itemsSource = _checkResults,
+                itemsSource = _filteredCheckResults,
                 fixedItemHeight = 28,
                 selectionType = SelectionType.Single,
                 makeItem = MakeResultListItem,
@@ -334,7 +334,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             AssetCheckResult result = _checkResults[index];
             CheckResultEntryView item = (CheckResultEntryView)element;
-            item.IconStyle = LocalCache.GetResultIconStyle();
+            item.IconStyle = LocalCache.GetCheckResultIconStyle();
             item.Bind(result);
         }
 

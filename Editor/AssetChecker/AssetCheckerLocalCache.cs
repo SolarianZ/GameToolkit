@@ -17,6 +17,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
         [SerializeField]
+        private ResultType _resultTypeFilter = (ResultType)~0U;
+        [SerializeField]
         private ResultIconStyle _resultIconStyle = ResultIconStyle.Style2;
 
 
@@ -29,6 +31,29 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             _settingsAsset = settings;
 
+            Save(true);
+        }
+
+        public AssetCheckResult[] GetCheckResults()
+        {
+            return _checkResults.ToArray();
+        }
+
+        public void SetCheckResults(IEnumerable<AssetCheckResult> checkResults)
+        {
+            _checkResults = checkResults?.ToArray() ?? Array.Empty<AssetCheckResult>();
+
+            Save(true);
+        }
+
+        public ResultType GetCheckResultTypeFilter()
+        {
+            return _resultTypeFilter;
+        }
+
+        public void SetCheckResultTypeFilter(ResultType filter)
+        {
+            _resultTypeFilter = filter;
             Save(true);
         }
 
@@ -46,24 +71,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             Save(true);
         }
 
-        public AssetCheckResult[] GetCheckResults()
-        {
-            return _checkResults.ToArray();
-        }
-
-        public void SetCheckResults(IEnumerable<AssetCheckResult> checkResults)
-        {
-            _checkResults = checkResults?.ToArray() ?? Array.Empty<AssetCheckResult>();
-
-            Save(true);
-        }
-
-        public ResultIconStyle GetResultIconStyle()
+        public ResultIconStyle GetCheckResultIconStyle()
         {
             return _resultIconStyle;
         }
 
-        public void SetResultIconStyle(ResultIconStyle iconStyle)
+        public void SetCheckResultIconStyle(ResultIconStyle iconStyle)
         {
             _resultIconStyle = iconStyle;
             Save(true);
