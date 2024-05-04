@@ -5,6 +5,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
     public enum ResultType
     {
+        AllPass,
         NotImportant,
         Warning,
         Error,

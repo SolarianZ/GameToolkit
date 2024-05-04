@@ -136,6 +136,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
 
             AssetCheckResult result = _results[_selectionIndex];
+            if (result == null)
+            {
+                ClearSelection();
+                return;
+            }
+
             _titleLabel.text = result.title;
             _assetField.value = result.asset;
             _checkerField.value = result.checker;
@@ -182,7 +188,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             AssetCheckResult result = _results[_selectionIndex];
             try
             {
-                if (result.checker.TryRepairAsset(result))
+                result.checker.RepairAsset(result, out bool allIssuesRepaired);
+                if (allIssuesRepaired)
                 {
                     AssetRepaired?.Invoke(_selectionIndex, true);
                 }
@@ -197,6 +204,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 result.title = e.GetType().Name;
                 result.details = e.Message;
                 result.repairable = false;
+
+                SelectResult(_selectionIndex);
 
                 AssetRepaired?.Invoke(_selectionIndex, false);
             }

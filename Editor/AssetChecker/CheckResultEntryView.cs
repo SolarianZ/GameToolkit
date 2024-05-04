@@ -69,6 +69,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             switch (result.type)
             {
+                case ResultType.AllPass:
+                    _typeImage.image = EditorGUIUtility.IconContent("TestPassed").image;
+                    break;
                 case ResultType.NotImportant:
                     _typeImage.image = EditorGUIUtility.isProSkin
                         ? EditorGUIUtility.IconContent("d_console.infoicon.sml@2x").image

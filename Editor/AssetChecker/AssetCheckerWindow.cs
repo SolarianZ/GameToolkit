@@ -133,6 +133,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 AssetCheckResult result = _checkResults[i];
                 switch (result.type)
                 {
+                    case ResultType.AllPass:
+                        _stats.allPass++;
+                        break;
                     case ResultType.NotImportant:
                         _stats.notImportant++;
                         break;
@@ -190,6 +193,30 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             EditorGUIUtility.PingObject(settings);
 
             return settings;
+        }
+
+        private void OnAssetRechecked(int index)
+        {
+            bool clearSelection = false;
+            if (_checkResults[index] == null)
+            {
+                _checkResults.RemoveAt(index);
+                clearSelection = true;
+            }
+
+            UpdateResultData();
+            UpdateResultControls(clearSelection);
+        }
+
+        private void OnAssetRepaired(int index, bool success)
+        {
+            if (success)
+            {
+                _checkResults.RemoveAt(index);
+            }
+
+            UpdateResultData();
+            UpdateResultControls(success);
         }
 
 

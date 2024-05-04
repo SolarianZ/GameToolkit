@@ -188,6 +188,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 style =
                 {
                     unityTextAlign = TextAnchor.MiddleCenter,
+                    marginBottom = 2,
                 }
             };
             resultContainer.Pane1.Add(resultLabel);
@@ -217,6 +218,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 style =
                 {
                     unityTextAlign = TextAnchor.MiddleCenter,
+                    marginBottom = 2,
                 }
             };
             resultContainer.Pane2.Add(detailsLabel);
@@ -338,23 +340,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             int index = _resultListView.selectedIndex;
             _resultDetailsView.SelectResult(index);
-        }
-
-        private void OnAssetRechecked(int index)
-        {
-            UpdateResultData();
-            UpdateResultControls(false);
-        }
-
-        private void OnAssetRepaired(int index, bool success)
-        {
-            if (success)
-            {
-                _checkResults.RemoveAt(index);
-            }
-
-            UpdateResultData();
-            UpdateResultControls(success);
         }
     }
 }
