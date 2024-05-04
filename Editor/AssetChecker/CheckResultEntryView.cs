@@ -116,13 +116,13 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     switch (IconStyle)
                     {
                         case ResultIconStyle.Style1:
-                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot1_pix16_gizmo").image;
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot0_pix16_gizmo").image;
                             break;
                         case ResultIconStyle.Style2:
-                            _typeImage.image = EditorGUIUtility.IconContent("winbtn_mac_inact@2x").image;
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot0_pix16_gizmo").image;
                             break;
                         case ResultIconStyle.Style3:
-                            _typeImage.image = EditorGUIUtility.IconContent("d_lightRim").image;
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot0_pix16_gizmo").image;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(IconStyle), IconStyle, null);
@@ -132,7 +132,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     switch (IconStyle)
                     {
                         case ResultIconStyle.Style1:
-                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot4_pix16_gizmo").image;
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot5_pix16_gizmo").image;
                             break;
                         case ResultIconStyle.Style2:
                             _typeImage.image = EditorGUIUtility.IconContent("d_winbtn_mac_min@2x").image;
@@ -164,7 +164,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     switch (IconStyle)
                     {
                         case ResultIconStyle.Style1:
-                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot14_pix16_gizmo").image;
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot7_pix16_gizmo").image;
                             break;
                         case ResultIconStyle.Style2:
                             _typeImage.image = EditorGUIUtility.IconContent("d_winbtn_mac_close_a@2x").image;

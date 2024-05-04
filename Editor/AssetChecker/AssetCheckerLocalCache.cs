@@ -17,7 +17,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
         [SerializeField]
-        private ResultIconStyle _resultIconStyle;
+        private ResultIconStyle _resultIconStyle = ResultIconStyle.Style2;
 
 
         public AssetCheckerSettings GetSettingsAsset()

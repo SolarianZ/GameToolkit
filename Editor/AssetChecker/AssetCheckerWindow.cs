@@ -226,29 +226,31 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             // Clear Check Results
             menu.AddItem(new GUIContent("Clear Check Results"), false, ClearCheckResults);
+            menu.AddSeparator("");
 
             // Result Icon Style
-            menu.AddItem(new GUIContent("Result Icon Style 1"),
+            menu.AddItem(new GUIContent("Result Icon Style/Style 1"),
                 LocalCache.GetResultIconStyle() == ResultIconStyle.Style1,
                 () =>
                 {
                     LocalCache.SetResultIconStyle(ResultIconStyle.Style1);
                     _resultListView.Rebuild();
                 });
-            menu.AddItem(new GUIContent("Result Icon Style 2"),
-                LocalCache.GetResultIconStyle() == ResultIconStyle.Style2, 
+            menu.AddItem(new GUIContent("Result Icon Style/Style 2"),
+                LocalCache.GetResultIconStyle() == ResultIconStyle.Style2,
                 () =>
                 {
                     LocalCache.SetResultIconStyle(ResultIconStyle.Style2);
                     _resultListView.Rebuild();
                 });
-            menu.AddItem(new GUIContent("Result Icon Style 3"),
-                LocalCache.GetResultIconStyle() == ResultIconStyle.Style3, 
+            menu.AddItem(new GUIContent("Result Icon Style/Style 3"),
+                LocalCache.GetResultIconStyle() == ResultIconStyle.Style3,
                 () =>
                 {
                     LocalCache.SetResultIconStyle(ResultIconStyle.Style3);
                     _resultListView.Rebuild();
                 });
+            menu.AddSeparator("");
 
             // Debug
             menu.AddItem(new GUIContent("[Debug] Inspect Local Cache Asset"), false, () =>
