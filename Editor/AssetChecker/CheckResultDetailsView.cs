@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Search;
 using UnityEngine.UIElements;
+using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
     public class CheckResultDetailsView : VisualElement
     {
         private readonly Label _titleLabel;
-        private readonly ObjectField _assetField;
-        private readonly ObjectField _checkerField;
+        private readonly ObjectView _assetView;
+        private readonly ObjectView _checkerView;
         private readonly Label _detailsLabel;
         private readonly Button _recheckButton;
         private readonly Button _repairButton;
@@ -40,31 +42,27 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             Add(_titleLabel);
 
-            _assetField = new ObjectField
+            _assetView = new ObjectView("Asset")
             {
-                name = "AssetField",
-                label = "Asset",
+                name = "AssetView",
                 style =
                 {
                     marginLeft = 4,
                     marginRight = 4,
                 }
             };
-            _assetField.SetEnabled(false);
-            Add(_assetField);
+            Add(_assetView);
 
-            _checkerField = new ObjectField
+            _checkerView = new ObjectView("Checker")
             {
-                name = "CheckerField",
-                label = "Checker",
+                name = "CheckerView",
                 style =
                 {
                     marginLeft = 4,
                     marginRight = 4,
                 }
             };
-            _checkerField.SetEnabled(false);
-            Add(_checkerField);
+            Add(_checkerView);
 
             ScrollView detailsScrollView = new ScrollView
             {
@@ -143,8 +141,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
 
             _titleLabel.text = result.title;
-            _assetField.value = result.asset;
-            _checkerField.value = result.checker;
+            _assetView.SetAsset(result.asset);
+            _checkerView.SetAsset(result.checker);
             _detailsLabel.text = result.details;
             _recheckButton.SetEnabled(result.asset && result.checker);
             _repairButton.SetEnabled(result.repairable);
@@ -156,8 +154,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             _titleLabel.text = "-";
             _detailsLabel.text = "-";
-            _assetField.value = null;
-            _checkerField.value = null;
+            _assetView.SetAsset(null);
+            _checkerView.SetAsset(null);
             _recheckButton.SetEnabled(false);
             _repairButton.SetEnabled(false);
         }
@@ -208,6 +206,64 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 SelectResult(_selectionIndex);
 
                 AssetRepaired?.Invoke(_selectionIndex, false);
+            }
+        }
+
+
+        public class ObjectView : VisualElement
+        {
+            private readonly ObjectField _assetField;
+            private readonly Button _pingAssetButton;
+
+            public ObjectView(string label)
+            {
+                style.flexDirection = FlexDirection.Row;
+
+                Label assetLabel = new Label
+                {
+                    name = "AssetLabel",
+                    text = label,
+                    style =
+                    {
+                        width = 60,
+                        minWidth = 60,
+                        maxWidth = 60,
+                    },
+                };
+                Add(assetLabel);
+
+                _assetField = new ObjectField
+                {
+                    name = "AssetField",
+                    style =
+                    {
+                        flexGrow = 1,
+                    }
+                };
+                _assetField.SetEnabled(false);
+                Add(_assetField);
+
+                _pingAssetButton = new Button(PingAsset)
+                {
+                    name = "PingAssetButton",
+                    text = "Ping",
+                };
+                _pingAssetButton.SetEnabled(false);
+                Add(_pingAssetButton);
+            }
+
+            public void SetAsset(UObject asset)
+            {
+                _assetField.value = asset;
+                _pingAssetButton.SetEnabled(asset);
+            }
+
+            private void PingAsset()
+            {
+                if (_assetField.value)
+                {
+                    EditorGUIUtility.PingObject(_assetField.value);
+                }
             }
         }
     }
