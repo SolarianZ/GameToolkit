@@ -12,7 +12,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         #region Controls
 
         private ObjectField _settingsField;
+        private HelpBox _executionHelpBox;
         private Button _executeButton;
+        private HelpBox _resultHelpBox;
         private ListView _resultListView;
         private CheckResultDetailsView _resultDetailsView;
 
@@ -84,6 +86,22 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             #endregion
 
 
+            #region Execution
+
+            // Execution HelpBox
+            _executionHelpBox = new HelpBox
+            {
+                name = "ExecutionHelpBox",
+                messageType = HelpBoxMessageType.Error,
+                style =
+                {
+                    marginLeft = 16,
+                    marginRight = 16,
+                }
+            };
+            _executionHelpBox.Q<Label>().style.fontSize = 13;
+            root.Add(_executionHelpBox);
+
             // Execution Button
             _executeButton = new Button(Execute)
             {
@@ -98,8 +116,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     marginBottom = 8,
                 }
             };
-            _executeButton.SetEnabled(_settings);
             root.Add(_executeButton);
+
+            UpdateExecutionControls();
+
+            #endregion
 
             // Separator
             root.Add(new VisualElement
@@ -110,7 +131,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     backgroundColor = EditorGUIUtility.isProSkin
                         ? new Color(26 / 255f, 26 / 255f, 26 / 255f, 1.0f)
                         : new Color(127 / 255f, 127 / 255f, 127 / 255f, 1.0f),
-                    width = Length.Percent(100),
+                    width = StyleKeyword.Auto,
                     height = 1,
                     minHeight = 1,
                     maxHeight = 1,
@@ -118,6 +139,21 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     marginRight = 16,
                 }
             });
+
+            // Execution HelpBox
+            _resultHelpBox = new HelpBox
+            {
+                name = "ResultHelpBox",
+                messageType = HelpBoxMessageType.Error,
+                style =
+                {
+                    display = DisplayStyle.None,
+                    marginLeft = 16,
+                    marginRight = 16,
+                }
+            };
+            _resultHelpBox.Q<Label>().style.fontSize = 13;
+            root.Add(_resultHelpBox);
 
             // Result Container
             SplitterView resultContainer = new SplitterView(FlexDirection.Row)
@@ -208,7 +244,60 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private void OnSettingsObjectChanged(ChangeEvent<Object> evt)
         {
             LocalCache.SetSettingsAsset(_settings);
-            _executeButton.SetEnabled(_settings);
+            UpdateExecutionControls();
+        }
+
+        private void UpdateExecutionControls()
+        {
+            if (_executionHelpBox == null || _executeButton == null)
+            {
+                return;
+            }
+
+            if (!_settings)
+            {
+                _executionHelpBox.messageType = HelpBoxMessageType.Error;
+                _executionHelpBox.text = "Please specify settings asset.";
+                _executionHelpBox.style.display = DisplayStyle.Flex;
+                _executeButton.SetEnabled(false);
+                return;
+            }
+
+            if (!_settings.assetProvider)
+            {
+                _executionHelpBox.messageType = HelpBoxMessageType.Error;
+                _executionHelpBox.text = "No asset provider specified in the settings.";
+                _executionHelpBox.style.display = DisplayStyle.Flex;
+                _executeButton.SetEnabled(false);
+                return;
+            }
+
+            AssetChecker[] checkers = _settings.assetCheckers;
+            if (checkers == null || checkers.Length == 0)
+            {
+                _executionHelpBox.messageType = HelpBoxMessageType.Error;
+                _executionHelpBox.text = "No asset checker specified in the settings.";
+                _executionHelpBox.style.display = DisplayStyle.Flex;
+                _executeButton.SetEnabled(false);
+                return;
+            }
+
+            for (int i = 0; i < checkers.Length; i++)
+            {
+                AssetChecker checker = checkers[i];
+                if (!checker)
+                {
+                    _executionHelpBox.messageType = HelpBoxMessageType.Warning;
+                    _executionHelpBox.text = "There are null asset checkers in the settings, please check.";
+                    _executionHelpBox.style.display = DisplayStyle.Flex;
+                    return;
+                }
+            }
+
+            _executionHelpBox.messageType = HelpBoxMessageType.Error;
+            _executionHelpBox.text = "You should not see this message.";
+            _executionHelpBox.style.display = DisplayStyle.None;
+            _executeButton.SetEnabled(true);
         }
 
         private VisualElement MakeResultListItem()

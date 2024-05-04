@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
@@ -36,6 +38,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _checkResults.AddRange(LocalCache.GetCheckResults());
         }
 
+        private void OnFocus()
+        {
+            UpdateExecutionControls();
+        }
+
         #endregion
 
 
@@ -52,7 +59,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
 
             AssetChecker[] checkers = _settings.assetCheckers;
-            if (_settings.assetCheckers == null || _settings.assetCheckers.Length == 0)
+            if (checkers == null || checkers.Length == 0)
             {
                 string errorMessage = $"No asset checker specified in the settings.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
@@ -71,8 +78,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             for (int i = 0; i < assets.Count; i++)
             {
                 UObject asset = assets[i];
-                Assert.IsTrue(asset);
-
                 for (int j = 0; j < checkers.Length; j++)
                 {
                     AssetChecker checker = checkers[j];
@@ -82,9 +87,25 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         continue;
                     }
 
-                    AssetCheckResult result = checker.CheckAsset(asset);
-                    if (result != null)
+                    try
                     {
+                        AssetCheckResult result = checker.CheckAsset(asset);
+                        if (result != null)
+                        {
+                            _checkResults.Add(result);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        AssetCheckResult result = new AssetCheckResult
+                        {
+                            type = ResultType.Exception,
+                            title = e.GetType().Name,
+                            details = e.Message,
+                            asset = asset,
+                            checker = checker,
+                            repairable = false,
+                        };
                         _checkResults.Add(result);
                     }
                 }
@@ -114,6 +135,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _checkResults.Clear();
             LocalCache.SetCheckResults(_checkResults);
 
+            _resultHelpBox.text = null;
+            _resultHelpBox.style.display = DisplayStyle.None;
             _resultListView.Rebuild();
             _resultListView.ClearSelection();
             _resultDetailsView.ClearSelection();

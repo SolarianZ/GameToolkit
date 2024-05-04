@@ -8,6 +8,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         NotImportant,
         Warning,
         Error,
+        Exception,
     }
 
     [Serializable]

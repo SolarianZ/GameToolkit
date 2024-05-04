@@ -80,6 +80,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 case ResultType.Error:
                     _typeImage.image = EditorGUIUtility.IconContent("Error@2x").image;
                     break;
+                case ResultType.Exception:
+                    _typeImage.image = EditorGUIUtility.IconContent("CollabConflict").image;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(result.type), result.type, null);
             }
