@@ -16,7 +16,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private CheckResultStats _checkResultStats = new CheckResultStats();
         [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
-        // TODO: Splitter position
+        [SerializeField]
+        private ResultIconStyle _resultIconStyle;
 
 
         public AssetCheckerSettings GetSettingsAsset()
@@ -54,6 +55,17 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             _checkResults = checkResults?.ToArray() ?? Array.Empty<AssetCheckResult>();
 
+            Save(true);
+        }
+
+        public ResultIconStyle GetResultIconStyle()
+        {
+            return _resultIconStyle;
+        }
+
+        public void SetResultIconStyle(ResultIconStyle iconStyle)
+        {
+            _resultIconStyle = iconStyle;
             Save(true);
         }
     }

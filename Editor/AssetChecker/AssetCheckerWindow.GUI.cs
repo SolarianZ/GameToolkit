@@ -1,5 +1,6 @@
 ﻿using GBG.GameToolkit.Unity.Editor.GUI;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -313,7 +314,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             _resultStatsLabel.text = $"Total: {_stats.GetTotal()}  Error: {_stats.error}  " +
                $"Warning: {_stats.warning}  Not Important: {_stats.notImportant}  " +
-               $"Exception: {_stats.exception}";
+               $"All Pass: {_stats.allPass}  Exception: {_stats.exception}";
             _resultListView.Rebuild();
 
             if (clearSelection)
@@ -333,6 +334,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             AssetCheckResult result = _checkResults[index];
             CheckResultEntryView item = (CheckResultEntryView)element;
+            item.IconStyle = LocalCache.GetResultIconStyle();
             item.Bind(result);
         }
 

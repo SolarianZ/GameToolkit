@@ -5,11 +5,20 @@ using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
+    public enum ResultIconStyle
+    {
+        Style1,
+        Style2,
+        Style3
+    }
+
     public class CheckResultEntryView : VisualElement
     {
         private readonly Image _typeImage;
         private readonly Label _label;
         private readonly Image _repairableImage;
+        private ResultType _resultType;
+        internal ResultIconStyle IconStyle { get; set; }
 
 
         public CheckResultEntryView()
@@ -48,6 +57,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _repairableImage = new Image
             {
                 name = "RepairableImage",
+                tooltip = "Repairable",
                 image = EditorGUIUtility.isProSkin
                             ? EditorGUIUtility.IconContent("d_CustomTool@2x").image
                             : EditorGUIUtility.IconContent("CustomTool@2x").image,
@@ -67,33 +77,108 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         public void Bind(AssetCheckResult result)
         {
-            switch (result.type)
-            {
-                case ResultType.AllPass:
-                    _typeImage.image = EditorGUIUtility.IconContent("TestPassed").image;
-                    break;
-                case ResultType.NotImportant:
-                    _typeImage.image = EditorGUIUtility.isProSkin
-                        ? EditorGUIUtility.IconContent("d_console.infoicon.sml@2x").image
-                        : EditorGUIUtility.IconContent("console.infoicon.sml@2x").image;
-                    break;
-                case ResultType.Warning:
-                    _typeImage.image = EditorGUIUtility.IconContent("Warning@2x").image;
-                    break;
-                case ResultType.Error:
-                    _typeImage.image = EditorGUIUtility.IconContent("Error@2x").image;
-                    break;
-                case ResultType.Exception:
-                    _typeImage.image = EditorGUIUtility.IconContent("CollabConflict").image;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(result.type), result.type, null);
-            }
+            _resultType = result.type;
+            UpdateTypeIcon();
 
             _label.text = result.title;
             _repairableImage.style.display = result.repairable
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
+        }
+
+        public void SetIconStyle(ResultIconStyle iconStyle)
+        {
+            IconStyle = iconStyle;
+            UpdateTypeIcon();
+        }
+
+        private void UpdateTypeIcon()
+        {
+            switch (_resultType)
+            {
+                case ResultType.AllPass:
+                    switch (IconStyle)
+                    {
+                        case ResultIconStyle.Style1:
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot3_pix16_gizmo").image;
+                            break;
+                        case ResultIconStyle.Style2:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_winbtn_mac_max@2x").image;
+                            break;
+                        case ResultIconStyle.Style3:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_greenLight").image;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(IconStyle), IconStyle, null);
+                    }
+                    break;
+                case ResultType.NotImportant:
+                    switch (IconStyle)
+                    {
+                        case ResultIconStyle.Style1:
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot1_pix16_gizmo").image;
+                            break;
+                        case ResultIconStyle.Style2:
+                            _typeImage.image = EditorGUIUtility.IconContent("winbtn_mac_inact@2x").image;
+                            break;
+                        case ResultIconStyle.Style3:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_lightRim").image;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(IconStyle), IconStyle, null);
+                    }
+                    break;
+                case ResultType.Warning:
+                    switch (IconStyle)
+                    {
+                        case ResultIconStyle.Style1:
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot4_pix16_gizmo").image;
+                            break;
+                        case ResultIconStyle.Style2:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_winbtn_mac_min@2x").image;
+                            break;
+                        case ResultIconStyle.Style3:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_orangeLight").image;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(IconStyle), IconStyle, null);
+                    }
+                    break;
+                case ResultType.Error:
+                    switch (IconStyle)
+                    {
+                        case ResultIconStyle.Style1:
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot6_pix16_gizmo").image;
+                            break;
+                        case ResultIconStyle.Style2:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_winbtn_mac_close@2x").image;
+                            break;
+                        case ResultIconStyle.Style3:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_redLight").image;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(IconStyle), IconStyle, null);
+                    }
+                    break;
+                case ResultType.Exception:
+                    switch (IconStyle)
+                    {
+                        case ResultIconStyle.Style1:
+                            _typeImage.image = EditorGUIUtility.IconContent("sv_icon_dot14_pix16_gizmo").image;
+                            break;
+                        case ResultIconStyle.Style2:
+                            _typeImage.image = EditorGUIUtility.IconContent("d_winbtn_mac_close_a@2x").image;
+                            break;
+                        case ResultIconStyle.Style3:
+                            _typeImage.image = EditorGUIUtility.IconContent("Error@2x").image;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(IconStyle), IconStyle, null);
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(_resultType), _resultType, null);
+            }
         }
     }
 }
