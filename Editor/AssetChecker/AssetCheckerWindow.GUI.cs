@@ -238,7 +238,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             // Restore values
             UpdateExecutionControls();
-            UpdateResultControls();
+            UpdateResultControls(true);
         }
 
         private void OnSettingsObjectChanged(ChangeEvent<UObject> evt)
@@ -300,7 +300,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _executeButton.SetEnabled(true);
         }
 
-        private void UpdateResultControls()
+        private void UpdateResultControls(bool clearSelection)
         {
             if (_resultStatsLabel == null ||
                 _resultListView == null ||
@@ -313,8 +313,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                $"Warning: {_stats.warning}  Not Important: {_stats.notImportant}  " +
                $"Exception: {_stats.exception}";
             _resultListView.Rebuild();
-            _resultListView.ClearSelection();
-            _resultDetailsView.ClearSelection();
+
+            if (clearSelection)
+            {
+                _resultListView.ClearSelection();
+                _resultDetailsView.ClearSelection();
+            }
         }
 
         private VisualElement MakeResultListItem()
@@ -338,16 +342,19 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void OnAssetRechecked(int index)
         {
-            LocalCache.SetCheckResults(_checkResults);
-            _resultListView.RefreshItem(index);
+            UpdateResultData();
+            UpdateResultControls(false);
         }
 
-        private void OnAssetRepaired(int index)
+        private void OnAssetRepaired(int index, bool success)
         {
-            LocalCache.SetCheckResults(_checkResults);
-            _checkResults.RemoveAt(index);
-            _resultListView.Rebuild();
-            _resultListView.ClearSelection();
+            if (success)
+            {
+                _checkResults.RemoveAt(index);
+            }
+
+            UpdateResultData();
+            UpdateResultControls(success);
         }
     }
 }

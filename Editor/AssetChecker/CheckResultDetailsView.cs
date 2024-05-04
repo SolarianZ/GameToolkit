@@ -17,7 +17,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private int _selectionIndex;
 
         public event Action<int> AssetRechecked;
-        public event Action<int> AssetRepaired;
+        public event Action<int, bool> AssetRepaired;
 
 
         public CheckResultDetailsView(IList<AssetCheckResult> results)
@@ -159,8 +159,19 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private void RecheckAsset()
         {
             AssetCheckResult result = _results[_selectionIndex];
-            AssetCheckResult newResult = result.checker.CheckAsset(result.asset);
-            _results[_selectionIndex] = newResult;
+            try
+            {
+                AssetCheckResult newResult = result.checker.CheckAsset(result.asset);
+                _results[_selectionIndex] = newResult;
+            }
+            catch (Exception e)
+            {
+                result.type = ResultType.Exception;
+                result.title = e.GetType().Name;
+                result.details = e.Message;
+                result.repairable = false;
+            }
+
             SelectResult(_selectionIndex);
 
             AssetRechecked?.Invoke(_selectionIndex);
@@ -169,12 +180,25 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private void RepairAsset()
         {
             AssetCheckResult result = _results[_selectionIndex];
-            if (result.checker.TryRepairAsset(result))
+            try
             {
-                int repairedIndex = _selectionIndex;
-                ClearSelection();
+                if (result.checker.TryRepairAsset(result))
+                {
+                    AssetRepaired?.Invoke(_selectionIndex, true);
+                }
+                else
+                {
+                    AssetRepaired?.Invoke(_selectionIndex, false);
+                }
+            }
+            catch (Exception e)
+            {
+                result.type = ResultType.Exception;
+                result.title = e.GetType().Name;
+                result.details = e.Message;
+                result.repairable = false;
 
-                AssetRepaired?.Invoke(repairedIndex);
+                AssetRepaired?.Invoke(_selectionIndex, false);
             }
         }
     }

@@ -73,7 +73,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (assets == null || assets.Count == 0)
             {
                 UpdateResultData();
-                UpdateResultControls();
+                UpdateResultControls(true);
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
 
             UpdateResultData();
-            UpdateResultControls();
+            UpdateResultControls(true);
 
             if (hasNullChecker)
             {
@@ -163,7 +163,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             _checkResults.Clear();
             UpdateResultData();
-            UpdateResultControls();
+            UpdateResultControls(true);
         }
 
         public AssetCheckerSettings GetSettingsAsset()
