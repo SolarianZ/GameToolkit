@@ -76,7 +76,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             _detailsLabel = new Label
             {
-                name = "DetailsLabel",
+                name = "SelectableDetailsLabel",
+                enableRichText = true,
                 style =
                 {
                     whiteSpace = WhiteSpace.Normal,
@@ -86,6 +87,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     marginBottom = 4,
                 }
             };
+            ((ITextSelection)_detailsLabel).isSelectable = true;
             detailsScrollView.contentContainer.Add(_detailsLabel);
 
             VisualElement buttonContainer = new VisualElement

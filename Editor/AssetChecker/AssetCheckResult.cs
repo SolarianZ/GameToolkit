@@ -3,13 +3,14 @@ using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
+    [Flags]
     public enum ResultType
     {
-        AllPass,
-        NotImportant,
-        Warning,
-        Error,
-        Exception,
+        AllPass = 1 << 0,
+        NotImportant = 1 << 1,
+        Warning = 1 << 2,
+        Error = 1 << 3,
+        Exception = 1 << 4,
     }
 
     [Serializable]
