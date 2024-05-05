@@ -249,12 +249,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             UpdateResultControls(true);
         }
 
-        private void OnSettingsObjectChanged(ChangeEvent<UObject> evt)
-        {
-            LocalCache.SetSettingsAsset(_settings);
-            UpdateExecutionControls();
-        }
-
         private void UpdateExecutionControls()
         {
             if (_executionHelpBox == null || _executeButton == null)
@@ -265,7 +259,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (!_settings)
             {
                 _executionHelpBox.messageType = HelpBoxMessageType.Error;
-                _executionHelpBox.text = "Please specify settings _asset.";
+                _executionHelpBox.text = "Please specify settings asset.";
                 _executionHelpBox.style.display = DisplayStyle.Flex;
                 _executeButton.SetEnabled(false);
                 return;
@@ -274,7 +268,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (!_settings.assetProvider)
             {
                 _executionHelpBox.messageType = HelpBoxMessageType.Error;
-                _executionHelpBox.text = "No _asset provider specified in the settings.";
+                _executionHelpBox.text = "No asset provider specified in the settings.";
                 _executionHelpBox.style.display = DisplayStyle.Flex;
                 _executeButton.SetEnabled(false);
                 return;
@@ -284,7 +278,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (checkers == null || checkers.Length == 0)
             {
                 _executionHelpBox.messageType = HelpBoxMessageType.Error;
-                _executionHelpBox.text = "No _asset checker specified in the settings.";
+                _executionHelpBox.text = "No asset checker specified in the settings.";
                 _executionHelpBox.style.display = DisplayStyle.Flex;
                 _executeButton.SetEnabled(false);
                 return;
@@ -296,7 +290,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 if (!checker)
                 {
                     _executionHelpBox.messageType = HelpBoxMessageType.Warning;
-                    _executionHelpBox.text = "There are null _asset checkers in the settings, please check.";
+                    _executionHelpBox.text = "There are null asset checkers in the settings, please check.";
                     _executionHelpBox.style.display = DisplayStyle.Flex;
                     return;
                 }
@@ -327,13 +321,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 _resultListView.ClearSelection();
                 _resultDetailsView.ClearSelection();
             }
-        }
-
-        private void OnResultTypeFilterChanged(ChangeEvent<System.Enum> evt)
-        {
-            LocalCache.SetCheckResultTypeFilter((CheckResultType)evt.newValue);
-            UpdateFilteredCheckResults();
-            UpdateResultControls(true);
         }
 
         private VisualElement MakeResultListItem()

@@ -73,6 +73,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     unityTextAlign = TextAnchor.MiddleLeft,
                 }
             };
+            ((ITextSelection)_titleLabel).isSelectable = true;
             labelContainer.Add(_titleLabel);
 
             _assetView = new ObjectView(this, false)

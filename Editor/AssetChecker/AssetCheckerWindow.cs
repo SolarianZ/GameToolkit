@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
@@ -15,9 +15,20 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
 
         [MenuItem("Tools/Bamboo/Asset Checker")]
-        public static void Open()
+        private static void Open()
         {
             GetWindow<AssetCheckerWindow>("AssetCheckerWindow");
+        }
+
+        public static AssetCheckerWindow Open(AssetCheckerSettings settings = null)
+        {
+            AssetCheckerWindow window = GetWindow<AssetCheckerWindow>("AssetCheckerWindow");
+            if (settings)
+            {
+                window.SetSettingsAsset(settings);
+            }
+
+            return window;
         }
 
         #endregion
@@ -51,11 +62,17 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         public void Execute()
         {
-            Assert.IsTrue(_settings);
+            if (!_settings)
+            {
+                string errorMessage = "Execute asset checker failed. Settings not specified.";
+                Debugger.LogError(errorMessage, this, LogTag);
+                EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
+                return;
+            }
 
             if (!_settings.assetProvider)
             {
-                string errorMessage = $"No _asset provider specified in the settings.";
+                string errorMessage = "Execute asset checker failed. Asset provider not specified in the settings.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
                 EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
                 return;
@@ -64,7 +81,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             AssetChecker[] checkers = _settings.assetCheckers;
             if (checkers == null || checkers.Length == 0)
             {
-                string errorMessage = $"No _asset checker specified in the settings.";
+                string errorMessage = "Execute asset checker failed. Asset checker not specified in the settings.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
                 EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
                 return;
@@ -123,7 +140,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             if (hasNullChecker)
             {
-                string errorMessage = $"There are null _asset checkers in the settings, please check.";
+                string errorMessage = "There are null asset checkers in the settings, please check.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
                 EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
             }
@@ -132,6 +149,13 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         public void SetCheckResultTypeFilter(CheckResultType filter)
         {
             _resultFilterField.value = filter;
+        }
+
+        private void OnResultTypeFilterChanged(ChangeEvent<Enum> evt)
+        {
+            LocalCache.SetCheckResultTypeFilter((CheckResultType)evt.newValue);
+            UpdateFilteredCheckResults();
+            UpdateResultControls(true);
         }
 
         public AssetCheckResult[] GetCheckResults()
@@ -157,10 +181,16 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _settingsField.value = settings;
         }
 
+        private void OnSettingsObjectChanged(ChangeEvent<UObject> evt)
+        {
+            LocalCache.SetSettingsAsset(_settings);
+            UpdateExecutionControls();
+        }
+
         public AssetCheckerSettings CreateSettingsAsset()
         {
-            string savePath = EditorUtility.SaveFilePanelInProject("Create new settings _asset",
-                nameof(AssetCheckerSettings), "_asset", null);
+            string savePath = EditorUtility.SaveFilePanelInProject("Create new settings asset",
+                nameof(AssetCheckerSettings), "asset", null);
             if (string.IsNullOrEmpty(savePath))
             {
                 return null;
@@ -171,6 +201,17 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             EditorGUIUtility.PingObject(settings);
 
             return settings;
+        }
+
+        public ResultIconStyle GetCheckResultIconStyle()
+        {
+            return LocalCache.GetCheckResultIconStyle();
+        }
+
+        public void SetCheckResultIconStyle(ResultIconStyle iconStyle)
+        {
+            LocalCache.SetCheckResultIconStyle(iconStyle);
+            _resultListView.Rebuild();
         }
 
         private void OnAssetRechecked(AssetCheckResult newResult, AssetCheckResult oldResult)

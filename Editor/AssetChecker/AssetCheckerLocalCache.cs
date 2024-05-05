@@ -30,7 +30,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         public void SetSettingsAsset(AssetCheckerSettings settings)
         {
             _settingsAsset = settings;
-
             Save(true);
         }
 
@@ -42,7 +41,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         public void SetCheckResults(IEnumerable<AssetCheckResult> checkResults)
         {
             _checkResults = checkResults?.ToArray() ?? Array.Empty<AssetCheckResult>();
-
             Save(true);
         }
 
