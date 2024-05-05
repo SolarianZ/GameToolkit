@@ -1,6 +1,5 @@
 ﻿using GBG.GameToolkit.Unity.Editor.GUI;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -17,6 +16,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private HelpBox _executionHelpBox;
         private Button _executeButton;
         private Label _resultStatsLabel;
+        private EnumFlagsField _resultFilterField;
         private ListView _resultListView;
         private CheckResultDetailsView _resultDetailsView;
 
@@ -194,6 +194,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             resultContainer.Pane1.Add(resultLabel);
 
+            // Filter
+            _resultFilterField = new EnumFlagsField(LocalCache.GetCheckResultTypeFilter());
+            _resultFilterField.RegisterValueChangedCallback(OnResultTypeFilterChanged);
+            _resultFilterField.SetEnabled(false); // TODO : Fix me
+            resultContainer.Pane1.Add(_resultFilterField);
+
             // Result List View
             _resultListView = new ListView
             {
@@ -260,7 +266,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (!_settings)
             {
                 _executionHelpBox.messageType = HelpBoxMessageType.Error;
-                _executionHelpBox.text = "Please specify settings asset.";
+                _executionHelpBox.text = "Please specify settings _asset.";
                 _executionHelpBox.style.display = DisplayStyle.Flex;
                 _executeButton.SetEnabled(false);
                 return;
@@ -269,7 +275,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (!_settings.assetProvider)
             {
                 _executionHelpBox.messageType = HelpBoxMessageType.Error;
-                _executionHelpBox.text = "No asset provider specified in the settings.";
+                _executionHelpBox.text = "No _asset provider specified in the settings.";
                 _executionHelpBox.style.display = DisplayStyle.Flex;
                 _executeButton.SetEnabled(false);
                 return;
@@ -279,7 +285,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             if (checkers == null || checkers.Length == 0)
             {
                 _executionHelpBox.messageType = HelpBoxMessageType.Error;
-                _executionHelpBox.text = "No asset checker specified in the settings.";
+                _executionHelpBox.text = "No _asset checker specified in the settings.";
                 _executionHelpBox.style.display = DisplayStyle.Flex;
                 _executeButton.SetEnabled(false);
                 return;
@@ -291,7 +297,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 if (!checker)
                 {
                     _executionHelpBox.messageType = HelpBoxMessageType.Warning;
-                    _executionHelpBox.text = "There are null asset checkers in the settings, please check.";
+                    _executionHelpBox.text = "There are null _asset checkers in the settings, please check.";
                     _executionHelpBox.style.display = DisplayStyle.Flex;
                     return;
                 }
@@ -324,6 +330,13 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
         }
 
+        private void OnResultTypeFilterChanged(ChangeEvent<System.Enum> evt)
+        {
+            LocalCache.SetCheckResultTypeFilter((CheckResultType)evt.newValue);
+            UpdateFilteredCheckResults();
+            UpdateResultControls(true);
+        }
+
         private VisualElement MakeResultListItem()
         {
             CheckResultEntryView item = new CheckResultEntryView();
@@ -334,7 +347,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             AssetCheckResult result = _checkResults[index];
             CheckResultEntryView item = (CheckResultEntryView)element;
-            item.IconStyle = LocalCache.GetCheckResultIconStyle();
             item.Bind(result);
         }
 

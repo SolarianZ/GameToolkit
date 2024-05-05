@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Search;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UObject = UnityEngine.Object;
 
@@ -9,6 +9,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
     public class CheckResultDetailsView : VisualElement
     {
+        private readonly Label _typeLabel;
         private readonly Label _titleLabel;
         private readonly ObjectView _assetView;
         private readonly ObjectView _checkerView;
@@ -27,7 +28,41 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _results = results;
             style.flexGrow = 1;
 
-            const float ButtonHeight = 28;
+            VisualElement labelContainer = new VisualElement
+            {
+                name = "LabelContainer",
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    marginLeft = 4,
+                    marginRight = 4,
+                    marginTop = 4,
+                    marginBottom = 4,
+                    overflow = Overflow.Hidden,
+                }
+            };
+            Add(labelContainer);
+
+            _typeLabel = new Label
+            {
+                name = "TypeLabel",
+                text = "-",
+                style =
+                {
+                    paddingLeft= 2,
+                    paddingRight= 2,
+                    borderLeftWidth = 2,
+                    borderRightWidth = 2,
+                    borderTopWidth = 2,
+                    borderBottomWidth = 2,
+                    borderTopLeftRadius = 4,
+                    borderTopRightRadius = 4,
+                    borderBottomLeftRadius = 4,
+                    borderBottomRightRadius = 4,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                }
+            };
+            labelContainer.Add(_typeLabel);
 
             _titleLabel = new Label
             {
@@ -35,14 +70,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 style =
                 {
                     marginLeft = 4,
-                    marginRight = 4,
-                    marginTop = 4,
-                    marginBottom = 4,
+                    unityTextAlign = TextAnchor.MiddleLeft,
                 }
             };
-            Add(_titleLabel);
+            labelContainer.Add(_titleLabel);
 
-            _assetView = new ObjectView("Asset")
+            _assetView = new ObjectView(this, false)
             {
                 name = "AssetView",
                 style =
@@ -53,7 +86,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             Add(_assetView);
 
-            _checkerView = new ObjectView("Checker")
+            _checkerView = new ObjectView(this, true)
             {
                 name = "CheckerView",
                 style =
@@ -70,6 +103,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 style =
                 {
                     flexGrow = 1,
+                    marginTop = 8,
                 }
             };
             Add(detailsScrollView);
@@ -90,6 +124,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             ((ITextSelection)_detailsLabel).isSelectable = true;
             detailsScrollView.contentContainer.Add(_detailsLabel);
 
+            const float ButtonHeight = 28;
             VisualElement buttonContainer = new VisualElement
             {
                 name = "ButtonContainer",
@@ -142,9 +177,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 return;
             }
 
+            UpdateResultTypeBorderColor(result.type);
+            _typeLabel.text = ObjectNames.NicifyVariableName(result.type.ToString());
             _titleLabel.text = result.title;
-            _assetView.SetAsset(result.asset);
-            _checkerView.SetAsset(result.checker);
+            _assetView.UpdateView();
+            _checkerView.UpdateView();
             _detailsLabel.text = result.details;
             _recheckButton.SetEnabled(result.asset && result.checker);
             _repairButton.SetEnabled(result.repairable);
@@ -154,12 +191,23 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             _selectionIndex = -1;
 
+            UpdateResultTypeBorderColor(CheckResultType.NotImportant);
+            _typeLabel.text = "-";
             _titleLabel.text = "-";
             _detailsLabel.text = "-";
-            _assetView.SetAsset(null);
-            _checkerView.SetAsset(null);
+            _assetView.UpdateView();
+            _checkerView.UpdateView();
             _recheckButton.SetEnabled(false);
             _repairButton.SetEnabled(false);
+        }
+
+        private void UpdateResultTypeBorderColor(CheckResultType resultType)
+        {
+            Color color = resultType.GetResultTypeBorderColor();
+            _typeLabel.style.borderLeftColor = color;
+            _typeLabel.style.borderRightColor = color;
+            _typeLabel.style.borderTopColor = color;
+            _typeLabel.style.borderBottomColor = color;
         }
 
         private void RecheckAsset()
@@ -172,7 +220,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
             catch (Exception e)
             {
-                result.type = ResultType.Exception;
+                result.type = CheckResultType.Exception;
                 result.title = e.GetType().Name;
                 result.details = e.Message;
                 result.repairable = false;
@@ -200,7 +248,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
             catch (Exception e)
             {
-                result.type = ResultType.Exception;
+                result.type = CheckResultType.Exception;
                 result.title = e.GetType().Name;
                 result.details = e.Message;
                 result.repairable = false;
@@ -214,36 +262,66 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         public class ObjectView : VisualElement
         {
-            private readonly ObjectField _assetField;
+            private readonly Image _objectIconImage;
+            private readonly Label _objectPathLabel;
             private readonly Button _pingAssetButton;
+            private readonly CheckResultDetailsView _owner;
+            private readonly bool _isCheckerView;
 
-            public ObjectView(string label)
+
+            public ObjectView(CheckResultDetailsView owner, bool isCheckerView)
             {
+                _owner = owner;
+                _isCheckerView = isCheckerView;
                 style.flexDirection = FlexDirection.Row;
 
-                Label assetLabel = new Label
+                Label objectLabel = new Label
                 {
-                    name = "AssetLabel",
-                    text = label,
+                    name = "ObjectLabel",
+                    text = isCheckerView ? "Checker" : "Asset",
                     style =
                     {
-                        width = 60,
-                        minWidth = 60,
-                        maxWidth = 60,
+                        width = 52,
+                        minWidth = 52,
+                        maxWidth = 52,
+                        paddingRight = 4,
+                        unityTextAlign = TextAnchor.MiddleRight,
                     },
                 };
-                Add(assetLabel);
+                Add(objectLabel);
 
-                _assetField = new ObjectField
+                const float ObjectIconSize = 20;
+                _objectIconImage = new Image
                 {
-                    name = "AssetField",
+                    name = "ObjectIconImage",
+                    style =
+                    {
+                        width = ObjectIconSize,
+                        minWidth = ObjectIconSize,
+                        maxWidth = ObjectIconSize,
+                        height = ObjectIconSize,
+                        minHeight = ObjectIconSize,
+                        maxHeight = ObjectIconSize,
+                    }
+                };
+                Add(_objectIconImage);
+
+                _objectPathLabel = new Label
+                {
+                    name = "ObjectPathLabel",
+                    text = "-",
                     style =
                     {
                         flexGrow = 1,
+                        flexShrink = 1,
+                        marginLeft = 4,
+                        overflow = Overflow.Hidden,
+                        unityFontStyleAndWeight = FontStyle.Italic,
+                        unityTextAlign = TextAnchor.MiddleLeft,
                     }
                 };
-                _assetField.SetEnabled(false);
-                Add(_assetField);
+                ((ITextSelection)_objectPathLabel).isSelectable = true;
+                Add(_objectPathLabel);
 
                 _pingAssetButton = new Button(PingAsset)
                 {
@@ -254,17 +332,44 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 Add(_pingAssetButton);
             }
 
-            public void SetAsset(UObject asset)
+            public void UpdateView()
             {
-                _assetField.value = asset;
-                _pingAssetButton.SetEnabled(asset);
+                UObject target = null;
+                if (_owner._selectionIndex != -1)
+                {
+                    target = _isCheckerView
+                        ? _owner._results[_owner._selectionIndex].checker
+                        : _owner._results[_owner._selectionIndex].asset;
+                }
+
+                _pingAssetButton.SetEnabled(target);
+
+                if (target)
+                {
+                    string targetPath = AssetDatabase.GetAssetPath(target);
+                    _objectPathLabel.text = targetPath;
+                    _objectIconImage.image = AssetDatabase.GetCachedIcon(targetPath);
+                }
+                else
+                {
+                    _objectPathLabel.text = "-";
+                    _objectIconImage.image = EditorGUIUtility.isProSkin
+                        ? EditorGUIUtility.IconContent("d_GameObject Icon").image
+                        : EditorGUIUtility.IconContent("GameObject Icon").image;
+                }
             }
 
             private void PingAsset()
             {
-                if (_assetField.value)
+                if (_owner._selectionIndex != -1)
                 {
-                    EditorGUIUtility.PingObject(_assetField.value);
+                    UObject target = _isCheckerView
+                        ? _owner._results[_owner._selectionIndex].checker
+                        : _owner._results[_owner._selectionIndex].asset;
+                    if (target)
+                    {
+                        EditorGUIUtility.PingObject(target);
+                    }
                 }
             }
         }

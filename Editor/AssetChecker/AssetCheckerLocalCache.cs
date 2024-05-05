@@ -17,7 +17,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
         [SerializeField]
-        private ResultType _resultTypeFilter = (ResultType)~0U;
+        private CheckResultType _resultTypeFilter = (CheckResultType)~0U;
         [SerializeField]
         private ResultIconStyle _resultIconStyle = ResultIconStyle.Style2;
 
@@ -46,12 +46,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             Save(true);
         }
 
-        public ResultType GetCheckResultTypeFilter()
+        public CheckResultType GetCheckResultTypeFilter()
         {
             return _resultTypeFilter;
         }
 
-        public void SetCheckResultTypeFilter(ResultType filter)
+        public void SetCheckResultTypeFilter(CheckResultType filter)
         {
             _resultTypeFilter = filter;
             Save(true);

@@ -55,7 +55,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             if (!_settings.assetProvider)
             {
-                string errorMessage = $"No asset provider specified in the settings.";
+                string errorMessage = $"No _asset provider specified in the settings.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
                 EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
                 return;
@@ -64,7 +64,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             AssetChecker[] checkers = _settings.assetCheckers;
             if (checkers == null || checkers.Length == 0)
             {
-                string errorMessage = $"No asset checker specified in the settings.";
+                string errorMessage = $"No _asset checker specified in the settings.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
                 EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
                 return;
@@ -105,7 +105,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     {
                         AssetCheckResult result = new AssetCheckResult
                         {
-                            type = ResultType.Exception,
+                            type = CheckResultType.Exception,
                             title = e.GetType().Name,
                             details = e.Message,
                             asset = asset,
@@ -123,54 +123,15 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             if (hasNullChecker)
             {
-                string errorMessage = $"There are null asset checkers in the settings, please check.";
+                string errorMessage = $"There are null _asset checkers in the settings, please check.";
                 Debugger.LogError(errorMessage, _settings, LogTag);
                 EditorUtility.DisplayDialog("Error", errorMessage, "Ok");
             }
         }
 
-        public void SetCheckResultTypeFilter(ResultType filter)
+        public void SetCheckResultTypeFilter(CheckResultType filter)
         {
-            if (filter == LocalCache.GetCheckResultTypeFilter())
-            {
-                return;
-            }
-
-            LocalCache.SetCheckResultTypeFilter(filter);
-            UpdateFilteredCheckResults();
-            UpdateResultControls(true);
-        }
-
-        private void UpdatePersistentResultData()
-        {
-            _stats.Reset();
-            for (int i = 0; i < _checkResults.Count; i++)
-            {
-                AssetCheckResult result = _checkResults[i];
-                switch (result.type)
-                {
-                    case ResultType.AllPass:
-                        _stats.allPass++;
-                        break;
-                    case ResultType.NotImportant:
-                        _stats.notImportant++;
-                        break;
-                    case ResultType.Warning:
-                        _stats.warning++;
-                        break;
-                    case ResultType.Error:
-                        _stats.error++;
-                        break;
-                    case ResultType.Exception:
-                        _stats.exception++;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(result.type), result.type, null);
-                }
-            }
-
-            LocalCache.SetCheckResultStats(_stats);
-            LocalCache.SetCheckResults(_checkResults);
+            _resultFilterField.value = filter;
         }
 
         public AssetCheckResult[] GetCheckResults()
@@ -198,8 +159,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         public AssetCheckerSettings CreateSettingsAsset()
         {
-            string savePath = EditorUtility.SaveFilePanelInProject("Create new settings asset",
-                nameof(AssetCheckerSettings), "asset", null);
+            string savePath = EditorUtility.SaveFilePanelInProject("Create new settings _asset",
+                nameof(AssetCheckerSettings), "_asset", null);
             if (string.IsNullOrEmpty(savePath))
             {
                 return null;
@@ -238,9 +199,41 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             UpdateResultControls(success);
         }
 
+        private void UpdatePersistentResultData()
+        {
+            _stats.Reset();
+            for (int i = 0; i < _checkResults.Count; i++)
+            {
+                AssetCheckResult result = _checkResults[i];
+                switch (result.type)
+                {
+                    case CheckResultType.AllPass:
+                        _stats.allPass++;
+                        break;
+                    case CheckResultType.NotImportant:
+                        _stats.notImportant++;
+                        break;
+                    case CheckResultType.Warning:
+                        _stats.warning++;
+                        break;
+                    case CheckResultType.Error:
+                        _stats.error++;
+                        break;
+                    case CheckResultType.Exception:
+                        _stats.exception++;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(result.type), result.type, null);
+                }
+            }
+
+            LocalCache.SetCheckResultStats(_stats);
+            LocalCache.SetCheckResults(_checkResults);
+        }
+
         private void UpdateFilteredCheckResults()
         {
-            ResultType filter = LocalCache.GetCheckResultTypeFilter();
+            CheckResultType filter = LocalCache.GetCheckResultTypeFilter();
             _filteredCheckResults.Clear();
             for (int i = 0; i < _checkResults.Count; i++)
             {
