@@ -173,13 +173,18 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             return settings;
         }
 
-        private void OnAssetRechecked(int index)
+        private void OnAssetRechecked(AssetCheckResult newResult, AssetCheckResult oldResult)
         {
             bool clearSelection = false;
-            if (_checkResults[index] == null)
+            if (newResult == null)
             {
-                _checkResults.RemoveAt(index);
+                _checkResults.Remove(oldResult);
                 clearSelection = true;
+            }
+            else
+            {
+                int resultIndex = _checkResults.IndexOf(oldResult);
+                _checkResults[resultIndex] = newResult;
             }
 
             UpdatePersistentResultData();
@@ -187,16 +192,16 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             UpdateResultControls(clearSelection);
         }
 
-        private void OnAssetRepaired(int index, bool success)
+        private void OnAssetRepaired(AssetCheckResult newResult, bool allIssuesRepaired)
         {
-            if (success)
+            if (allIssuesRepaired)
             {
-                _checkResults.RemoveAt(index);
+                _checkResults.Remove(newResult);
             }
 
             UpdatePersistentResultData();
             UpdateFilteredCheckResults();
-            UpdateResultControls(success);
+            UpdateResultControls(allIssuesRepaired);
         }
 
         private void UpdatePersistentResultData()

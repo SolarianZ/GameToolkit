@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,6 +6,9 @@ using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
+    public delegate void AssetRecheckedHandler(AssetCheckResult newResult, AssetCheckResult oldResult);
+    public delegate void AssetRepairedHandler(AssetCheckResult result, bool allIssuesRepaired);
+
     public class CheckResultDetailsView : VisualElement
     {
         private readonly Label _typeLabel;
@@ -16,16 +18,14 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private readonly Label _detailsLabel;
         private readonly Button _recheckButton;
         private readonly Button _repairButton;
-        private readonly IList<AssetCheckResult> _results;
-        private int _selectionIndex;
+        private AssetCheckResult _selectedResult;
 
-        public event Action<int> AssetRechecked;
-        public event Action<int, bool> AssetRepaired;
+        public event AssetRecheckedHandler AssetRechecked;
+        public event AssetRepairedHandler AssetRepaired;
 
 
-        public CheckResultDetailsView(IList<AssetCheckResult> results)
+        public CheckResultDetailsView()
         {
-            _results = results;
             style.flexGrow = 1;
 
             VisualElement labelContainer = new VisualElement
@@ -161,35 +161,28 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             buttonContainer.Add(_repairButton);
         }
 
-        public void SelectResult(int index)
+        public void SelectResult(AssetCheckResult selectedResult)
         {
-            _selectionIndex = index;
-            if (_selectionIndex == -1)
+            _selectedResult = selectedResult;
+            if (_selectedResult == null)
             {
                 ClearSelection();
                 return;
             }
 
-            AssetCheckResult result = _results[_selectionIndex];
-            if (result == null)
-            {
-                ClearSelection();
-                return;
-            }
-
-            UpdateResultTypeBorderColor(result.type);
-            _typeLabel.text = ObjectNames.NicifyVariableName(result.type.ToString());
-            _titleLabel.text = result.title;
+            UpdateResultTypeBorderColor(_selectedResult.type);
+            _typeLabel.text = ObjectNames.NicifyVariableName(_selectedResult.type.ToString());
+            _titleLabel.text = _selectedResult.title;
             _assetView.UpdateView();
             _checkerView.UpdateView();
-            _detailsLabel.text = result.details;
-            _recheckButton.SetEnabled(result.asset && result.checker);
-            _repairButton.SetEnabled(result.repairable);
+            _detailsLabel.text = _selectedResult.details;
+            _recheckButton.SetEnabled(_selectedResult.asset && _selectedResult.checker);
+            _repairButton.SetEnabled(_selectedResult.repairable);
         }
 
         public void ClearSelection()
         {
-            _selectionIndex = -1;
+            _selectedResult = null;
 
             UpdateResultTypeBorderColor(CheckResultType.NotImportant);
             _typeLabel.text = "-";
@@ -212,50 +205,54 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void RecheckAsset()
         {
-            AssetCheckResult result = _results[_selectionIndex];
+            AssetCheckResult oldResult = _selectedResult;
+            AssetCheckResult newResult;
             try
             {
-                AssetCheckResult newResult = result.checker.CheckAsset(result.asset);
-                _results[_selectionIndex] = newResult;
+                newResult = oldResult.checker.CheckAsset(oldResult.asset);
             }
             catch (Exception e)
             {
-                result.type = CheckResultType.Exception;
-                result.title = e.GetType().Name;
-                result.details = e.Message;
-                result.repairable = false;
+                newResult = new AssetCheckResult
+                {
+                    type = CheckResultType.Exception,
+                    title = e.GetType().Name,
+                    details = e.Message,
+                    asset = oldResult.asset,
+                    checker = oldResult.checker,
+                    repairable = false,
+                };
             }
 
-            SelectResult(_selectionIndex);
+            SelectResult(newResult);
 
-            AssetRechecked?.Invoke(_selectionIndex);
+            AssetRechecked?.Invoke(newResult, oldResult);
         }
 
         private void RepairAsset()
         {
-            AssetCheckResult result = _results[_selectionIndex];
             try
             {
-                result.checker.RepairAsset(result, out bool allIssuesRepaired);
+                _selectedResult.checker.RepairAsset(_selectedResult, out bool allIssuesRepaired);
                 if (allIssuesRepaired)
                 {
-                    AssetRepaired?.Invoke(_selectionIndex, true);
+                    AssetRepaired?.Invoke(_selectedResult, true);
                 }
                 else
                 {
-                    AssetRepaired?.Invoke(_selectionIndex, false);
+                    AssetRepaired?.Invoke(_selectedResult, false);
                 }
             }
             catch (Exception e)
             {
-                result.type = CheckResultType.Exception;
-                result.title = e.GetType().Name;
-                result.details = e.Message;
-                result.repairable = false;
+                _selectedResult.type = CheckResultType.Exception;
+                _selectedResult.title = e.GetType().Name;
+                _selectedResult.details = e.Message;
+                _selectedResult.repairable = false;
 
-                SelectResult(_selectionIndex);
+                SelectResult(_selectedResult);
 
-                AssetRepaired?.Invoke(_selectionIndex, false);
+                AssetRepaired?.Invoke(_selectedResult, false);
             }
         }
 
@@ -335,11 +332,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             public void UpdateView()
             {
                 UObject target = null;
-                if (_owner._selectionIndex != -1)
+                if (_owner._selectedResult != null)
                 {
                     target = _isCheckerView
-                        ? _owner._results[_owner._selectionIndex].checker
-                        : _owner._results[_owner._selectionIndex].asset;
+                        ? _owner._selectedResult.checker
+                        : _owner._selectedResult.asset;
                 }
 
                 _pingAssetButton.SetEnabled(target);
@@ -361,11 +358,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             private void PingAsset()
             {
-                if (_owner._selectionIndex != -1)
+                if (_owner._selectedResult != null)
                 {
                     UObject target = _isCheckerView
-                        ? _owner._results[_owner._selectionIndex].checker
-                        : _owner._results[_owner._selectionIndex].asset;
+                        ? _owner._selectedResult.checker
+                        : _owner._selectedResult.asset;
                     if (target)
                     {
                         EditorGUIUtility.PingObject(target);

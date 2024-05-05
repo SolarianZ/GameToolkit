@@ -197,7 +197,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             // Filter
             _resultFilterField = new EnumFlagsField(LocalCache.GetCheckResultTypeFilter());
             _resultFilterField.RegisterValueChangedCallback(OnResultTypeFilterChanged);
-            _resultFilterField.SetEnabled(false); // TODO : Fix me
             resultContainer.Pane1.Add(_resultFilterField);
 
             // Result List View
@@ -231,7 +230,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             resultContainer.Pane2.Add(detailsLabel);
 
             // Details View
-            _resultDetailsView = new CheckResultDetailsView(_checkResults)
+            _resultDetailsView = new CheckResultDetailsView
             {
                 name = "CheckResultDetailsView",
             };
@@ -345,15 +344,15 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void BindResultListItem(VisualElement element, int index)
         {
-            AssetCheckResult result = _checkResults[index];
+            AssetCheckResult result = _filteredCheckResults[index];
             CheckResultEntryView item = (CheckResultEntryView)element;
             item.Bind(result);
         }
 
         private void OnCheckResultSelectionChanged(IEnumerable<int> selectedIndices)
         {
-            int index = _resultListView.selectedIndex;
-            _resultDetailsView.SelectResult(index);
+            AssetCheckResult result = (AssetCheckResult)_resultListView.selectedItem;
+            _resultDetailsView.SelectResult(result);
         }
     }
 }
