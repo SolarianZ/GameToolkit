@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,8 +12,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
     public class CheckResultDetailsView : VisualElement
     {
-        private readonly Label _typeLabel;
         private readonly Label _titleLabel;
+        private readonly Label _typeLabel;
+        private readonly Label _categoriesLabel;
         private readonly ObjectView _assetView;
         private readonly ObjectView _checkerView;
         private readonly Label _detailsLabel;
@@ -28,12 +30,29 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         {
             style.flexGrow = 1;
 
-            VisualElement labelContainer = new VisualElement
+            _titleLabel = new Label
+            {
+                name = "TitleLabel",
+                style =
+                {
+                    marginLeft = 4,
+                    marginRight = 4,
+                    marginTop = 4,
+                    marginBottom = 4,
+                    fontSize = 15,
+                    unityTextAlign = TextAnchor.MiddleLeft,
+                }
+            };
+            ((ITextSelection)_titleLabel).isSelectable = true;
+            Add(_titleLabel);
+
+            VisualElement typeContainer = new VisualElement
             {
                 name = "LabelContainer",
                 style =
                 {
                     flexDirection = FlexDirection.Row,
+                    flexWrap = Wrap.Wrap,
                     marginLeft = 4,
                     marginRight = 4,
                     marginTop = 4,
@@ -41,7 +60,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     overflow = Overflow.Hidden,
                 }
             };
-            Add(labelContainer);
+            Add(typeContainer);
 
             _typeLabel = new Label
             {
@@ -49,6 +68,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 text = "-",
                 style =
                 {
+                    marginRight = 4,
                     paddingLeft= 2,
                     paddingRight= 2,
                     borderLeftWidth = 2,
@@ -62,19 +82,20 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     unityTextAlign = TextAnchor.MiddleCenter,
                 }
             };
-            labelContainer.Add(_typeLabel);
+            ((ITextSelection)_typeLabel).isSelectable = true;
+            typeContainer.Add(_typeLabel);
 
-            _titleLabel = new Label
+            _categoriesLabel = new Label
             {
-                name = "TitleLabel",
+                name = "CategoriesLabel",
                 style =
                 {
-                    marginLeft = 4,
                     unityTextAlign = TextAnchor.MiddleLeft,
+                    whiteSpace = WhiteSpace.Normal,
                 }
             };
-            ((ITextSelection)_titleLabel).isSelectable = true;
-            labelContainer.Add(_titleLabel);
+            ((ITextSelection)_categoriesLabel).isSelectable = true;
+            typeContainer.Add(_categoriesLabel);
 
             _assetView = new ObjectView(this, false)
             {
@@ -83,6 +104,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 {
                     marginLeft = 4,
                     marginRight = 4,
+                    marginBottom = 1,
                 }
             };
             Add(_assetView);
@@ -94,6 +116,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 {
                     marginLeft = 4,
                     marginRight = 4,
+                    marginTop = 1,
                 }
             };
             Add(_checkerView);
@@ -172,8 +195,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
 
             UpdateResultTypeBorderColor(_selectedResult.type);
-            _typeLabel.text = ObjectNames.NicifyVariableName(_selectedResult.type.ToString());
             _titleLabel.text = _selectedResult.title;
+            _typeLabel.text = ObjectNames.NicifyVariableName(_selectedResult.type.ToString());
+            _categoriesLabel.text = FormatCategories(_selectedResult.categories);
             _assetView.UpdateView();
             _checkerView.UpdateView();
             _detailsLabel.text = _selectedResult.details;
@@ -187,12 +211,37 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             UpdateResultTypeBorderColor(CheckResultType.NotImportant);
             _typeLabel.text = "-";
+            _categoriesLabel.text = null;
             _titleLabel.text = "-";
             _detailsLabel.text = "-";
             _assetView.UpdateView();
             _checkerView.UpdateView();
             _recheckButton.SetEnabled(false);
             _repairButton.SetEnabled(false);
+        }
+
+        private string FormatCategories(string[] categories)
+        {
+            if (categories == null || categories.Length == 0)
+            {
+                return null;
+            }
+
+            StringBuilder builder = new StringBuilder(categories[0].Length);
+            builder.Append(categories[0]);
+
+            for (int i = 1; i < categories.Length; i++)
+            {
+                string category = categories[i];
+                if (string.IsNullOrEmpty(category))
+                {
+                    continue;
+                }
+
+                builder.Append(" | ").Append(category.Trim());
+            }
+
+            return builder.ToString();
         }
 
         private void UpdateResultTypeBorderColor(CheckResultType resultType)
@@ -217,6 +266,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 newResult = new AssetCheckResult
                 {
                     type = CheckResultType.Exception,
+                    categories = new string[] { "Exception" },
                     title = e.GetType().Name,
                     details = e.Message,
                     asset = oldResult.asset,
@@ -272,6 +322,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 _owner = owner;
                 _isCheckerView = isCheckerView;
                 style.flexDirection = FlexDirection.Row;
+                style.flexWrap = Wrap.Wrap;
 
                 Label objectLabel = new Label
                 {
@@ -294,6 +345,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     name = "ObjectIconImage",
                     style =
                     {
+                        alignSelf = Align.Center,
                         width = ObjectIconSize,
                         minWidth = ObjectIconSize,
                         maxWidth = ObjectIconSize,
@@ -316,6 +368,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         overflow = Overflow.Hidden,
                         unityFontStyleAndWeight = FontStyle.Italic,
                         unityTextAlign = TextAnchor.MiddleLeft,
+                        whiteSpace = WhiteSpace.Normal,
                     }
                 };
                 ((ITextSelection)_objectPathLabel).isSelectable = true;

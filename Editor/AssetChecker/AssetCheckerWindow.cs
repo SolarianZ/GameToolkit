@@ -123,6 +123,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         AssetCheckResult result = new AssetCheckResult
                         {
                             type = CheckResultType.Exception,
+                            categories = new string[] { "Exception" },
                             title = e.GetType().Name,
                             details = e.Message,
                             asset = asset,

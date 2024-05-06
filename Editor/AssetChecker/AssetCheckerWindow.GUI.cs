@@ -182,18 +182,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             #region Result List
 
-            // Label
-            Label resultLabel = new Label("Results")
-            {
-                name = "ResultLabel",
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                    marginBottom = 2,
-                }
-            };
-            resultContainer.Pane1.Add(resultLabel);
-
             // Filter
             _resultFilterField = new EnumFlagsField(LocalCache.GetCheckResultTypeFilter());
             _resultFilterField.RegisterValueChangedCallback(OnResultTypeFilterChanged);
@@ -216,18 +204,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
 
             #region Result Details
-
-            // Label
-            Label detailsLabel = new Label("Details")
-            {
-                name = "DetailsLabel",
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                    marginBottom = 2,
-                }
-            };
-            resultContainer.Pane2.Add(detailsLabel);
 
             // Details View
             _resultDetailsView = new CheckResultDetailsView

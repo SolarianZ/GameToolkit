@@ -7,6 +7,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
     public class AssetCheckResult
     {
         public CheckResultType type;
+        public string[] categories;
         public string title;
         public string details;
         public UObject asset;
