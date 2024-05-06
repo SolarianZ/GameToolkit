@@ -13,5 +13,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         public UObject asset;
         public AssetChecker checker;
         public bool repairable;
+        public string customViewId;
     }
 }

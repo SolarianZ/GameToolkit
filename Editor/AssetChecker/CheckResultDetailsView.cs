@@ -17,10 +17,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private readonly Label _categoriesLabel;
         private readonly ObjectView _assetView;
         private readonly ObjectView _checkerView;
+        private readonly ScrollView _detailsScrollView;
         private readonly Label _detailsLabel;
         private readonly Button _recheckButton;
         private readonly Button _repairButton;
         private AssetCheckResult _selectedResult;
+        private CustomDetailsView _customDetailsView;
 
         public event AssetRecheckedHandler AssetRechecked;
         public event AssetRepairedHandler AssetRepaired;
@@ -121,7 +123,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             Add(_checkerView);
 
-            ScrollView detailsScrollView = new ScrollView
+            _detailsScrollView = new ScrollView
             {
                 name = "DetailsScrollView",
                 style =
@@ -130,7 +132,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     marginTop = 8,
                 }
             };
-            Add(detailsScrollView);
+            Add(_detailsScrollView);
 
             _detailsLabel = new Label
             {
@@ -146,7 +148,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 }
             };
             ((ITextSelection)_detailsLabel).isSelectable = true;
-            detailsScrollView.contentContainer.Add(_detailsLabel);
+            _detailsScrollView.contentContainer.Add(_detailsLabel);
 
             const float ButtonHeight = 28;
             VisualElement buttonContainer = new VisualElement
@@ -200,7 +202,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _categoriesLabel.text = FormatCategories(_selectedResult.categories);
             _assetView.UpdateView();
             _checkerView.UpdateView();
-            _detailsLabel.text = _selectedResult.details;
+            UpdateDetailsView();
             _recheckButton.SetEnabled(_selectedResult.asset && _selectedResult.checker);
             _repairButton.SetEnabled(_selectedResult.repairable);
         }
@@ -213,6 +215,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _typeLabel.text = "-";
             _categoriesLabel.text = null;
             _titleLabel.text = "-";
+            _detailsScrollView.contentContainer.Clear();
             _detailsLabel.text = "-";
             _assetView.UpdateView();
             _checkerView.UpdateView();
@@ -253,6 +256,39 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             _typeLabel.style.borderBottomColor = color;
         }
 
+        private void UpdateDetailsView()
+        {
+            _detailsScrollView.contentContainer.Clear();
+
+            if (_customDetailsView != null &&
+                _customDetailsView.CustomViewId == _selectedResult.customViewId)
+            {
+                _customDetailsView.Bind(_selectedResult);
+                _detailsScrollView.contentContainer.Add(_customDetailsView);
+                return;
+            }
+
+            _customDetailsView = null;
+            CustomViewProvider customViewProvider = AssetCheckerLocalCache.instance.InstantCustomViewProvider;
+            if (!string.IsNullOrEmpty(_selectedResult.customViewId) && customViewProvider)
+            {
+                _customDetailsView = customViewProvider.GetDetailsView(_selectedResult.customViewId);
+                if (_customDetailsView != null)
+                {
+                    Debugger.Assert(_customDetailsView.CustomViewId == _selectedResult.customViewId, null);
+                    _customDetailsView.Bind(_selectedResult);
+                    _detailsScrollView.contentContainer.Add(_customDetailsView);
+                    return;
+                }
+
+                Debugger.LogError($"can not find custom details view of id {_selectedResult.customViewId}",
+                    customViewProvider, AssetCheckerWindow.LogTag);
+            }
+
+            _detailsLabel.text = _selectedResult.details;
+            _detailsScrollView.contentContainer.Add(_detailsLabel);
+        }
+
         private void RecheckAsset()
         {
             AssetCheckResult oldResult = _selectedResult;
@@ -272,6 +308,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     asset = oldResult.asset,
                     checker = oldResult.checker,
                     repairable = false,
+                    customViewId = null,
                 };
             }
 

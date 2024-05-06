@@ -21,6 +21,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private ResultIconStyle _resultIconStyle = ResultIconStyle.Style2;
 
+        public CustomViewProvider InstantCustomViewProvider { get; set; }
+
 
         public AssetCheckerSettings GetSettingsAsset()
         {

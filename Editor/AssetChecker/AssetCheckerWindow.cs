@@ -11,7 +11,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
     {
         #region Static
 
-        const string LogTag = "AssetChecker";
+        internal const string LogTag = "AssetChecker";
 
 
         [MenuItem("Tools/Bamboo/Asset Checker")]
@@ -54,6 +54,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void OnFocus()
         {
+            LocalCache.InstantCustomViewProvider = _settings?.customViewProvider;
             UpdateExecutionControls();
         }
 
@@ -129,6 +130,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                             asset = asset,
                             checker = checker,
                             repairable = false,
+                            customViewId = null,
                         };
                         _checkResults.Add(result);
                     }
