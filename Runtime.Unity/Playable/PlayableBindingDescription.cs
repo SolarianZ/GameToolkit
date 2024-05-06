@@ -36,7 +36,7 @@ namespace GBG.GameToolkit.Unity
             Refresh();
         }
 
-        private void Start()
+        private void OnEnable()
         {
             Refresh();
         }
