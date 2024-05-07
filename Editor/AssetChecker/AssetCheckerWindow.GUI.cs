@@ -19,7 +19,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private DropdownField _resultCategoryFilterField;
         private ListView _resultListView;
         private CheckResultDetailsView _resultDetailsView;
-        private bool _isGuiCreated;
 
         #endregion
 
@@ -233,7 +232,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             // SelectResult properties
             root.Bind(new SerializedObject(this));
-            _isGuiCreated = true;
 
             // Restore values
             UpdateExecutionControls();
@@ -242,7 +240,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void UpdateExecutionControls()
         {
-            if (!_isGuiCreated)
+            if (_executionHelpBox == null || _executeButton == null)
             {
                 return;
             }
@@ -295,13 +293,15 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void UpdateResultControls(bool clearSelection)
         {
-            if (!_isGuiCreated)
+            if (_resultStatsLabel == null ||
+                _resultListView == null ||
+                _resultDetailsView == null)
             {
                 return;
             }
 
-            _resultStatsLabel.text = $"Total: {_stats.GetTotal()}  Error: {_stats.error}  " +
-               $"Warning: {_stats.warning}  Not Important: {_stats.notImportant}  " +
+            _resultStatsLabel.text = $"Total: {_stats.GetTotal()}  Filtered: {_filteredCheckResults.Count}  " +
+               $"Error: {_stats.error}  Warning: {_stats.warning}  Not Important: {_stats.notImportant}  " +
                $"All Pass: {_stats.allPass}  Exception: {_stats.exception}";
             _resultListView.Rebuild();
 

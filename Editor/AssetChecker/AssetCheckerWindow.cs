@@ -48,7 +48,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void OnEnable()
         {
-            _isGuiCreated = false;
             _settings = LocalCache.GetSettingsAsset();
             _stats = LocalCache.GetCheckResultStats();
             _checkResults.AddRange(LocalCache.GetCheckResults());
@@ -58,6 +57,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private void OnFocus()
         {
             LocalCache.InstantCustomViewProvider = _settings?.customViewProvider;
+
+            // NOTE: If the editor window is already open, when there's a change in the script code (triggering compilation), 
+            // Unity may call OnFocus before calling OnEnable, so it's necessary to check if the UI controls are null inside the method. 
+            // Be careful not to cache a bool value to indicate whether the UI has been created, 
+            // because in this situation, the UI controls will be set to null while the bool value remains unchanged.
             UpdateExecutionControls();
         }
 
