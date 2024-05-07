@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
-    [Flags]
     public enum CheckResultType : uint
     {
         AllPass = 1U << 0,
@@ -12,6 +11,20 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         Warning = 1U << 2,
         Error = 1U << 3,
         Exception = 1U << 4,
+    }
+
+    [Flags]
+    public enum CheckResultTypes : uint
+    {
+        None = 0,
+        AllTypes = ~0U,
+
+        // Sync with CheckResultType
+        AllPass = CheckResultType.AllPass,
+        NotImportant = CheckResultType.NotImportant,
+        Warning = CheckResultType.Warning,
+        Error = CheckResultType.Error,
+        Exception = CheckResultType.Exception,
     }
 
     public static class CheckResultTypeHelper

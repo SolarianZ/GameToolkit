@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UObject = UnityEngine.Object;
 
 namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 {
@@ -16,9 +15,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private HelpBox _executionHelpBox;
         private Button _executeButton;
         private Label _resultStatsLabel;
-        private EnumFlagsField _resultFilterField;
+        private EnumFlagsField _resultTypeFilterField;
+        private DropdownField _resultCategoryFilterField;
         private ListView _resultListView;
         private CheckResultDetailsView _resultDetailsView;
+        private bool _isGuiCreated;
 
         #endregion
 
@@ -182,10 +183,23 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             #region Result List
 
-            // Filter
-            _resultFilterField = new EnumFlagsField(LocalCache.GetCheckResultTypeFilter());
-            _resultFilterField.RegisterValueChangedCallback(OnResultTypeFilterChanged);
-            resultContainer.Pane1.Add(_resultFilterField);
+            // Type Filter
+            _resultTypeFilterField = new EnumFlagsField(LocalCache.GetCheckResultTypeFilter())
+            {
+                name = "ResultTypeFilterField",
+            };
+            _resultTypeFilterField.RegisterValueChangedCallback(OnResultTypeFilterChanged);
+            resultContainer.Pane1.Add(_resultTypeFilterField);
+
+            // Category Filter
+            _resultCategoryFilterField = new DropdownField
+            {
+                name = "ResultCategoryFilterField",
+                choices = _resultCategories,
+                value = LocalCache.GetCheckResultCategoryFilter(),
+            };
+            _resultCategoryFilterField.RegisterValueChangedCallback(OnResultCategoryFilterChanged);
+            resultContainer.Pane1.Add(_resultCategoryFilterField);
 
             // Result List View
             _resultListView = new ListView
@@ -219,6 +233,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
             // SelectResult properties
             root.Bind(new SerializedObject(this));
+            _isGuiCreated = true;
 
             // Restore values
             UpdateExecutionControls();
@@ -227,7 +242,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void UpdateExecutionControls()
         {
-            if (_executionHelpBox == null || _executeButton == null)
+            if (!_isGuiCreated)
             {
                 return;
             }
@@ -280,9 +295,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void UpdateResultControls(bool clearSelection)
         {
-            if (_resultStatsLabel == null ||
-                _resultListView == null ||
-                _resultDetailsView == null)
+            if (!_isGuiCreated)
             {
                 return;
             }

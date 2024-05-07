@@ -10,6 +10,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         FilePathAttribute.Location.ProjectFolder)]
     internal class AssetCheckerLocalCache : ScriptableSingleton<AssetCheckerLocalCache>
     {
+        public const string AllCategories = "All Categories";
+
         [SerializeField]
         private AssetCheckerSettings _settingsAsset;
         [SerializeField]
@@ -17,7 +19,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
         [SerializeField]
-        private CheckResultType _resultTypeFilter = (CheckResultType)~0U;
+        private CheckResultTypes _resultTypeFilter = CheckResultTypes.AllTypes;
+        [SerializeField]
+        private string _resultCategoryFilter = AllCategories;
         [SerializeField]
         private ResultIconStyle _resultIconStyle = ResultIconStyle.Style2;
 
@@ -46,14 +50,27 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             Save(true);
         }
 
-        public CheckResultType GetCheckResultTypeFilter()
+        public CheckResultTypes GetCheckResultTypeFilter()
         {
             return _resultTypeFilter;
         }
 
-        public void SetCheckResultTypeFilter(CheckResultType filter)
+        public void SetCheckResultTypeFilter(CheckResultTypes types)
         {
-            _resultTypeFilter = filter;
+            _resultTypeFilter = types;
+            Save(true);
+        }
+
+        public string GetCheckResultCategoryFilter()
+        {
+            return _resultCategoryFilter;
+        }
+
+        public void SetCheckResultCategoryFilter(string category)
+        {
+            _resultCategoryFilter = string.IsNullOrWhiteSpace(category)
+                ? AllCategories
+                : category.Trim();
             Save(true);
         }
 

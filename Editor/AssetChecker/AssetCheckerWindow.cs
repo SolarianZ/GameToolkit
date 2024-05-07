@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -38,6 +39,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private AssetCheckerSettings _settings;
         private CheckResultStats _stats;
         private readonly List<AssetCheckResult> _checkResults = new List<AssetCheckResult>();
+        private readonly List<string> _resultCategories = new List<string> { AssetCheckerLocalCache.AllCategories };
         private readonly List<AssetCheckResult> _filteredCheckResults = new List<AssetCheckResult>();
         internal AssetCheckerLocalCache LocalCache => AssetCheckerLocalCache.instance;
 
@@ -46,6 +48,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void OnEnable()
         {
+            _isGuiCreated = false;
             _settings = LocalCache.GetSettingsAsset();
             _stats = LocalCache.GetCheckResultStats();
             _checkResults.AddRange(LocalCache.GetCheckResults());
@@ -149,14 +152,29 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             }
         }
 
-        public void SetCheckResultTypeFilter(CheckResultType filter)
+        public void SetCheckResultTypeFilter(CheckResultTypes filter)
         {
-            _resultFilterField.value = filter;
+            _resultTypeFilterField.value = filter;
+        }
+
+        public void SetCheckResultCategoryFilter(string category)
+        {
+            category = string.IsNullOrWhiteSpace(category)
+                ? AssetCheckerLocalCache.AllCategories
+                : category.Trim();
+            _resultCategoryFilterField.value = category;
         }
 
         private void OnResultTypeFilterChanged(ChangeEvent<Enum> evt)
         {
-            LocalCache.SetCheckResultTypeFilter((CheckResultType)evt.newValue);
+            LocalCache.SetCheckResultTypeFilter((CheckResultTypes)evt.newValue);
+            UpdateFilteredCheckResults();
+            UpdateResultControls(true);
+        }
+
+        private void OnResultCategoryFilterChanged(ChangeEvent<string> evt)
+        {
+            LocalCache.SetCheckResultCategoryFilter(evt.newValue);
             UpdateFilteredCheckResults();
             UpdateResultControls(true);
         }
@@ -251,9 +269,13 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         private void UpdatePersistentResultData()
         {
             _stats.Reset();
+            _resultCategories.Clear();
+
             for (int i = 0; i < _checkResults.Count; i++)
             {
                 AssetCheckResult result = _checkResults[i];
+
+                // Stats
                 switch (result.type)
                 {
                     case CheckResultType.AllPass:
@@ -282,16 +304,50 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         private void UpdateFilteredCheckResults()
         {
-            CheckResultType filter = LocalCache.GetCheckResultTypeFilter();
+            CheckResultTypes selectedTypes = LocalCache.GetCheckResultTypeFilter();
+            string selectedCategory = LocalCache.GetCheckResultCategoryFilter();
+
             _filteredCheckResults.Clear();
+            HashSet<string> categories = new HashSet<string>();
+
             for (int i = 0; i < _checkResults.Count; i++)
             {
                 AssetCheckResult result = _checkResults[i];
-                if ((result.type & filter) != 0)
+                if (result.categories != null)
+                {
+                    foreach (string category in result.categories)
+                    {
+                        if (string.IsNullOrWhiteSpace(category))
+                        {
+                            continue;
+                        }
+
+                        string trimmedCategory = category.Trim();
+                        if (trimmedCategory == AssetCheckerLocalCache.AllCategories)
+                        {
+                            continue;
+                        }
+
+                        categories.Add(trimmedCategory);
+                    }
+                }
+
+                CheckResultTypes resultType = (CheckResultTypes)result.type;
+                if ((resultType & selectedTypes) == 0)
+                {
+                    continue;
+                }
+
+                if (selectedCategory == AssetCheckerLocalCache.AllCategories ||
+                   (result.categories?.Contains(selectedCategory) ?? false))
                 {
                     _filteredCheckResults.Add(result);
                 }
             }
+
+            _resultCategories.AddRange(categories);
+            _resultCategories.RemoveAll(category => string.IsNullOrWhiteSpace(category) || category == AssetCheckerLocalCache.AllCategories);
+            _resultCategories.Insert(0, AssetCheckerLocalCache.AllCategories); // Option for no category filter
         }
 
 
