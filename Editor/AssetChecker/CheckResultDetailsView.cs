@@ -347,9 +347,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
 
         public class ObjectView : VisualElement
         {
-            private readonly Image _objectIconImage;
+            private readonly Button _objectIconButton;
             private readonly Label _objectPathLabel;
-            private readonly Button _pingAssetButton;
             private readonly CheckResultDetailsView _owner;
             private readonly bool _isCheckerView;
 
@@ -370,16 +369,19 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         width = 52,
                         minWidth = 52,
                         maxWidth = 52,
-                        paddingRight = 4,
+                        paddingLeft = 1,
+                        paddingRight = 1,
+                        marginRight = 3,
                         unityTextAlign = TextAnchor.MiddleRight,
                     },
                 };
                 Add(objectLabel);
 
                 const float ObjectIconSize = 20;
-                _objectIconImage = new Image
+                _objectIconButton = new Button(PingAsset)
                 {
-                    name = "ObjectIconImage",
+                    name = "ObjectIconButton",
+                    tooltip = "Ping object",
                     style =
                     {
                         alignSelf = Align.Center,
@@ -389,9 +391,17 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         height = ObjectIconSize,
                         minHeight = ObjectIconSize,
                         maxHeight = ObjectIconSize,
+                        paddingLeft = 1,
+                        paddingRight = 1,
+                        paddingTop = 1,
+                        paddingBottom = 1,
+                        marginLeft = 1,
+                        marginRight = 1,
+                        marginTop = 1,
+                        marginBottom = 1,
                     }
                 };
-                Add(_objectIconImage);
+                Add(_objectIconButton);
 
                 _objectPathLabel = new Label
                 {
@@ -401,7 +411,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     {
                         flexGrow = 1,
                         flexShrink = 1,
-                        marginLeft = 4,
+                        marginLeft = 3,
+                        paddingLeft = 1,
+                        paddingRight = 1,
                         overflow = Overflow.Hidden,
                         unityFontStyleAndWeight = FontStyle.Italic,
                         unityTextAlign = TextAnchor.MiddleLeft,
@@ -410,14 +422,6 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 };
                 ((ITextSelection)_objectPathLabel).isSelectable = true;
                 Add(_objectPathLabel);
-
-                _pingAssetButton = new Button(PingAsset)
-                {
-                    name = "PingAssetButton",
-                    text = "Ping",
-                };
-                _pingAssetButton.SetEnabled(false);
-                Add(_pingAssetButton);
             }
 
             public void UpdateView()
@@ -429,21 +433,16 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         ? _owner._selectedResult.checker
                         : _owner._selectedResult.asset;
                 }
-
-                _pingAssetButton.SetEnabled(target);
-
                 if (target)
                 {
                     string targetPath = AssetDatabase.GetAssetPath(target);
                     _objectPathLabel.text = targetPath;
-                    _objectIconImage.image = AssetDatabase.GetCachedIcon(targetPath);
+                    _objectIconButton.style.backgroundImage = new StyleBackground(AssetDatabase.GetCachedIcon(targetPath) as Texture2D);
                 }
                 else
                 {
                     _objectPathLabel.text = "-";
-                    _objectIconImage.image = EditorGUIUtility.isProSkin
-                        ? EditorGUIUtility.IconContent("d_GameObject Icon").image
-                        : EditorGUIUtility.IconContent("GameObject Icon").image;
+                    _objectIconButton.style.backgroundImage = null;
                 }
             }
 
