@@ -1,5 +1,4 @@
-﻿using GBG.GameToolkit.Unity.Editor.GUI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -151,36 +150,31 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     marginRight = 16,
                     marginTop = 4,
                     marginBottom = 4,
+                    whiteSpace = WhiteSpace.Normal,
                 }
             };
             root.Add(_resultStatsLabel);
 
             // Result Container
-            SplitterView resultContainer = new SplitterView(FlexDirection.Row)
+            TwoPaneSplitView resultContainer = new TwoPaneSplitView(0, 200, TwoPaneSplitViewOrientation.Horizontal)
             {
                 name = "ResultContainer",
-                Pane1 =
-                {
-                    name = "ResultItemContainer",
-                    style =
-                    {
-                        width = 300,
-                        minWidth = 200,
-                    }
-                },
-                Pane2 =
-                {
-                    name = "ResultDetailsContainer",
-                    style =
-                    {
-                        minWidth = 200,
-                    }
-                }
             };
+            resultContainer.schedule.Execute(() =>
+            {
+                resultContainer.fixedPane.style.minWidth = 200;
+                resultContainer.flexedPane.style.minWidth = 200;
+            });
             root.Add(resultContainer);
 
 
             #region Result List
+
+            VisualElement resultListContainer = new VisualElement
+            {
+                name = "ResultListContainer",
+            };
+            resultContainer.Add(resultListContainer);
 
             // Type Filter
             _resultTypeFilterField = new EnumFlagsField(LocalCache.GetCheckResultTypeFilter())
@@ -188,7 +182,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 name = "ResultTypeFilterField",
             };
             _resultTypeFilterField.RegisterValueChangedCallback(OnResultTypeFilterChanged);
-            resultContainer.Pane1.Add(_resultTypeFilterField);
+            resultListContainer.Add(_resultTypeFilterField);
 
             // Category Filter
             _resultCategoryFilterField = new DropdownField
@@ -198,7 +192,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 value = LocalCache.GetCheckResultCategoryFilter(),
             };
             _resultCategoryFilterField.RegisterValueChangedCallback(OnResultCategoryFilterChanged);
-            resultContainer.Pane1.Add(_resultCategoryFilterField);
+            resultListContainer.Add(_resultCategoryFilterField);
 
             // Result List View
             _resultListView = new ListView
@@ -211,7 +205,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 bindItem = BindResultListItem,
             };
             _resultListView.selectedIndicesChanged += OnCheckResultSelectionChanged;
-            resultContainer.Pane1.Add(_resultListView);
+            resultListContainer.Add(_resultListView);
 
             #endregion
 
@@ -225,7 +219,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
             };
             _resultDetailsView.AssetRechecked += OnAssetRechecked;
             _resultDetailsView.AssetRepaired += OnAssetRepaired;
-            resultContainer.Pane2.Add(_resultDetailsView);
+            resultContainer.Add(_resultDetailsView);
 
             #endregion
 

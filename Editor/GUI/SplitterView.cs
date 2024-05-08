@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 namespace GBG.GameToolkit.Unity.Editor.GUI
 {
+    [Obsolete("Use UnityEngine.UIElements.TwoPaneSplitView instead.")]
     public class SplitterView : VisualElement
     {
         public VisualElement Pane1 { get; }
