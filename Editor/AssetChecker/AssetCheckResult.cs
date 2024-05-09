@@ -6,7 +6,7 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
     [Serializable]
     public class AssetCheckResult
     {
-        public CheckResultType type;
+        public CheckResultType type = CheckResultType.Exception;
         public string[] categories;
         public string title;
         public string details;

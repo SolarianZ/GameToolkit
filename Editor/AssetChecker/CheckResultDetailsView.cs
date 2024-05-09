@@ -437,7 +437,8 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 {
                     string targetPath = AssetDatabase.GetAssetPath(target);
                     _objectPathLabel.text = targetPath;
-                    _objectIconButton.style.backgroundImage = new StyleBackground(AssetDatabase.GetCachedIcon(targetPath) as Texture2D);
+                    _objectIconButton.style.backgroundImage = new StyleBackground(AssetPreview.GetMiniThumbnail(target));
+                    //_objectIconButton.style.backgroundImage = new StyleBackground(AssetDatabase.GetCachedIcon(targetPath) as Texture2D);
                 }
                 else
                 {
