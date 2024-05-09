@@ -8,41 +8,44 @@ using Sirenix.OdinInspector;
 namespace GBG.GameToolkit.Unity
 {
     [Serializable]
-    public struct BindingKeyInfo : IEquatable<BindingKeyInfo>
+    public struct BindingKey : IEquatable<BindingKey>
     {
         /// <summary>
-        /// Track name.
+        /// Playable track name.
         /// </summary>
         public string StreamName => _streamName;
         /// <summary>
-        /// Track binding type full name.
+        /// Playable track binding type full name.
+        /// This type must be same with the type specified by the TrackBindingTypeAttribute of the playable track.
+        /// Do NOT use subclass.
         /// </summary>
         public string OutputTargetTypeFullName => _outputTargetFullName;
 #if ODIN_INSPECTOR
         [LabelText("Name")]
 #endif
-        [Tooltip("Track name.")]
+        [Tooltip("Playable track name.")]
         [SerializeField]
         private string _streamName;
 #if ODIN_INSPECTOR
         [LabelText("Type")]
 #endif
-        [Tooltip("Track binding type full name.")]
+        [Tooltip("Playable track binding type full name. " +
+                 "This type must be same with the type specified by " +
+                 "the TrackBindingTypeAttribute of the playable track. " +
+                 "Do NOT use subclass.")]
         [SerializeField]
         private string _outputTargetFullName;
-        // Track binding type.
-        private Type _type;
 
-        public BindingKeyInfo(string streamName, string outputTargetTypeFullName)
+
+        public BindingKey(string streamName, string outputTargetTypeFullName)
         {
             _streamName = streamName;
             _outputTargetFullName = outputTargetTypeFullName;
-            _type = null;
         }
 
-        public BindingKeyInfo(string streamName, Type outputTargetType) : this(streamName, outputTargetType.FullName)
+        public BindingKey(string streamName, Type outputTargetType)
+            : this(streamName, outputTargetType.FullName)
         {
-            _type = outputTargetType;
         }
 
         public void Deconstruct(out string streamName, out string outputTargetTypeFullName)
@@ -56,11 +59,6 @@ namespace GBG.GameToolkit.Unity
             if (type == null)
             {
                 throw new ArgumentNullException(nameof(type));
-            }
-
-            if (_type != null)
-            {
-                return _type == type;
             }
 
             return type.FullName == _outputTargetFullName;
@@ -79,22 +77,22 @@ namespace GBG.GameToolkit.Unity
             return hashCode;
         }
 
-        public bool Equals(BindingKeyInfo other)
+        public bool Equals(BindingKey other)
         {
             return other._streamName == _streamName && other._outputTargetFullName == _outputTargetFullName;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is BindingKeyInfo other && Equals(other);
+            return obj is BindingKey other && Equals(other);
         }
 
-        public static bool operator ==(BindingKeyInfo left, BindingKeyInfo right)
+        public static bool operator ==(BindingKey left, BindingKey right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(BindingKeyInfo left, BindingKeyInfo right)
+        public static bool operator !=(BindingKey left, BindingKey right)
         {
             return !left.Equals(right);
         }

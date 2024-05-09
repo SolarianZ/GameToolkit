@@ -9,7 +9,9 @@ namespace GBG.GameToolkit.Unity
 {
     public static class PlayableBindingHelper
     {
-        public static void CollectGenericBindings(this PlayableDirector playableDirector, Dictionary<BindingKeyInfo, UObject> bindingKeyTable)
+        #region Collecting
+
+        public static void CollectGenericBindings(this PlayableDirector playableDirector, Dictionary<BindingKey, UObject> bindingKeyTable)
         {
             if (bindingKeyTable == null)
             {
@@ -20,7 +22,7 @@ namespace GBG.GameToolkit.Unity
             playableAsset.CollectGenericBindings(bindingKeyTable);
         }
 
-        public static void CollectGenericBindings(this PlayableAsset playableAsset, Dictionary<BindingKeyInfo, UObject> bindingKeyTable)
+        public static void CollectGenericBindings(this PlayableAsset playableAsset, Dictionary<BindingKey, UObject> bindingKeyTable)
         {
             if (bindingKeyTable == null)
             {
@@ -37,7 +39,7 @@ namespace GBG.GameToolkit.Unity
             {
                 if (HasGenericBinding(binding))
                 {
-                    BindingKeyInfo key = new BindingKeyInfo(binding.streamName, binding.outputTargetType);
+                    BindingKey key = new BindingKey(binding.streamName, binding.outputTargetType);
                     if (bindingKeyTable.ContainsKey(key))
                     {
                         Debug.LogError($"Duplicate playable generic binding key: {key}.", playableAsset);
@@ -49,7 +51,7 @@ namespace GBG.GameToolkit.Unity
             }
         }
 
-        public static void CollectGenericBindings(this PlayableDirector playableDirector, List<BindingKeyInfo> bindingKeys)
+        public static void CollectGenericBindings(this PlayableDirector playableDirector, List<BindingKey> bindingKeys)
         {
             if (bindingKeys == null)
             {
@@ -60,7 +62,7 @@ namespace GBG.GameToolkit.Unity
             playableAsset.CollectGenericBindings(bindingKeys);
         }
 
-        public static void CollectGenericBindings(this PlayableAsset playableAsset, List<BindingKeyInfo> bindingKeys)
+        public static void CollectGenericBindings(this PlayableAsset playableAsset, List<BindingKey> bindingKeys)
         {
             if (bindingKeys == null)
             {
@@ -77,7 +79,7 @@ namespace GBG.GameToolkit.Unity
             {
                 if (HasGenericBinding(binding))
                 {
-                    bindingKeys.Add(new BindingKeyInfo(binding.streamName, binding.outputTargetType));
+                    bindingKeys.Add(new BindingKey(binding.streamName, binding.outputTargetType));
                 }
             }
         }
@@ -87,5 +89,148 @@ namespace GBG.GameToolkit.Unity
         {
             return playableBinding.sourceObject && playableBinding.outputTargetType != null;
         }
+
+        #endregion
+
+
+        #region Binding
+
+        /// <summary>
+        /// Bind the object to playable track.
+        /// </summary>
+        /// <param name="playableDirector">PlayableDirector used for set generic binding.</param>
+        /// <param name="bindingKeyTable">
+        ///     Playable binding key table of the PlayableDirector.
+        ///     Key: Playable binding key.
+        ///     Value: Playable track.
+        /// </param>
+        /// <param name="bindingKey">Playable binding key.</param>
+        /// <param name="bindingValue">Object used for bind to playable track.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public static void SetGenericBinding(PlayableDirector playableDirector,
+            IReadOnlyDictionary<BindingKey, UObject> bindingKeyTable,
+            BindingKey bindingKey, UObject bindingValue)
+        {
+            if (!playableDirector)
+            {
+                throw new ArgumentNullException(nameof(playableDirector));
+            }
+
+            if (bindingKeyTable == null)
+            {
+                throw new ArgumentNullException(nameof(bindingKeyTable));
+            }
+
+#if UNITY_EDITOR
+            if (bindingValue)
+            {
+                Type declaredSourceBindingType = Type.GetType(bindingKey.OutputTargetTypeFullName);
+                if (!declaredSourceBindingType.IsInstanceOfType(bindingValue))
+                {
+                    throw new ArgumentException($"Binding value must be instance of type '{bindingKey.OutputTargetTypeFullName}'.");
+                }
+            }
+#endif
+
+            UObject sourceObject = bindingKeyTable[bindingKey];
+            playableDirector.SetGenericBinding(sourceObject, bindingValue);
+        }
+
+        /// <summary>
+        /// Try bind the object to playable track.
+        /// </summary>
+        /// <param name="playableDirector">PlayableDirector used for set generic binding.</param>
+        /// <param name="bindingKeyTable">
+        ///     Playable binding key table of the PlayableDirector.
+        ///     Key: Playable binding key.
+        ///     Value: Playable track.
+        /// </param>
+        /// <param name="bindingKey">Playable binding key.</param>
+        /// <param name="bindingValue">Object used for bind to playable track.</param>
+        /// <returns></returns>
+        public static bool TrySetGenericBinding(PlayableDirector playableDirector,
+            IReadOnlyDictionary<BindingKey, UObject> bindingKeyTable,
+            BindingKey bindingKey, UObject bindingValue)
+        {
+            if (!playableDirector || bindingKeyTable == null)
+            {
+                return false;
+            }
+
+            if (bindingKeyTable.TryGetValue(bindingKey, out UObject sourceObject))
+            {
+                playableDirector.SetGenericBinding(sourceObject, bindingValue);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Get the object bound to the playable track.
+        /// </summary>
+        /// <param name="playableDirector">PlayableDirector used for set generic binding.</param>
+        /// <param name="bindingKeyTable">
+        ///     Playable binding key table of the PlayableDirector.
+        ///     Key: Playable binding key.
+        ///     Value: Playable track.
+        /// </param>
+        /// <param name="bindingKey">Playable binding key.</param>
+        /// <returns>Object bound to the playable track.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="KeyNotFoundException"></exception>
+        public static UObject GetGenericBinding(PlayableDirector playableDirector,
+            IReadOnlyDictionary<BindingKey, UObject> bindingKeyTable, BindingKey bindingKey)
+        {
+            if (!playableDirector)
+            {
+                throw new ArgumentNullException(nameof(playableDirector));
+            }
+
+            if (bindingKeyTable == null)
+            {
+                throw new ArgumentNullException(nameof(bindingKeyTable));
+            }
+
+            UObject sourceObject = bindingKeyTable[bindingKey];
+            UObject bindingValue = playableDirector.GetGenericBinding(sourceObject);
+
+            return bindingValue;
+        }
+
+        /// <summary>
+        /// Try get the object bound to the playable track.
+        /// </summary>
+        /// <param name="playableDirector">PlayableDirector used for set generic binding.</param>
+        /// <param name="bindingKeyTable">
+        ///     Playable binding key table of the PlayableDirector.
+        ///     Key: Playable binding key.
+        ///     Value: Playable track.
+        /// </param>
+        /// <param name="bindingKey">Playable binding key.</param>
+        /// <param name="bindingValue">Object bound to the playable track.</param>
+        /// <returns></returns>
+        public static bool TryGetGenericBinding(PlayableDirector playableDirector,
+            IReadOnlyDictionary<BindingKey, UObject> bindingKeyTable,
+            BindingKey bindingKey, out UObject bindingValue)
+        {
+            if (!playableDirector || bindingKeyTable == null)
+            {
+                bindingValue = default;
+                return false;
+            }
+
+            if (bindingKeyTable.TryGetValue(bindingKey, out UObject sourceObject))
+            {
+                bindingValue = playableDirector.GetGenericBinding(sourceObject);
+                return true;
+            }
+
+            bindingValue = default;
+            return false;
+        }
+
+        #endregion
     }
 }
