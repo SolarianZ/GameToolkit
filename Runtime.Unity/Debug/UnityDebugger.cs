@@ -8,12 +8,18 @@ using UnityEditor;
 
 namespace GBG.GameToolkit.Unity
 {
+    /// <summary>
+    /// Default Unity debugger.
+    /// If you don't want to use this default debugger, please add scripting define symbol 'GBG_DONT_USE_UNITY_DEBUGGER' to your ProjectSettings.
+    /// </summary>
     public static class UnityDebugger
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !GBG_DONT_USE_UNITY_DEBUGGER
         [InitializeOnLoadMethod]
 #endif
+#if !GBG_DONT_USE_UNITY_DEBUGGER
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+#endif
         static void AutoRegister()
         {
             Debugger.AssertionFailureHandler = AssertionFailureHandler;
