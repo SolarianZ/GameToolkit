@@ -45,7 +45,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     unityTextAlign = TextAnchor.MiddleLeft,
                 }
             };
-            ((ITextSelection)_titleLabel).isSelectable = true;
+#if UNITY_2022_3_OR_NEWER
+            ((ITextSelection)_titleLabel).isSelectable = true; 
+#endif
             Add(_titleLabel);
 
             VisualElement typeContainer = new VisualElement
@@ -84,7 +86,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     unityTextAlign = TextAnchor.MiddleCenter,
                 }
             };
-            ((ITextSelection)_typeLabel).isSelectable = true;
+#if UNITY_2022_3_OR_NEWER
+            ((ITextSelection)_typeLabel).isSelectable = true; 
+#endif
             typeContainer.Add(_typeLabel);
 
             _categoriesLabel = new Label
@@ -96,7 +100,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     whiteSpace = WhiteSpace.Normal,
                 }
             };
-            ((ITextSelection)_categoriesLabel).isSelectable = true;
+#if UNITY_2022_3_OR_NEWER
+            ((ITextSelection)_categoriesLabel).isSelectable = true; 
+#endif
             typeContainer.Add(_categoriesLabel);
 
             _assetView = new ObjectView(this, false)
@@ -147,7 +153,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                     marginBottom = 4,
                 }
             };
-            ((ITextSelection)_detailsLabel).isSelectable = true;
+#if UNITY_2022_3_OR_NEWER
+            ((ITextSelection)_detailsLabel).isSelectable = true; 
+#endif
             _detailsScrollView.contentContainer.Add(_detailsLabel);
 
             const float ButtonHeight = 28;
@@ -420,7 +428,9 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                         whiteSpace = WhiteSpace.Normal,
                     }
                 };
-                ((ITextSelection)_objectPathLabel).isSelectable = true;
+#if UNITY_2022_3_OR_NEWER
+                ((ITextSelection)_objectPathLabel).isSelectable = true; 
+#endif
                 Add(_objectPathLabel);
             }
 
