@@ -204,7 +204,11 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
                 makeItem = MakeResultListItem,
                 bindItem = BindResultListItem,
             };
+#if UNITY_2022_3_OR_NEWER
             _resultListView.selectedIndicesChanged += OnCheckResultSelectionChanged;
+#else
+            _resultListView.onSelectedIndicesChange += OnCheckResultSelectionChanged;
+#endif
             resultListContainer.Add(_resultListView);
 
             #endregion

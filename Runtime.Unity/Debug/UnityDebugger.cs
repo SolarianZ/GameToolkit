@@ -26,7 +26,9 @@ namespace GBG.GameToolkit.Unity
             Debugger.Logger = LogHandler;
         }
 
-        [HideInCallstack]
+#if UNITY_2022_3_OR_NEWER
+        [HideInCallstack] 
+#endif
         public static void LogHandler(LogLevel level, string tag, string message, object context)
         {
             if (level < Debugger.LogFilterLevel) return;
@@ -53,7 +55,9 @@ namespace GBG.GameToolkit.Unity
             }
         }
 
-        [HideInCallstack]
+#if UNITY_2022_3_OR_NEWER
+        [HideInCallstack] 
+#endif
         public static void AssertionFailureHandler(string message)
         {
             Assert.IsTrue(false, message);

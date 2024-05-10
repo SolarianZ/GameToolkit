@@ -16,8 +16,10 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
     [Flags]
     public enum CheckResultTypes : uint
     {
+#if UNITY_2022_3_OR_NEWER
         None = 0,
-        AllTypes = ~0U,
+        AllTypes = ~0U, 
+#endif
 
         // Sync with CheckResultType
         AllPass = CheckResultType.AllPass,

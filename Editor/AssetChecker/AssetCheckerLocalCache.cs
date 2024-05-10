@@ -19,7 +19,12 @@ namespace GBG.GameToolkit.Unity.Editor.AssetChecker
         [SerializeField]
         private AssetCheckResult[] _checkResults = Array.Empty<AssetCheckResult>();
         [SerializeField]
-        private CheckResultTypes _resultTypeFilter = CheckResultTypes.AllTypes;
+        private CheckResultTypes _resultTypeFilter =
+#if UNITY_2022_3_OR_NEWER
+            CheckResultTypes.AllTypes; 
+#else
+            (CheckResultTypes)~0U;
+#endif
         [SerializeField]
         private string _resultCategoryFilter = AllCategories;
         [SerializeField]
