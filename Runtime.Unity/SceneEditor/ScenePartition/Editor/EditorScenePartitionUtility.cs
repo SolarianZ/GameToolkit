@@ -109,11 +109,16 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
             }
 
             LoadAllScenes(ref rootSceneComp);
-            string[] scenePaths = new string[SceneManager.loadedSceneCount];
-            for (int i = 0; i < SceneManager.loadedSceneCount; i++)
+
+            int sceneCount = SceneManager.sceneCount;
+            string[] scenePaths = new string[sceneCount];
+            for (int i = 0; i < sceneCount; i++)
             {
                 Scene scene = SceneManager.GetSceneAt(i);
-                scenePaths[i] = scene.path;
+                if (scene.isLoaded)
+                {
+                    scenePaths[i] = scene.path;
+                }
             }
 
             //Lightmapping.ClearLightingDataAsset();

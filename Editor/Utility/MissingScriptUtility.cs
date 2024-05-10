@@ -5,16 +5,21 @@ using UDebug = UnityEngine.Debug;
 
 namespace GBG.GameToolkit.Editor.Utility
 {
-    public static class MissingScriptTool
+    public static class MissingScriptUtility
     {
         [MenuItem("Tools/Bamboo/GameObject/Log GameObjects with Missing Script in Loaded Scenes")]
         public static void LogGameObjectsWithMissingScriptInLoadedScenes()
         {
             var missingScriptCount = 0;
-            var sceneCount = SceneManager.loadedSceneCount;
+            var sceneCount = SceneManager.sceneCount;
             for (var i = 0; i < sceneCount; i++)
             {
                 var scene = SceneManager.GetSceneAt(i);
+                if (!scene.isLoaded)
+                {
+                    continue;
+                }
+
                 var rootGameObjects = scene.GetRootGameObjects();
                 foreach (var rootGameObject in rootGameObjects)
                 {
