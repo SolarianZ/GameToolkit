@@ -82,7 +82,11 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
             var rootScenePath = rootSceneComp.gameObject.scene.path;
             var rootScene = EditorSceneManager.OpenScene(rootScenePath, OpenSceneMode.Single);
             SceneManager.SetActiveScene(rootScene);
+#if UNITY_6000_0_OR_NEWER
+            rootSceneComp = UObject.FindFirstObjectByType<RootScene>();
+#else
             rootSceneComp = UObject.FindObjectOfType<RootScene>();
+#endif
             foreach (SceneData subsceneData in rootSceneComp.PartitionData.Subscenes)
             {
                 if (!subsceneData.IsValid())
