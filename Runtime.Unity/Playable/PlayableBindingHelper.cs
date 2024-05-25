@@ -9,6 +9,21 @@ namespace GBG.GameToolkit.Unity
 {
     public static class PlayableBindingHelper
     {
+        public static Dictionary<BindingKey, UObject> SharedBindingKeyTable
+        {
+            get
+            {
+                m_bindingKeyTable ??= new Dictionary<BindingKey, UObject>();
+                return m_bindingKeyTable;
+            }
+            set
+            {
+                m_bindingKeyTable = value;
+            }
+        }
+        private static Dictionary<BindingKey, UObject> m_bindingKeyTable = new Dictionary<BindingKey, UObject>();
+
+
         #region Collecting
 
         public static void CollectGenericBindings(this PlayableDirector playableDirector, Dictionary<BindingKey, UObject> bindingKeyTable)
