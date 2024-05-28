@@ -54,6 +54,11 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
                 return false;
             }
 
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                return false;
+            }
+
             SceneData[] subscenes = SubscenesCollector(rootSceneComp.gameObject.scene);
             Bounds[] subsceneBoundsList = new Bounds[subscenes.Length];
             for (int i = 0; i < subscenes.Length; i++)
@@ -112,7 +117,10 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
                 return;
             }
 
-            LoadAllScenes(ref rootSceneComp);
+            if (!LoadAllScenes(ref rootSceneComp))
+            {
+                return;
+            }
 
             int sceneCount = SceneManager.sceneCount;
             string[] scenePaths = new string[sceneCount];
