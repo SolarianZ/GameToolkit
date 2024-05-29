@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR // Fix compile errors on build
 using GBG.GameToolkit.Unity.ScenePartition;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -35,15 +36,33 @@ namespace GBG.GameToolkit.Unity.Editor.ScenePartition
             string rootSceneFolder = Path.GetDirectoryName(rootScene.path);
             string[] subscenePaths = Directory.GetFiles(rootSceneFolder,
                 $"{rootScene.name}_P*.unity", SearchOption.TopDirectoryOnly);
-            SceneData[] result = new SceneData[subscenePaths.Length];
+            List<SceneData> result = new List<SceneData>(subscenePaths.Length);
             for (int i = 0; i < subscenePaths.Length; i++)
             {
                 string subscenePath = subscenePaths[i].Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
                 string subsceneGuid = AssetDatabase.AssetPathToGUID(subscenePath);
-                result[i] = new SceneData(subscenePath, subsceneGuid);
+                result.Add(new SceneData(subscenePath, subsceneGuid));
             }
 
-            return result;
+            result.Sort((a, b) =>
+            {
+                int aIndex = ParseIndexBySuffix(a.ResKey);
+                int bIndex = ParseIndexBySuffix(b.ResKey);
+                if (aIndex < bIndex) return -1;
+                if (aIndex > bIndex) return 1;
+                return 0;
+            });
+
+            return result.ToArray();
+
+            static int ParseIndexBySuffix(string name)
+            {
+                int pIndex = name.LastIndexOf("P");
+                int dotIndex = name.LastIndexOf(".");
+                string indexStr = name.Substring(pIndex + 1, dotIndex - pIndex);
+                int index = int.Parse(indexStr);
+                return index;
+            }
         }
 
         public static bool CollectSubscenes(RootScene rootSceneComp)
