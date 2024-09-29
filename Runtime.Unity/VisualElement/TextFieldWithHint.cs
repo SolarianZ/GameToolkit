@@ -42,7 +42,13 @@ namespace GBG.GameToolkit.Unity.UIElements
             };
             HintLabel.AddToClassList(HintLabelUssClassName);
 
-            VisualElement textElement = this.Q<VisualElement>(className: TextInputBase.innerTextElementUssClassName); // For Unity 2019: className: TextField.inputUssClassName
+            string textElementClassName =
+#if UNITY_2022_1_OR_NEWER
+                TextInputBase.innerTextElementUssClassName;
+#else
+                inputUssClassName;
+#endif
+            VisualElement textElement = this.Q<VisualElement>(className: textElementClassName);
             textElement.Add(HintLabel);
         }
 
